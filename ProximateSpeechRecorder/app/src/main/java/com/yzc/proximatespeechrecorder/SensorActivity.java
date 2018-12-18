@@ -27,6 +27,7 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
 
     private Long startTimestamp = 0L;
     private Boolean isRecording = false;
+    private File file;
 
     private SensorManager mSensorManager;
     private TextView textView_sensor;
@@ -80,6 +81,7 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
             if (sensorEvent.sensor.getType() == sensorType[i]) {
                 sensorData[i] = values;
                 s = sensorName[i];
+                //s = Integer.toString(i);
             }
 
             if (sensorData[i] != null) {
@@ -89,24 +91,19 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
                 sb.append("\n");
             }
         }
+
         textView_sensor.setText(sb.toString());
         if (!isRecording)
             return;
-        if (startTimestamp == 0) {
+
+        if (startTimestamp == 0)
             startTimestamp = sensorEvent.timestamp;
-            String ss = Long.toString(System.currentTimeMillis()) + "\n";
-            ss += Long.toString(SystemClock.elapsedRealtimeNanos()) + "\n";
-            try {
-                fos.write(ss.getBytes());
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+
         s += " " + Long.toString((sensorEvent.timestamp - startTimestamp) / 1000000);
         s += " " + Integer.toString(sensorEvent.accuracy);
-        for (int i=0; i < sensorEvent.values.length; ++i)
-            s += " " + Float.toString(sensorEvent.values[i]);
+        for (float data : sensorEvent.values)
+            s += " " + Float.toString(data);
+
         s += "\n";
         byte [] buffer = s.getBytes();
         try {
@@ -130,7 +127,7 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
 
         for(int type:sensorType) {
             Sensor sensor = mSensorManager.getDefaultSensor(type);
-            mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+            mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
         }
 
         List<Sensor> sensorList = mSensorManager.getSensorList(Sensor.TYPE_ALL);
@@ -145,31 +142,54 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
                 isRecording ^= true;
                 if (isRecording) {
                     button_record.setText("Stop Recording");
-                    try {
-                        SimpleDateFormat format = new SimpleDateFormat("yy.MM.dd HH_mm_ss", Locale.US);
-                        String fileName = format.format(new Date()) + ".txt";
-                        File path = new File(pathName);
-                        File file = new File(pathName + fileName);
-                        boolean res;
-                        if (!path.exists())
-                            res = path.mkdir();
-                        if (!file.exists())
-                            res = file.createNewFile();
-                        fos = new FileOutputStream(file);
-                        MediaScannerConnection.scanFile(this, new String[] { file.getAbsolutePath() }, null, null);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    createDataFile();
                 } else {
                     button_record.setText("Start Recording");
-                    startTimestamp = 0L;
                     try {
                         fos.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    MediaScannerConnection.scanFile(this, new String[] { file.getAbsolutePath() }, null, null);
                 }
                 break;
+        }
+    }
+
+    private void createDataFile() {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yy.MM.dd HH_mm_ss", Locale.US);
+            String fileName = format.format(new Date()) + ".txt";
+            File path = new File(pathName);
+            file = new File(pathName + fileName);
+            boolean res;
+            if (!path.exists())
+                res = path.mkdir();
+            if (!file.exists())
+                res = file.createNewFile();
+            fos = new FileOutputStream(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        startTimestamp = 0L;
+        String ss = Long.toString(System.currentTimeMillis()) + "\n";
+        ss += Long.toString(SystemClock.elapsedRealtimeNanos()) + "\n";
+
+        for (int i = 0; i < sensorType.length; i++) {
+            if (sensorData[i] != null) {
+                ss += sensorName[i];
+                ss += " 0"; //Timestamp
+                ss += " 0"; //Accuracy
+                for (float data : sensorData[i])
+                    ss += " " + Float.toString(data);
+                ss += "\n";
+            }
+        }
+        try {
+            fos.write(ss.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
