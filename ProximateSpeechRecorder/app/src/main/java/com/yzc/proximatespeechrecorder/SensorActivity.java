@@ -33,16 +33,33 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
     private TextView textView_sensor;
     private Button button_record;
     private int sensorType[] = {
-            Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_ROTATION_VECTOR,
-            Sensor.TYPE_GYROSCOPE, Sensor.TYPE_MAGNETIC_FIELD,
+            Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_MAGNETIC_FIELD,
+            Sensor.TYPE_GYROSCOPE, Sensor.TYPE_ROTATION_VECTOR,
+
             Sensor.TYPE_GRAVITY, Sensor.TYPE_PROXIMITY,
-            Sensor.TYPE_LIGHT, Sensor.TYPE_LINEAR_ACCELERATION
+            Sensor.TYPE_LIGHT, Sensor.TYPE_LINEAR_ACCELERATION,
+
+            Sensor.TYPE_ACCELEROMETER_UNCALIBRATED, Sensor.TYPE_PRESSURE,
+            Sensor.TYPE_RELATIVE_HUMIDITY, Sensor.TYPE_AMBIENT_TEMPERATURE,
+
+            Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, Sensor.TYPE_GAME_ROTATION_VECTOR,
+            Sensor.TYPE_GYROSCOPE_UNCALIBRATED, Sensor.TYPE_SIGNIFICANT_MOTION,
+            Sensor.TYPE_STEP_DETECTOR, Sensor.TYPE_STEP_COUNTER
     };
     private String sensorName[] = {
-            "ACCELEROMETER", "ROTATION_VECTOR",
-            "GYROSCOPE", "MAGNETIC_FIELD",
+            "ACCELEROMETER", "MAGNETIC_FIELD",
+            "GYROSCOPE", "ROTATION_VECTOR",
+
             "GRAVITY", "PROXIMITY",
             "LIGHT", "LINEAR_ACCELERATION",
+
+            "ACCELEROMETER_UNCALIBRATED", "PRESSURE",
+            "RELATIVE_HUMIDITY", "AMBIENT_TEMPERATURE",
+
+            "MAGNETIC_FIELD_UNCALIBRATED", "GAME_ROTATION_VECTOR",
+            "GYROSCOPE_UNCALIBRATED", "SIGNIFICANT_MOTION",
+            "STEP_DETECTOR", "STEP_COUNTER"
+
     };
     private float sensorData[][] = new float[sensorType.length][];
 
@@ -125,9 +142,13 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
             return;
         }
 
-        for(int type:sensorType) {
-            Sensor sensor = mSensorManager.getDefaultSensor(type);
-            mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
+        for (int i = 0; i < sensorType.length; i++) {
+            Sensor sensor = mSensorManager.getDefaultSensor(sensorType[i]);
+            if (sensor != null) {
+                Log.i("loadSensor", "register " + sensorName[i] + " successful");
+                mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+            } else
+                Log.w("loadSensor", "register " + sensorName[i] + " failed");
         }
 
         List<Sensor> sensorList = mSensorManager.getSensorList(Sensor.TYPE_ALL);
