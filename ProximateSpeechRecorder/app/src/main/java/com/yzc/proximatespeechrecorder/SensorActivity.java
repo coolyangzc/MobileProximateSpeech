@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -25,17 +26,16 @@ import java.util.Locale;
 
 public class SensorActivity extends Activity implements SensorEventListener, View.OnClickListener {
 
-    private Long startTimestamp = 0L;
+    private Long startTimestamp = 0L, startUpTimeMill;
     private Boolean isRecording = false;
     private File file;
 
     private SensorManager mSensorManager;
-    private TextView textView_sensor;
+    private TextView textView_sensor, textView_touch;
     private Button button_record;
     private int sensorType[] = {
             Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_MAGNETIC_FIELD,
             Sensor.TYPE_GYROSCOPE, Sensor.TYPE_ROTATION_VECTOR,
-
             Sensor.TYPE_GRAVITY, Sensor.TYPE_PROXIMITY,
             Sensor.TYPE_LIGHT, Sensor.TYPE_LINEAR_ACCELERATION,
 
@@ -49,7 +49,6 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
     private String sensorName[] = {
             "ACCELEROMETER", "MAGNETIC_FIELD",
             "GYROSCOPE", "ROTATION_VECTOR",
-
             "GRAVITY", "PROXIMITY",
             "LIGHT", "LINEAR_ACCELERATION",
 
@@ -71,6 +70,7 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor);
         textView_sensor = findViewById(R.id.textView_sensor);
+        textView_touch = findViewById(R.id.textView_touch);
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(this);
         loadSensor();
@@ -108,15 +108,10 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
                 sb.append("\n");
             }
         }
-
         textView_sensor.setText(sb.toString());
         if (!isRecording)
             return;
-
-        if (startTimestamp == 0)
-            startTimestamp = sensorEvent.timestamp;
-
-        s += " " + Long.toString((sensorEvent.timestamp - startTimestamp) / 1000000);
+        s += " " + Long.toString((sensorEvent.timestamp - startTimestamp) / 1000000L);
         s += " " + Integer.toString(sensorEvent.accuracy);
         for (float data : sensorEvent.values)
             s += " " + Float.toString(data);
@@ -133,6 +128,67 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent e) {
+        String text = "";
+        boolean updated = false;
+
+        for (int i = 0; i < e.getPointerCount(); ++i) {
+            int id = e.getPointerId(i);
+            int x = (int) e.getX(i), y = (int) e.getY(i);
+            float p = e.getPressure(i);
+            float s = e.getSize(i);
+            text += "Id:" + id + " X:" + x + " Y:" + y;
+            text += String.format(Locale.US," S:%.2f P:%.2f", s, p) + "\n";
+        }
+        if (e.getAction() == MotionEvent.ACTION_UP)
+            text = "";
+        textView_touch.setText(text);
+
+        if (isRecording) {
+            String s = "TOUCH " + e.getAction();
+            s += " " + Long.toString((e.getEventTime()- startUpTimeMill));
+            s += " " + Integer.toString(e.getPointerCount());
+            for(int i = 0; i < e.getPointerCount(); ++i) {
+                int id = e.getPointerId(i);
+                float x = e.getX(i), y = e.getY(i);
+                float p = e.getPressure(i), sz = e.getSize(i);
+                s += " " + Integer.toString(id);
+                s += " " + Float.toString(x) + " " + Float.toString(y);
+                s += " " + Float.toString(p) + " " + Float.toString(sz);
+            }
+            s += "\n";
+            byte [] buffer = s.getBytes();
+            try {
+                fos.write(buffer);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return super.dispatchTouchEvent(e);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_record:
+                isRecording ^= true;
+                if (isRecording) {
+                    button_record.setText("Stop Recording");
+                    createDataFile();
+                } else {
+                    button_record.setText("Start Recording");
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    MediaScannerConnection.scanFile(this, new String[] { file.getAbsolutePath() }, null, null);
+                }
+                break;
+        }
     }
 
     private void loadSensor() {
@@ -156,26 +212,6 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
             Log.d("SensorList", sensor.getName());
         }
     }
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.button_record:
-                isRecording ^= true;
-                if (isRecording) {
-                    button_record.setText("Stop Recording");
-                    createDataFile();
-                } else {
-                    button_record.setText("Start Recording");
-                    try {
-                        fos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    MediaScannerConnection.scanFile(this, new String[] { file.getAbsolutePath() }, null, null);
-                }
-                break;
-        }
-    }
 
     private void createDataFile() {
         try {
@@ -193,9 +229,11 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
             e.printStackTrace();
         }
 
-        startTimestamp = 0L;
+        startTimestamp = SystemClock.elapsedRealtimeNanos();
+        startUpTimeMill = SystemClock.uptimeMillis();
         String ss = Long.toString(System.currentTimeMillis()) + "\n";
-        ss += Long.toString(SystemClock.elapsedRealtimeNanos()) + "\n";
+        ss += Long.toString(startUpTimeMill) + "\n";
+        ss += Long.toString(startTimestamp) + "\n";
 
         for (int i = 0; i < sensorType.length; i++) {
             if (sensorData[i] != null) {
