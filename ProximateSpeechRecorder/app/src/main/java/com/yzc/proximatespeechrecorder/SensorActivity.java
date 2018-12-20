@@ -1,10 +1,12 @@
 package com.yzc.proximatespeechrecorder;
 
 import android.app.Activity;
+import android.graphics.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,8 +30,9 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
 
     private Long startTimestamp = 0L, startUpTimeMill;
     private Boolean isRecording = false;
-    private File file;
+    private File file, videoFile;
 
+    private MediaRecorder mRecorder;
     private SensorManager mSensorManager;
     private TextView textView_sensor, textView_touch;
     private Button button_record;
@@ -182,10 +185,15 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
                     button_record.setText("Start Recording");
                     try {
                         fos.close();
+                        mRecorder.stop();
+                        mRecorder.reset();
+                        mRecorder.release();
+                        mRecorder = null;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    MediaScannerConnection.scanFile(this, new String[] { file.getAbsolutePath() }, null, null);
+                    MediaScannerConnection.scanFile(this,
+                            new String[] { file.getAbsolutePath(), videoFile.getAbsolutePath() }, null, null);
                 }
                 break;
         }
@@ -216,15 +224,36 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
     private void createDataFile() {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yy.MM.dd HH_mm_ss", Locale.US);
-            String fileName = format.format(new Date()) + ".txt";
+            String fileName = format.format(new Date());
             File path = new File(pathName);
-            file = new File(pathName + fileName);
+            file = new File(pathName + fileName + ".txt");
             boolean res;
             if (!path.exists())
                 res = path.mkdir();
             if (!file.exists())
                 res = file.createNewFile();
             fos = new FileOutputStream(file);
+
+            videoFile = new File(pathName + fileName + ".mp4");
+            mRecorder = new MediaRecorder();
+
+            mRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+            //mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+
+            mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+
+            mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            //mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
+
+
+            //mRecorder.setVideoSize(640, 480);
+            //mRecorder.setVideoFrameRate(30);
+            //mRecorder.setVideoEncodingBitRate(3 * 1024 * 1024);
+            //mRecorder.setOrientationHint(90);
+            mRecorder.setOutputFile(videoFile);
+            mRecorder.prepare();
+            mRecorder.start();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
