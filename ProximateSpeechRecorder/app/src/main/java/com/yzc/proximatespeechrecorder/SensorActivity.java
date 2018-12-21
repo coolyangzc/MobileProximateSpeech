@@ -1,11 +1,12 @@
 package com.yzc.proximatespeechrecorder;
 
 import android.app.Activity;
-import android.graphics.Camera;
+import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
     private Boolean isRecording = false;
     private File file, videoFile;
 
+    private Camera mCamera;
     private MediaRecorder mRecorder;
     private SensorManager mSensorManager;
     private TextView textView_sensor, textView_touch;
@@ -136,7 +139,6 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
         String text = "";
-        boolean updated = false;
 
         for (int i = 0; i < e.getPointerCount(); ++i) {
             int id = e.getPointerId(i);
@@ -181,10 +183,12 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
                 if (isRecording) {
                     button_record.setText("Stop Recording");
                     createDataFile();
+                    startRecordingVideo();
                 } else {
                     button_record.setText("Start Recording");
                     try {
                         fos.close();
+                        mCamera.lock();
                         mRecorder.stop();
                         mRecorder.reset();
                         mRecorder.release();
@@ -233,27 +237,7 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
             if (!file.exists())
                 res = file.createNewFile();
             fos = new FileOutputStream(file);
-
             videoFile = new File(pathName + fileName + ".mp4");
-            mRecorder = new MediaRecorder();
-
-            mRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-            //mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-
-            mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-
-            mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            //mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
-
-
-            //mRecorder.setVideoSize(640, 480);
-            //mRecorder.setVideoFrameRate(30);
-            //mRecorder.setVideoEncodingBitRate(3 * 1024 * 1024);
-            //mRecorder.setOrientationHint(90);
-            mRecorder.setOutputFile(videoFile);
-            mRecorder.prepare();
-            mRecorder.start();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -280,4 +264,90 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
             e.printStackTrace();
         }
     }
+
+    private void startRecordingVideo() {
+        setUpMediaRecorder();
+        try {
+            mRecorder.prepare();
+            mRecorder.start();
+        } catch (IllegalStateException e) {
+            mRecorder.release();
+            Log.d("startRecordingVideo", "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+        } catch (IOException e) {
+            mRecorder.release();
+            Log.d("startRecordingVideo", "IOException preparing MediaRecorder: " + e.getMessage());
+        }
+    }
+
+    private void setUpMediaRecorder() {
+        try {
+            Log.d("setUpMediaRecorder", Integer.toString(FindFrontCamera()));
+            mCamera = Camera.open(FindFrontCamera());
+        } catch (Exception e) {
+            Toast.makeText(this, "摄像头正在使用", Toast.LENGTH_LONG).show();
+            return;
+        }
+        List<Camera.Size> a = mCamera.getParameters().getSupportedVideoSizes();
+        for (Camera.Size sz : a)
+            Log.d("Size", Integer.toString(sz.height) + " " + Integer.toString(sz.width));
+
+
+        mCamera.unlock();
+        mRecorder = new MediaRecorder();
+        mRecorder.setCamera(mCamera);
+
+        if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_480P)) {
+            CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
+            profile.videoBitRate = 480 * 720;
+            mRecorder.setProfile(profile);
+        } else if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_720P)) {
+            CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
+            profile.videoBitRate = 1280 * 720;
+
+            mRecorder.setProfile(profile);
+        } else if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_QVGA)) {
+            mRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_QVGA));
+        } else if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_CIF)) {
+            mRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_CIF));
+        } else {
+            mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            mRecorder.setVideoEncodingBitRate(2500000);
+            mRecorder.setVideoFrameRate(20);
+            mRecorder.setVideoSize(720, 1280);
+        }
+
+        /*
+        //mRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+
+        //mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+
+
+        mRecorder.setVideoSize(1920, 1080);
+        mRecorder.setVideoFrameRate(30);
+        mRecorder.setVideoEncodingBitRate(20 * 1024 * 1024);
+        //mRecorder.setOrientationHint(90);*/
+        mRecorder.setOutputFile(videoFile);
+    }
+
+    private int FindFrontCamera(){
+        int cameraCount = 0;
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        cameraCount = Camera.getNumberOfCameras();
+        for (int camIdx = 0; camIdx < cameraCount;camIdx++) {
+            Camera.getCameraInfo(camIdx, cameraInfo);
+            if ( cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                return camIdx;
+            }
+        }
+        return -1;
+    }
+
+
 }
+

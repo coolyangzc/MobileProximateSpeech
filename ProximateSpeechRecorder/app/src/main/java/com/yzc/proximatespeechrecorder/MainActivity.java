@@ -28,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
         verifyVideoPermissions(this);
 
         Intent intent = new Intent();
-        intent.setClass(this, SensorActivity.class);
+        intent.setClass(this, CameraActivity.class);
+        //intent.setClass(this, SensorActivity.class);
         startActivity(intent);
     }
 
