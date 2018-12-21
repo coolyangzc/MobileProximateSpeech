@@ -15,7 +15,7 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="48dp"
         android:text="Button"
         app:layout_constraintBottom_toBottomOf="@+id/textureView"
         app:layout_constraintEnd_toStartOf="@+id/textureView"
