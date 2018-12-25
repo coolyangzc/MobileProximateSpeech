@@ -1,19 +1,33 @@
 package com.yzc.proximatespeechrecorder;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,19 +37,28 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 
-public class SensorActivity extends Activity implements SensorEventListener, View.OnClickListener {
+public class SensorActivity extends Activity implements SensorEventListener {
 
     private Long startTimestamp = 0L, startUpTimeMill;
     private Boolean isRecording = false;
     private File file, videoFile;
+    private Context ctx;
+    private String TAG = "ProximateSpeechRecorder";
 
-    private Camera mCamera;
-    private MediaRecorder mRecorder;
+    //Camera2
+    private String mCameraIdFront; //前置摄像头ID
+    private CameraDevice mCameraDevice;
+    private MediaRecorder mMediaRecorder;
+    private CaptureRequest.Builder mCaptureBuilder;
+    private CaptureRequest mCaptureRequest;
+    private CameraCaptureSession mCaptureSession;
+
     private SensorManager mSensorManager;
     private TextView textView_sensor, textView_touch;
     private Button button_record;
@@ -75,18 +98,53 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor);
+        ctx = this;
+        initViews();
+        loadSensor();
+        setupCamera();
+        openCamera(mCameraIdFront);
+    }
+
+    private void initViews() {
         textView_sensor = findViewById(R.id.textView_sensor);
         textView_touch = findViewById(R.id.textView_touch);
         button_record = findViewById(R.id.button_record);
-        button_record.setOnClickListener(this);
-        loadSensor();
+        button_record.setOnClickListener(clickListener);
     }
+
+    View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+            switch (view.getId()) {
+                case R.id.button_record:
+                    isRecording ^= true;
+                    if (isRecording) {
+                        button_record.setText("Stop Recording");
+                        createDataFile();
+                        prepareMediaRecorder();
+                        startMediaRecorder();//开始录制
+                    } else {
+                        button_record.setText("Start Recording");
+                        try {
+                            fos.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        stopMediaRecorder();
+                        MediaScannerConnection.scanFile(ctx,
+                                new String[] { file.getAbsolutePath(), videoFile.getAbsolutePath() }, null, null);
+
+                    }
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onResume() {
         super.onResume();
         //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        //mSensorManager.registerListener(this, mRotationVector, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -175,34 +233,6 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
         return super.dispatchTouchEvent(e);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.button_record:
-                isRecording ^= true;
-                if (isRecording) {
-                    button_record.setText("Stop Recording");
-                    createDataFile();
-                    startRecordingVideo();
-                } else {
-                    button_record.setText("Start Recording");
-                    try {
-                        fos.close();
-                        mCamera.lock();
-                        mRecorder.stop();
-                        mRecorder.reset();
-                        mRecorder.release();
-                        mRecorder = null;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    MediaScannerConnection.scanFile(this,
-                            new String[] { file.getAbsolutePath(), videoFile.getAbsolutePath() }, null, null);
-                }
-                break;
-        }
-    }
-
     private void loadSensor() {
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         if (mSensorManager == null) {
@@ -227,7 +257,7 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
 
     private void createDataFile() {
         try {
-            SimpleDateFormat format = new SimpleDateFormat("yy.MM.dd HH_mm_ss", Locale.US);
+            SimpleDateFormat format = new SimpleDateFormat("yyMMdd HH_mm_ss", Locale.US);
             String fileName = format.format(new Date());
             File path = new File(pathName);
             file = new File(pathName + fileName + ".txt");
@@ -265,89 +295,135 @@ public class SensorActivity extends Activity implements SensorEventListener, Vie
         }
     }
 
-    private void startRecordingVideo() {
-        setUpMediaRecorder();
+
+    /**
+     * *************************************Camera2*************************************************
+     */
+    private void setupCamera() {
         try {
-            mRecorder.prepare();
-            mRecorder.start();
-        } catch (IllegalStateException e) {
-            mRecorder.release();
-            Log.d("startRecordingVideo", "IllegalStateException preparing MediaRecorder: " + e.getMessage());
-        } catch (IOException e) {
-            mRecorder.release();
-            Log.d("startRecordingVideo", "IOException preparing MediaRecorder: " + e.getMessage());
+            CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            if (manager != null)
+                mCameraIdFront = manager.getCameraIdList()[1];
+            else
+                Log.d(TAG, "getSystemService failed");
+            mMediaRecorder = new MediaRecorder();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    private void openCamera(String CameraId) {
+        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            manager.openCamera(CameraId, mStateCallback, null);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
+        @Override
+        public void onOpened(CameraDevice camera) {
+            mCameraDevice = camera;
+        }
+
+        @Override
+        public void onDisconnected(CameraDevice cameraDevice) {
+            cameraDevice.close();
+            mCameraDevice = null;
+        }
+
+        @Override
+        public void onError(CameraDevice cameraDevice, int error) {
+            cameraDevice.close();
+            mCameraDevice = null;
+        }
+    };
+
+    private void prepareMediaRecorder() {
+        try {
+            Log.d(TAG, "prepareMediaRecorder");
+            setUpMediaRecorder();
+
+            mCaptureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            List<Surface> surfaces = new ArrayList<>();
+
+            Surface recorderSurface = mMediaRecorder.getSurface();
+            surfaces.add(recorderSurface);
+            mCaptureBuilder.addTarget(recorderSurface);
+
+
+            mCameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onConfigured(CameraCaptureSession session) {
+                    try {
+                        mCaptureRequest = mCaptureBuilder.build();
+                        mCaptureSession = session;
+                        mCaptureSession.setRepeatingRequest(mCaptureRequest, null, null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onConfigureFailed(CameraCaptureSession session) {
+                    Log.d(TAG, "onConfigureFailed");
+                }
+            }, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startMediaRecorder() {
+        Log.d(TAG, "startMediaRecorder");
+        try {
+            mMediaRecorder.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopMediaRecorder() {
+        try {
+            mMediaRecorder.stop();
+            mMediaRecorder.reset();
+            resetCamera();
+        } catch (Exception e) {
+            Toast.makeText(this, "录制时间过短", Toast.LENGTH_LONG).show();
+            resetCamera();
+        }
+    }
+
+    public void resetCamera() {
+        if (mCameraDevice != null) {
+            mCameraDevice.close();
+        }
+        setupCamera();
+        openCamera(mCameraIdFront);
     }
 
     private void setUpMediaRecorder() {
         try {
-            Log.d("setUpMediaRecorder", Integer.toString(FindFrontCamera()));
-            mCamera = Camera.open(FindFrontCamera());
-        } catch (Exception e) {
-            Toast.makeText(this, "摄像头正在使用", Toast.LENGTH_LONG).show();
-            return;
-        }
-        List<Camera.Size> a = mCamera.getParameters().getSupportedVideoSizes();
-        for (Camera.Size sz : a)
-            Log.d("Size", Integer.toString(sz.height) + " " + Integer.toString(sz.width));
-
-
-        mCamera.unlock();
-        mRecorder = new MediaRecorder();
-        mRecorder.setCamera(mCamera);
-
-        if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_480P)) {
-            CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
-            profile.videoBitRate = 480 * 720;
-            mRecorder.setProfile(profile);
-        } else if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_720P)) {
-            CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
-            profile.videoBitRate = 1280 * 720;
-
-            mRecorder.setProfile(profile);
-        } else if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_QVGA)) {
-            mRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_QVGA));
-        } else if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_CIF)) {
-            mRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_CIF));
-        } else {
-            mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-            mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-            mRecorder.setVideoEncodingBitRate(2500000);
-            mRecorder.setVideoFrameRate(20);
-            mRecorder.setVideoSize(720, 1280);
-        }
-
-        /*
-        //mRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-        mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-
-        //mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-
-
-        mRecorder.setVideoSize(1920, 1080);
-        mRecorder.setVideoFrameRate(30);
-        mRecorder.setVideoEncodingBitRate(20 * 1024 * 1024);
-        //mRecorder.setOrientationHint(90);*/
-        mRecorder.setOutputFile(videoFile);
-    }
-
-    private int FindFrontCamera(){
-        int cameraCount = 0;
-        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-        cameraCount = Camera.getNumberOfCameras();
-        for (int camIdx = 0; camIdx < cameraCount;camIdx++) {
-            Camera.getCameraInfo(camIdx, cameraInfo);
-            if ( cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                return camIdx;
+            Log.d(TAG, "setUpMediaRecorder");
+            mMediaRecorder.reset();
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+            if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_1080P)) {
+                CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_1080P);
+                //profile.videoBitRate = mPreviewSize.getWidth() * mPreviewSize.getHeight();
+                profile.videoBitRate = 10 * 1920 * 1080;
+                mMediaRecorder.setProfile(profile);
             }
+            mMediaRecorder.setOutputFile(videoFile);
+            mMediaRecorder.setOrientationHint(270);
+            mMediaRecorder.prepare();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return -1;
     }
-
-
 }
 

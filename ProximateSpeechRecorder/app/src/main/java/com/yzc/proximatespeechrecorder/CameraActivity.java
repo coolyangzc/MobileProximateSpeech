@@ -76,16 +76,16 @@ public class CameraActivity extends Activity implements TextureView.SurfaceTextu
         openCamera(mCameraIdFront);//打开相机
     }
 
-    //初始化TextureView
-    private void initTextureView() {
-        mTextureView.setSurfaceTextureListener(this);
-    }
-
     //初始化视图控件
     private void initViews() {
         mTextureView = findViewById(R.id.textureView);
         btn = findViewById(R.id.button);
         btn.setOnClickListener(clickListener);
+    }
+
+    //初始化TextureView
+    private void initTextureView() {
+        mTextureView.setSurfaceTextureListener(this);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
