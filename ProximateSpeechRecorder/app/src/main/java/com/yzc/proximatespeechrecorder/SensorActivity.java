@@ -203,8 +203,10 @@ public class SensorActivity extends Activity implements SensorEventListener {
             int x = (int) e.getX(i), y = (int) e.getY(i);
             float p = e.getPressure(i);
             float s = e.getSize(i);
+            float o = e.getOrientation(i);
+
             text += "Id:" + id + " X:" + x + " Y:" + y;
-            text += String.format(Locale.US," S:%.2f P:%.2f", s, p) + "\n";
+            text += String.format(Locale.US," S:%.2f P:%.2f O:%.2f", s, p, o) + "\n";
         }
         if (e.getAction() == MotionEvent.ACTION_UP)
             text = "";
@@ -217,10 +219,10 @@ public class SensorActivity extends Activity implements SensorEventListener {
             for(int i = 0; i < e.getPointerCount(); ++i) {
                 int id = e.getPointerId(i);
                 float x = e.getX(i), y = e.getY(i);
-                float p = e.getPressure(i), sz = e.getSize(i);
+                float p = e.getPressure(i), sz = e.getSize(i), o = e.getOrientation(i);
                 s += " " + Integer.toString(id);
                 s += " " + Float.toString(x) + " " + Float.toString(y);
-                s += " " + Float.toString(p) + " " + Float.toString(sz);
+                s += " " + Float.toString(p) + " " + Float.toString(sz) + " " + Float.toString(o);
             }
             s += "\n";
             byte [] buffer = s.getBytes();
