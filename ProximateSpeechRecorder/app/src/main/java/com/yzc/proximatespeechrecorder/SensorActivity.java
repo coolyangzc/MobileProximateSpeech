@@ -206,7 +206,10 @@ public class SensorActivity extends Activity implements SensorEventListener {
             float o = e.getOrientation(i);
 
             text += "Id:" + id + " X:" + x + " Y:" + y;
-            text += String.format(Locale.US," S:%.2f P:%.2f O:%.2f", s, p, o) + "\n";
+            text += String.format(Locale.US," S:%.2f P:%.2f O:%.6f", s, p, o) + "\n";
+            text += String.format(Locale.US, "Tool Major: %.2f Minus: %.2f", e.getToolMajor(), e.getToolMinor()) + "\n";
+            text += String.format(Locale.US, "Touch Major: %.2f Minus: %.2f", e.getTouchMajor(), e.getTouchMinor()) + "\n";
+
         }
         if (e.getAction() == MotionEvent.ACTION_UP)
             text = "";
@@ -217,12 +220,22 @@ public class SensorActivity extends Activity implements SensorEventListener {
             s += " " + Long.toString((e.getEventTime()- startUpTimeMill));
             s += " " + Integer.toString(e.getPointerCount());
             for(int i = 0; i < e.getPointerCount(); ++i) {
-                int id = e.getPointerId(i);
-                float x = e.getX(i), y = e.getY(i);
-                float p = e.getPressure(i), sz = e.getSize(i), o = e.getOrientation(i);
-                s += " " + Integer.toString(id);
-                s += " " + Float.toString(x) + " " + Float.toString(y);
-                s += " " + Float.toString(p) + " " + Float.toString(sz) + " " + Float.toString(o);
+                s += " " + Integer.toString(e.getPointerId(i));
+
+                List<Float> touchData = new ArrayList<Float>();
+                touchData.add(e.getX(i));
+                touchData.add(e.getY(i));
+                touchData.add(e.getRawX());
+                touchData.add(e.getRawY());
+
+                touchData.add(e.getPressure(i));
+                touchData.add(e.getSize(i));
+                touchData.add(e.getOrientation(i));
+                touchData.add(e.getTouchMajor());
+                touchData.add(e.getTouchMinor());
+
+                for (Float data : touchData)
+                    s += " " + data.toString();
             }
             s += "\n";
             byte [] buffer = s.getBytes();
