@@ -1,2 +1,2 @@
-.\adb shell tpd reboot
-.\adb shell chmod 744 /data/diff_data
+adb shell tpd reboot
+adb shell chmod 744 /data/diff_data

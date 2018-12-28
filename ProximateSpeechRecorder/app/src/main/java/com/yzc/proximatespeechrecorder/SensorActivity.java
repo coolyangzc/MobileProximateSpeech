@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -52,7 +50,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private String TAG = "ProximateSpeechRecorder";
 
     //Camera2
-    private String mCameraIdFront; //前置摄像头ID
+    private String mCameraIdFront;
     private CameraDevice mCameraDevice;
     private MediaRecorder mMediaRecorder;
     private CaptureRequest.Builder mCaptureBuilder;
@@ -123,7 +121,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
                         button_record.setText("Stop Recording");
                         createDataFile();
                         prepareMediaRecorder();
-                        startMediaRecorder();//开始录制
+                        startMediaRecorder();
                     } else {
                         button_record.setText("Start Recording");
                         try {
@@ -207,8 +205,8 @@ public class SensorActivity extends Activity implements SensorEventListener {
 
             text += "Id:" + id + " X:" + x + " Y:" + y;
             text += String.format(Locale.US," S:%.2f P:%.2f O:%.6f", s, p, o) + "\n";
-            text += String.format(Locale.US, "Tool Major: %.2f Minus: %.2f", e.getToolMajor(), e.getToolMinor()) + "\n";
-            text += String.format(Locale.US, "Touch Major: %.2f Minus: %.2f", e.getTouchMajor(), e.getTouchMinor()) + "\n";
+            text += String.format(Locale.US, "Tool Major: %.2f Minus: %.2f", e.getToolMajor(i), e.getToolMinor(i)) + "\n";
+            text += String.format(Locale.US, "Touch Major: %.2f Minus: %.2f", e.getTouchMajor(i), e.getTouchMinor(i)) + "\n";
 
         }
         if (e.getAction() == MotionEvent.ACTION_UP)
@@ -216,23 +214,23 @@ public class SensorActivity extends Activity implements SensorEventListener {
         textView_touch.setText(text);
 
         if (isRecording) {
-            String s = "TOUCH " + e.getAction();
+            String s = "TOUCH ";
             s += " " + Long.toString((e.getEventTime()- startUpTimeMill));
+            s += " " + e.getAction();
+            s += " " + Float.toString(e.getRawX()) + " " + Float.toString(e.getRawY());
             s += " " + Integer.toString(e.getPointerCount());
+
             for(int i = 0; i < e.getPointerCount(); ++i) {
                 s += " " + Integer.toString(e.getPointerId(i));
-
                 List<Float> touchData = new ArrayList<Float>();
                 touchData.add(e.getX(i));
                 touchData.add(e.getY(i));
-                touchData.add(e.getRawX());
-                touchData.add(e.getRawY());
 
                 touchData.add(e.getPressure(i));
                 touchData.add(e.getSize(i));
                 touchData.add(e.getOrientation(i));
-                touchData.add(e.getTouchMajor());
-                touchData.add(e.getTouchMinor());
+                touchData.add(e.getTouchMajor(i));
+                touchData.add(e.getTouchMinor(i));
 
                 for (Float data : touchData)
                     s += " " + data.toString();

@@ -29,6 +29,10 @@
             android:name="com.yzc.proximatespeechrecorder.CameraActivity"
             android:label="CameraActivity"  >
         </activity>
+        <activity
+            android:name="com.yzc.proximatespeechrecorder.CapacityActivity"
+            android:label="CapacityActivity"  >
+        </activity>
     </application>
 
 </manifest>
