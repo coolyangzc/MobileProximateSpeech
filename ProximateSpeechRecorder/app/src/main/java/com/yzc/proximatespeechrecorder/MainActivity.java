@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent();
         //intent.setClass(this, CameraActivity.class);
-        //intent.setClass(this, SensorActivity.class);
-        intent.setClass(this, CapacityActivity.class);
+        intent.setClass(this, SensorActivity.class);
+        //intent.setClass(this, CapacityActivity.class);
         startActivity(intent);
     }
 

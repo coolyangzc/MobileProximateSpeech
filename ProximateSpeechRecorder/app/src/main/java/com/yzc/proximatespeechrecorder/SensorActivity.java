@@ -10,11 +10,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
@@ -22,7 +20,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -92,6 +89,10 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private final String pathName = Environment.getExternalStorageDirectory().getPath() + "/SensorData/";
     private FileOutputStream fos;
 
+    static {
+        System.loadLibrary("native-lib");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +123,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
                         createDataFile();
                         prepareMediaRecorder();
                         startMediaRecorder();
+                        readDiffStart();
                     } else {
                         button_record.setText("Start Recording");
                         try {
@@ -130,6 +132,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
                             e.printStackTrace();
                         }
                         stopMediaRecorder();
+                        readDiffStop();
                         MediaScannerConnection.scanFile(ctx,
                                 new String[] { file.getAbsolutePath(), videoFile.getAbsolutePath() }, null, null);
 
@@ -215,7 +218,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
 
         if (isRecording) {
             String s = "TOUCH ";
-            s += " " + Long.toString((e.getEventTime()- startUpTimeMill));
+            s += " " + Long.toString((e.getEventTime() - startUpTimeMill));
             s += " " + e.getAction();
             s += " " + Float.toString(e.getRawX()) + " " + Float.toString(e.getRawY());
             s += " " + Integer.toString(e.getPointerCount());
@@ -307,6 +310,31 @@ public class SensorActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         }
     }
+
+    /**
+     * *************************************Capacity************************************************
+     */
+
+    public void processDiff(short[] data){
+        if (isRecording) {
+            String s = "CAPACITY ";
+            s += Long.toString((SystemClock.elapsedRealtimeNanos() - startTimestamp) / 1000000L);
+            for (short c : data)
+                s += " " + Short.toString(c);
+            s += "\n";
+            try {
+                fos.write(s.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    /**
+     * A native method that is implemented by the 'native-lib' native library,
+     * which is packaged with this application.
+     */
+    public native void readDiffStart();
+    public native void readDiffStop(); // Java_com_example_diffshow_MainActivity_readDiffStop
 
 
     /**
