@@ -28,7 +28,7 @@
 
 
 
-struct FlaseTouchData{
+struct FalseTouchData{
     int x;
     int y;
     int id;
@@ -38,7 +38,7 @@ struct FalseFrameData{
     uint16_t rawData[32*18];
     int touchNum;
     int downNum;
-    struct FlaseTouchData touchData[10];
+    struct FalseTouchData touchData[10];
 };
 
 
@@ -111,6 +111,7 @@ void *run(void *args){
                     continue;
                 if(sockfd == fd)  //diffData
                 {
+                    gettimeofday(&tv,NULL);
                     struct FalseFrameData frameData;
                     memset(&frameData,0, sizeof(frameData));
                     recvNum = read(sockfd, (char *)&frameData, sizeof(frameData));
@@ -123,15 +124,16 @@ void *run(void *args){
                         LOGE("frameData  InComplete !!!");
                         break;
                     }
-                    gettimeofday(&tv,NULL);
-                    LOGD("Time:%ld  TouchNum:%d  DownNum:%d",tv.tv_usec/1000,frameData.touchNum,frameData.downNum);
+                    long t = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+                    LOGD("Time:%ld %ld %ld TouchNum:%d  DownNum:%d",tv.tv_sec, tv.tv_usec,t,frameData.touchNum,frameData.downNum);
                     for(int i = 0; i <frameData.touchNum;i++){
                         LOGD("ID:%d  x:%d  y:%d",frameData.touchData[i].id,frameData.touchData[i].x,frameData.touchData[i].y);
                     }
 
+
                     env->SetShortArrayRegion(diffdata,0,DIFF_LENGTH,frameData.diffData);
                    // env->SetShortArrayRegion(rawdata,0,DIFF_LENGTH,(jshort*)frameData.rawData);//回调java处理函数
-                    env->CallVoidMethod((jobject)args,callBack_method,diffdata);
+                    env->CallVoidMethod((jobject)args,callBack_method,diffdata,t);
                 }else{  //app exit
                     char buf[10];
                     read(sockfd,buf,10);
@@ -197,7 +199,7 @@ JNIEXPORT void JNICALL
 Java_com_yzc_proximatespeechrecorder_SensorActivity_readDiffStart(JNIEnv *env, jobject instance) {
 
     env->GetJavaVM(&g_jvm); // 保存java虚拟机对象
-    callBack_method = env->GetMethodID(env->GetObjectClass(instance),"processDiff","([S)V");
+    callBack_method = env->GetMethodID(env->GetObjectClass(instance),"processCapa","([SJ)V");
 
     if(callBack_method == 0){
         __android_log_print(ANDROID_LOG_DEBUG,TAG,"find callBack_method error");

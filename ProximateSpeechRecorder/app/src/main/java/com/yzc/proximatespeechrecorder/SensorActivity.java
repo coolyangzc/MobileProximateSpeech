@@ -40,7 +40,7 @@ import java.util.Locale;
 
 public class SensorActivity extends Activity implements SensorEventListener {
 
-    private Long startTimestamp = 0L, startUpTimeMill;
+    private Long startTimestamp, startUpTimeMill, startTimeMillis;
     private Boolean isRecording = false;
     private File file, videoFile;
     private Context ctx;
@@ -260,7 +260,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
             Sensor sensor = mSensorManager.getDefaultSensor(sensorType[i]);
             if (sensor != null) {
                 Log.i("loadSensor", "register " + sensorName[i] + " successful");
-                mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+                mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
             } else
                 Log.w("loadSensor", "register " + sensorName[i] + " failed");
         }
@@ -288,9 +288,11 @@ public class SensorActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         }
 
+
         startTimestamp = SystemClock.elapsedRealtimeNanos();
         startUpTimeMill = SystemClock.uptimeMillis();
-        String ss = Long.toString(System.currentTimeMillis()) + "\n";
+        startTimeMillis = System.currentTimeMillis();
+        String ss = Long.toString(startTimeMillis) + "\n";
         ss += Long.toString(startUpTimeMill) + "\n";
         ss += Long.toString(startTimestamp) + "\n";
 
@@ -315,10 +317,10 @@ public class SensorActivity extends Activity implements SensorEventListener {
      * *************************************Capacity************************************************
      */
 
-    public void processDiff(short[] data){
+    public void processCapa(short[] data, long timestamp){
         if (isRecording) {
             String s = "CAPACITY ";
-            s += Long.toString((SystemClock.elapsedRealtimeNanos() - startTimestamp) / 1000000L);
+            s += " " + Long.toString(timestamp - startTimeMillis);
             for (short c : data)
                 s += " " + Short.toString(c);
             s += "\n";
