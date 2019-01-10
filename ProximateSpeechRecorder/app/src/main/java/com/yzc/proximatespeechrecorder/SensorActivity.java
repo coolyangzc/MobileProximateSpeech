@@ -40,7 +40,7 @@ import java.util.Locale;
 
 public class SensorActivity extends Activity implements SensorEventListener {
 
-    private Long startTimestamp, startUpTimeMill, startTimeMillis;
+    private Long startTimestamp, startUpTimeMillis, startTimeMillis;
     private Boolean isRecording = false;
     private File file, videoFile;
     private Context ctx;
@@ -218,7 +218,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
 
         if (isRecording) {
             String s = "TOUCH ";
-            s += " " + Long.toString((e.getEventTime() - startUpTimeMill));
+            s += " " + Long.toString((e.getEventTime() - startUpTimeMillis));
             s += " " + e.getAction();
             s += " " + Float.toString(e.getRawX()) + " " + Float.toString(e.getRawY());
             s += " " + Integer.toString(e.getPointerCount());
@@ -288,12 +288,11 @@ public class SensorActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         }
 
-
-        startTimestamp = SystemClock.elapsedRealtimeNanos();
-        startUpTimeMill = SystemClock.uptimeMillis();
         startTimeMillis = System.currentTimeMillis();
+        startUpTimeMillis = SystemClock.uptimeMillis();
+        startTimestamp = SystemClock.elapsedRealtimeNanos();
         String ss = Long.toString(startTimeMillis) + "\n";
-        ss += Long.toString(startUpTimeMill) + "\n";
+        ss += Long.toString(startUpTimeMillis) + "\n";
         ss += Long.toString(startTimestamp) + "\n";
 
         for (int i = 0; i < sensorType.length; i++) {
