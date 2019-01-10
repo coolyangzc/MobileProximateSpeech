@@ -130,7 +130,6 @@ void *run(void *args){
                         LOGD("ID:%d  x:%d  y:%d",frameData.touchData[i].id,frameData.touchData[i].x,frameData.touchData[i].y);
                     }
 
-
                     env->SetShortArrayRegion(diffdata,0,DIFF_LENGTH,frameData.diffData);
                    // env->SetShortArrayRegion(rawdata,0,DIFF_LENGTH,(jshort*)frameData.rawData);//回调java处理函数
                     env->CallVoidMethod((jobject)args,callBack_method,diffdata,t);
