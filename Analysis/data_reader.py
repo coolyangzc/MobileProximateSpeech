@@ -1,5 +1,3 @@
-import re
-
 
 class FrameList:
     def __init__(self):
@@ -14,9 +12,10 @@ class FrameList:
 class Data:
 
     start_time_millis, start_up_time_millis, start_elapsed_realtime_nanos = 0, 0, 0
+    min_time, max_time = 0, 0
     type_to_list = {}
 
-    def read(self, file_path, show_msg = True):
+    def read(self, file_path, show_msg=True):
         f = open(file_path, "r")
         lines = f.readlines()
         f.close()
@@ -37,6 +36,7 @@ class Data:
 
         frame_list = self.type_to_list[type_name]
         frame_list.time_stamp.append(int(data[1]))
+        self.max_time = max(int(data[1]), self.max_time)
         frame_list.accuracy.append(int(data[2]))
 
         for i in range(len(data) - 3):
@@ -44,6 +44,15 @@ class Data:
                 frame_list.value.append([])
             frame_list.value[i].append(float(data[i+3]))
 
+    def get_types(self):
+        type_list = []
+        for t in self.type_to_list:
+            type_list.append(t)
+        return type_list
+
     def get_list(self, type_name) -> 'FrameList':
         if type_name in self.type_to_list:
             return self.type_to_list[type_name]
+
+    def get_max_time(self):
+        return self.max_time
