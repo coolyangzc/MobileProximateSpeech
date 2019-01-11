@@ -8,6 +8,18 @@ class FrameList:
     def get_data_len(self):
         return len(self.value)
 
+    def get_min_data(self):
+        tmp = 1e100
+        for values in self.value:
+            tmp = min(tmp, min(values))
+        return tmp
+
+    def get_max_data(self):
+        tmp = -1e100
+        for values in self.value:
+            tmp = max(tmp, max(values))
+        return tmp
+
 
 class Data:
 

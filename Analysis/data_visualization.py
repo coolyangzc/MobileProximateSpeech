@@ -35,7 +35,53 @@ def visualize_file(file_path):
     plt.show()
 
 
-visualize_file('../Data/190111 14_40_17.txt')
-visualize_file('../Data/190111 14_40_36.txt')
-visualize_file('../Data/190111 14_40_47.txt')
-visualize_file('../Data/190111 14_40_56.txt')
+def compare_files(file_path_list):
+    data_list = []
+    for file_path in file_path_list:
+        d = data_reader.Data()
+        d.read(file_path)
+        data_list.append(d)
+    type_list = data_list[0].get_types()
+    type_list.remove('TOUCH')
+    type_list.remove('CAPACITY')
+    type_list.sort()
+    max_time = 0
+    for d in data_list:
+        max_time = max(max_time, d.get_max_time())
+
+    n = len(file_path_list)
+    for t in type_list:
+        plt.figure(figsize=(10, n*3))
+        plt.suptitle(t, x=0.02, y=0.998, horizontalalignment='left')
+
+        y_min = 1e100
+        y_max = -1e100
+        for d in data_list:
+            y_min = min(y_min, d.get_list(t).get_min_data())
+            y_max = max(y_max, d.get_list(t).get_max_data())
+        dis = y_max - y_min
+
+        y_min = y_min - dis * 0.05
+        y_max = y_max + dis * 0.05
+        for file_id in range(n):
+            plt.subplot(len(data_list), 1, file_id+1)
+            plt.xlim(0, max_time)
+            plt.ylim(y_min, y_max)
+            plt.title(file_path_list[file_id])
+
+            frame_list = data_list[file_id].get_list(t)
+            for i in range(frame_list.get_data_len()):
+                if len(frame_list.value[i]) <= 100:
+                    plot_format = 'x:'
+                else:
+                    plot_format = '-'
+                plt.plot(frame_list.time_stamp, frame_list.value[i], plot_format, label=i)
+            plt.legend()
+        plt.show()
+
+
+files = ['../Data/190111 14_40_17.txt', '../Data/190111 14_40_36.txt',
+         '../Data/190111 14_40_47.txt', '../Data/190111 14_40_56.txt']
+#for file in files:
+    #visualize_file(file)
+compare_files(files)
