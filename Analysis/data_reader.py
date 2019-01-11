@@ -15,6 +15,9 @@ class Data:
     min_time, max_time = 0, 0
     type_to_list = {}
 
+    def __init__(self):
+        self.type_to_list = {}
+
     def read(self, file_path, show_msg=True):
         f = open(file_path, "r")
         lines = f.readlines()
@@ -25,6 +28,13 @@ class Data:
         self.start_elapsed_realtime_nanos = int(lines[2])
         for line in lines[3:]:
             self.__add_frame(line)
+
+    def clear(self):
+        self.min_time = self.max_time = 0
+        self.start_time_millis = 0
+        self.start_up_time_millis = 0
+        self.start_elapsed_realtime_nanos = 0
+        self.type_to_list.clear()
 
     def __add_frame(self, line):
         data = line.split()

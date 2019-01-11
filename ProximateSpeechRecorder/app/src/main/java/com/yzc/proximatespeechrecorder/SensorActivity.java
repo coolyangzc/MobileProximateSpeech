@@ -217,12 +217,13 @@ public class SensorActivity extends Activity implements SensorEventListener {
         textView_touch.setText(text);
 
         if (isRecording) {
-            String s = "TOUCH ";
+            String s = "TOUCH";
             s += " " + Long.toString((e.getEventTime() - startUpTimeMillis));
+            s += " -1"; //Accuracy
             s += " " + e.getAction();
             s += " " + Float.toString(e.getRawX()) + " " + Float.toString(e.getRawY());
-            s += " " + Integer.toString(e.getPointerCount());
 
+            s += " " + Integer.toString(e.getPointerCount());
             for(int i = 0; i < e.getPointerCount(); ++i) {
                 s += " " + Integer.toString(e.getPointerId(i));
                 List<Float> touchData = new ArrayList<Float>();
@@ -299,7 +300,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
             if (sensorData[i] != null) {
                 ss += sensorName[i];
                 ss += " 0"; //Timestamp
-                ss += " 0"; //Accuracy
+                ss += " -1"; //Accuracy
                 for (float data : sensorData[i])
                     ss += " " + Float.toString(data);
                 ss += "\n";
@@ -318,8 +319,9 @@ public class SensorActivity extends Activity implements SensorEventListener {
 
     public void processCapa(short[] data, long timestamp){
         if (isRecording) {
-            String s = "CAPACITY ";
+            String s = "CAPACITY";
             s += " " + Long.toString(timestamp - startTimeMillis);
+            s += " -1"; //Accuracy
             for (short c : data)
                 s += " " + Short.toString(c);
             s += "\n";
