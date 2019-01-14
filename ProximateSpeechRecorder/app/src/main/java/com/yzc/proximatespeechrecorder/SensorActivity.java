@@ -24,7 +24,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,6 +58,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
 
     private SensorManager mSensorManager;
     private TextView textView_sensor, textView_touch;
+    private Spinner spinner_from, spinner_to;
     private Button button_record;
     private int sensorType[] = {
             Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_MAGNETIC_FIELD,
@@ -107,8 +110,24 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private void initViews() {
         textView_sensor = findViewById(R.id.textView_sensor);
         textView_touch = findViewById(R.id.textView_touch);
+        spinner_from = findViewById(R.id.spinner_from);
+        spinner_to = findViewById(R.id.spinner_to);
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(clickListener);
+
+        List<String> data_list = new ArrayList<String>();
+        data_list.add("北京");
+        data_list.add("上海");
+        data_list.add("广州");
+        data_list.add("深圳");
+
+        //适配器
+        ArrayAdapter<String> arr_adapter= new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data_list);
+        //设置样式
+        arr_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //加载适配器
+        spinner_from.setAdapter(arr_adapter);
+        spinner_to.setAdapter(arr_adapter);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {

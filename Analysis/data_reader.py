@@ -3,9 +3,9 @@ class FrameList:
     def __init__(self):
         self.type = ""
         self.time_stamp, self.accuracy = [], []
-        self.value = []
+        self.value, self.slope = [], []
 
-    def get_data_len(self):
+    def get_data_way(self):
         return len(self.value)
 
     def get_min_data(self):
@@ -19,6 +19,45 @@ class FrameList:
         for values in self.value:
             tmp = max(tmp, max(values))
         return tmp
+
+    def get_min_slope(self):
+        if len(self.slope) == 0:
+            self.get_slope()
+        tmp = 1e100
+        for slopes in self.slope:
+            tmp = min(tmp, min(slopes))
+        return tmp
+
+    def get_max_slope(self):
+        if len(self.slope) == 0:
+            self.get_slope()
+        tmp = -1e100
+        for slopes in self.slope:
+            tmp = max(tmp, max(slopes))
+        return tmp
+
+    def get_slope(self, time_window=100):
+        self.slope.clear()
+        for w in range(len(self.value)):
+            self.slope.append([])
+            slope = self.slope[-1]
+            t, v = self.time_stamp, self.value[w]
+
+            slope.append(0)
+            window_sum = v[0]
+            window_l = 0
+            for i in range(1, len(t)):
+                while t[i] - t[window_l] > time_window:
+                    window_sum -= v[window_l]
+                    window_l += 1
+                if i == window_l:
+                    slope.append(v[i] - v[i - 1])
+                else:
+                    slope.append(v[i] - window_sum / (i - window_l))
+                window_sum += v[i]
+
+        return self.slope
+
 
 
 class Data:
