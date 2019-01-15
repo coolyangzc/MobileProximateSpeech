@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="de7ba81e-35ff-462d-bbea-3ee31447ea18" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_reader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_visualization.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_visualization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/SensorActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/SensorActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/res/layout/activity_sensor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/res/layout/activity_sensor.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -36,8 +33,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data_visualization.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="37" column="45" selection-start-line="37" selection-start-column="45" selection-end-line="37" selection-end-column="45" />
+            <state relative-caret-position="100">
+              <caret line="58" column="21" lean-forward="true" selection-start-line="58" selection-start-column="21" selection-end-line="58" selection-end-column="21" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -48,7 +45,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_reader.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="860">
+            <state relative-caret-position="613">
               <caret line="43" column="34" selection-start-line="43" selection-start-column="34" selection-end-line="43" selection-end-column="34" />
             </state>
           </provider>
@@ -114,7 +111,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -126,6 +122,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -190,12 +187,13 @@
       <workItem from="1547189278619" duration="441000" />
       <workItem from="1547189835084" duration="5088000" />
       <workItem from="1547429740607" duration="13424000" />
-      <workItem from="1547455517881" duration="32000" />
+      <workItem from="1547455517881" duration="1228000" />
+      <workItem from="1547523798267" duration="3002000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19322000" />
+    <option name="totallyTimeSpent" value="23520000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -210,7 +208,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15147454" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15348525" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -251,20 +249,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_visualization.py">
+    <entry file="file://$PROJECT_DIR$/data_reader.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="37" column="45" selection-start-line="37" selection-start-column="45" selection-end-line="37" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="613">
+          <caret line="43" column="34" selection-start-line="43" selection-start-column="34" selection-end-line="43" selection-end-column="34" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_reader.py">
+    <entry file="file://$PROJECT_DIR$/data_visualization.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="860">
-          <caret line="43" column="34" selection-start-line="43" selection-start-column="34" selection-end-line="43" selection-end-column="34" />
+        <state relative-caret-position="100">
+          <caret line="58" column="21" lean-forward="true" selection-start-line="58" selection-start-column="21" selection-end-line="58" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

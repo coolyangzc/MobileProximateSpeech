@@ -77,7 +77,6 @@ def compare_files(file_path_list, show_slope=False):
             plt.xlim(0, max_time)
             plt.ylim(y_min, y_max)
 
-
             frame_list = data_list[file_id].get_list(t)
             if show_slope:
                 data = frame_list.slope

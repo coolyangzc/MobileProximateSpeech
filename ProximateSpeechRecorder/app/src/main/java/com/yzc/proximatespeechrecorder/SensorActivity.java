@@ -110,23 +110,37 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private void initViews() {
         textView_sensor = findViewById(R.id.textView_sensor);
         textView_touch = findViewById(R.id.textView_touch);
-        spinner_from = findViewById(R.id.spinner_from);
-        spinner_to = findViewById(R.id.spinner_to);
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(clickListener);
 
-        List<String> data_list = new ArrayList<String>();
-        data_list.add("北京");
-        data_list.add("上海");
-        data_list.add("广州");
-        data_list.add("深圳");
+        spinner_from = findViewById(R.id.spinner_from);
+        spinner_to = findViewById(R.id.spinner_to);
+        setSpinners();
 
-        //适配器
-        ArrayAdapter<String> arr_adapter= new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data_list);
-        //设置样式
+
+
+    }
+
+    private void setSpinners() {
+        List<String> from_list = new ArrayList<String>();
+        List<String> to_list = new ArrayList<String>();
+
+        from_list.add("桌上");
+        from_list.add("裤兜");
+        from_list.add("握持：浏览");
+        from_list.add("握持：打字");
+
+        to_list.add("近距语音");
+        to_list.add("握持");
+
+        ArrayAdapter<String> arr_adapter= new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, from_list);
         arr_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //加载适配器
         spinner_from.setAdapter(arr_adapter);
+
+        arr_adapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, to_list);
+        arr_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_to.setAdapter(arr_adapter);
     }
 
@@ -307,11 +321,12 @@ public class SensorActivity extends Activity implements SensorEventListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        String ss = spinner_from.getSelectedItem().toString() +
+                " " + spinner_to.getSelectedItem().toString() + "\n";
         startTimeMillis = System.currentTimeMillis();
         startUpTimeMillis = SystemClock.uptimeMillis();
         startTimestamp = SystemClock.elapsedRealtimeNanos();
-        String ss = Long.toString(startTimeMillis) + "\n";
+        ss += Long.toString(startTimeMillis) + "\n";
         ss += Long.toString(startUpTimeMillis) + "\n";
         ss += Long.toString(startTimestamp) + "\n";
 
