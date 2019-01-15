@@ -309,15 +309,17 @@ public class SensorActivity extends Activity implements SensorEventListener {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyMMdd HH_mm_ss", Locale.US);
             String fileName = format.format(new Date());
-            File path = new File(pathName);
-            file = new File(pathName + fileName + ".txt");
+            String curPathName = pathName +
+                    new SimpleDateFormat("yyMMdd", Locale.US).format(new Date()) + "/";
+            File path = new File(curPathName);
+            file = new File(curPathName + fileName + ".txt");
             boolean res;
             if (!path.exists())
                 res = path.mkdir();
             if (!file.exists())
                 res = file.createNewFile();
             fos = new FileOutputStream(file);
-            videoFile = new File(pathName + fileName + ".mp4");
+            videoFile = new File(curPathName + fileName + ".mp4");
         } catch (IOException e) {
             e.printStackTrace();
         }
