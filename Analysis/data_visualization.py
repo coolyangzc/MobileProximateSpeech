@@ -1,4 +1,7 @@
+import os
+
 import data_reader
+import matplotlib
 import matplotlib.pyplot as plt
 
 
@@ -53,7 +56,7 @@ def compare_files(file_path_list, show_slope=False):
 
     n = len(file_path_list)
     for t in type_list:
-        plt.figure(figsize=(10, n*3.5))
+        plt.figure(figsize=(9, n*3))
         plt.suptitle(t, x=0.02, y=0.998, horizontalalignment='left')
 
         y_min = 1e100
@@ -80,10 +83,14 @@ def compare_files(file_path_list, show_slope=False):
             frame_list = data_list[file_id].get_list(t)
             if show_slope:
                 data = frame_list.slope
-                plt.title(file_path_list[file_id] + '(slope)')
+                plt.title(file_path_list[file_id] + ' ' +
+                          data_list[file_id].description + '(slope)',
+                          fontproperties='SimHei')
             else:
                 data = frame_list.value
-                plt.title(file_path_list[file_id])
+                plt.title(file_path_list[file_id] + ' ' +
+                          data_list[file_id].description,
+                          fontproperties='SimHei')
             for i in range(frame_list.get_data_way()):
                 if len(data[i]) <= 100:
                     plot_format = 'x:'
@@ -91,13 +98,21 @@ def compare_files(file_path_list, show_slope=False):
                     plot_format = '-'
                 plt.plot(frame_list.time_stamp, data[i], plot_format, label=i)
             plt.legend()
+
         plt.show()
 
 
-files = ['../Data/190111 14_40_17.txt', #'../Data/190111 14_40_36.txt',
-         '../Data/190111 14_40_47.txt', '../Data/190111 14_40_56.txt',
-         '../Data/190114 10_36_37.txt']
+#files = ['../Data/190111 14_40_17.txt', #'../Data/190111 14_40_36.txt',
+#         '../Data/190111 14_40_47.txt', '../Data/190111 14_40_56.txt',
+#         '../Data/190114 10_36_37.txt']
 #for file in files:
     #visualize_file(file)
+
+file_dir = '../Data/190115/'
+file_list = os.listdir(file_dir)
+files = []
+for file_name in file_list:
+    if file_name[-4:] == ".txt":
+        files.append(file_dir + file_name)
 compare_files(files, False)
-compare_files(files, True)
+#compare_files(files, True)

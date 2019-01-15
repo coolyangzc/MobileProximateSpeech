@@ -130,7 +130,8 @@ public class SensorActivity extends Activity implements SensorEventListener {
         from_list.add("握持：浏览");
         from_list.add("握持：打字");
 
-        to_list.add("近距语音");
+        to_list.add("近距语音:遮挡嘴部");
+        to_list.add("近距语音:水平话筒");
         to_list.add("握持");
 
         ArrayAdapter<String> arr_adapter= new ArrayAdapter<String>

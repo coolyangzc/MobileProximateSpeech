@@ -63,6 +63,7 @@ class FrameList:
 class Data:
 
     start_time_millis, start_up_time_millis, start_elapsed_realtime_nanos = 0, 0, 0
+    description = ''
     min_time, max_time = 0, 0
     type_to_list = {}
 
@@ -70,14 +71,15 @@ class Data:
         self.type_to_list = {}
 
     def read(self, file_path, show_msg=True):
-        f = open(file_path, "r")
+        f = open(file_path, "r", encoding='utf-8')
         lines = f.readlines()
         f.close()
-
-        self.start_time_millis = int(lines[0])
-        self.start_up_time_millis = int(lines[1])
-        self.start_elapsed_realtime_nanos = int(lines[2])
-        for line in lines[3:]:
+        self.description = lines[0]
+        print(lines[0])
+        self.start_time_millis = int(lines[1])
+        self.start_up_time_millis = int(lines[2])
+        self.start_elapsed_realtime_nanos = int(lines[3])
+        for line in lines[4:]:
             self.__add_frame(line)
 
     def clear(self):
