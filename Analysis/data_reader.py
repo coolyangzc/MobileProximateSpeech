@@ -10,12 +10,11 @@ class FrameList:
 
     def get_data(self, kind):
         if kind[:5] == 'slope':
-            if len(self.slope) == 0:
-                k = kind.split()
-                if len(k) > 1:
-                    self.get_slope(int(k[1]))
-                else:
-                    self.get_slope()
+            k = kind.split()
+            if len(k) > 1:
+                self.get_slope(int(k[1]))
+            else:
+                self.get_slope()
             return self.slope
         elif kind == 'sum':
             return self.sum
@@ -35,6 +34,18 @@ class FrameList:
         for data in choice:
             tmp = max(tmp, max(data))
         return tmp
+
+    def get_sum(self):
+        self.sum.clear()
+        for w in range(len(self.value)):
+            self.sum.append([])
+            s = self.sum[-1]
+            v = self.value[w]
+            s.append(v[0])
+            for i in range(1, len(v)):
+                s.append(v[i] + s[i-1])
+        return self.sum
+
 
     def get_slope(self, time_window=100):
         self.slope.clear()
@@ -80,6 +91,8 @@ class Data:
         self.start_elapsed_realtime_nanos = int(lines[3])
         for line in lines[4:]:
             self.__add_frame(line)
+        for (t, l) in self.type_to_list.items():
+            l.get_sum()
 
     def clear(self):
         self.min_time = self.max_time = 0
