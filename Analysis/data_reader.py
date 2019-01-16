@@ -3,37 +3,37 @@ class FrameList:
     def __init__(self):
         self.type = ""
         self.time_stamp, self.accuracy = [], []
-        self.value, self.slope = [], []
+        self.value, self.slope, self.sum = [], [], []
 
     def get_data_way(self):
         return len(self.value)
 
-    def get_min_data(self):
+    def get_data(self, kind):
+        if kind[:5] == 'slope':
+            if len(self.slope) == 0:
+                k = kind.split()
+                if len(k) > 1:
+                    self.get_slope(int(k[1]))
+                else:
+                    self.get_slope()
+            return self.slope
+        elif kind == 'sum':
+            return self.sum
+        else:
+            return self.value
+
+    def get_min_data(self, kind='value'):
+        choice = self.get_data(kind)
         tmp = 1e100
-        for values in self.value:
-            tmp = min(tmp, min(values))
+        for data in choice:
+            tmp = min(tmp, min(data))
         return tmp
 
-    def get_max_data(self):
+    def get_max_data(self, kind='value'):
+        choice = self.get_data(kind)
         tmp = -1e100
-        for values in self.value:
-            tmp = max(tmp, max(values))
-        return tmp
-
-    def get_min_slope(self):
-        if len(self.slope) == 0:
-            self.get_slope()
-        tmp = 1e100
-        for slopes in self.slope:
-            tmp = min(tmp, min(slopes))
-        return tmp
-
-    def get_max_slope(self):
-        if len(self.slope) == 0:
-            self.get_slope()
-        tmp = -1e100
-        for slopes in self.slope:
-            tmp = max(tmp, max(slopes))
+        for data in choice:
+            tmp = max(tmp, max(data))
         return tmp
 
     def get_slope(self, time_window=100):
@@ -59,11 +59,10 @@ class FrameList:
         return self.slope
 
 
-
 class Data:
 
     start_time_millis, start_up_time_millis, start_elapsed_realtime_nanos = 0, 0, 0
-    description = ''
+    description, file_path = '', ''
     min_time, max_time = 0, 0
     type_to_list = {}
 
@@ -74,8 +73,8 @@ class Data:
         f = open(file_path, "r", encoding='utf-8')
         lines = f.readlines()
         f.close()
+        self.file_path = file_path
         self.description = lines[0]
-        print(lines[0])
         self.start_time_millis = int(lines[1])
         self.start_up_time_millis = int(lines[2])
         self.start_elapsed_realtime_nanos = int(lines[3])

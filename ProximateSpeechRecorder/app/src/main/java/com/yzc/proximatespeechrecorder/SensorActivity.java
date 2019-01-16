@@ -85,11 +85,11 @@ public class SensorActivity extends Activity implements SensorEventListener {
             "MAGNETIC_FIELD_UNCALIBRATED", "GAME_ROTATION_VECTOR",
             "GYROSCOPE_UNCALIBRATED", "SIGNIFICANT_MOTION",
             "STEP_DETECTOR", "STEP_COUNTER"
-
     };
     private float sensorData[][] = new float[sensorType.length][];
 
-    private final String pathName = Environment.getExternalStorageDirectory().getPath() + "/SensorData/";
+    private final String pathName =
+            Environment.getExternalStorageDirectory().getPath() + "/SensorData/";
     private FileOutputStream fos;
 
     static {
