@@ -2,13 +2,19 @@ package com.yzc.proximatespeechrecorder;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
+
+    private Button button_demo, button_record;
+    private Context ctx;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -24,15 +30,35 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ctx = this;
+        initViews();
         verifyStoragePermissions(this);
         verifyVideoPermissions(this);
-
-        Intent intent = new Intent();
-        //intent.setClass(this, CameraActivity.class);
-        intent.setClass(this, SensorActivity.class);
-        //intent.setClass(this, CapacityActivity.class);
-        startActivity(intent);
     }
+
+    private void initViews() {
+        button_demo = findViewById(R.id.button_demo);
+        button_record = findViewById(R.id.button_record);
+        button_demo.setOnClickListener(clickListener);
+        button_record.setOnClickListener(clickListener);
+    }
+
+    View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent();
+            switch (view.getId()) {
+                case R.id.button_demo:
+                    intent.setClass(ctx, DemoActivity.class);
+                    startActivity(intent);
+                    break;
+                case R.id.button_record:
+                    intent.setClass(ctx, SensorActivity.class);
+                    startActivity(intent);
+                    break;
+            }
+        }
+    };
 
     public static void verifyStoragePermissions(Activity activity) {
         int permission = ActivityCompat.checkSelfPermission(activity,

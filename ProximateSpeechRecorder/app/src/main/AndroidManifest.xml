@@ -33,6 +33,10 @@
             android:name="com.yzc.proximatespeechrecorder.CapacityActivity"
             android:label="CapacityActivity"  >
         </activity>
+        <activity
+            android:name="com.yzc.proximatespeechrecorder.DemoActivity"
+            android:label="DemoActivity"  >
+        </activity>
     </application>
 
 </manifest>
