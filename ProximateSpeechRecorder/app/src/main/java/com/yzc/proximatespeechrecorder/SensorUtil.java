@@ -4,7 +4,8 @@ import android.hardware.Sensor;
 
 public class SensorUtil {
 
-    public static int sensorType[] = {
+
+    public static final int sensorType[] = {
             Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_MAGNETIC_FIELD,
             Sensor.TYPE_GYROSCOPE, Sensor.TYPE_ROTATION_VECTOR,
             Sensor.TYPE_GRAVITY, Sensor.TYPE_PROXIMITY,
@@ -18,7 +19,7 @@ public class SensorUtil {
             Sensor.TYPE_STEP_DETECTOR, Sensor.TYPE_STEP_COUNTER
     };
 
-    public static String sensorName[] = {
+    public static final String sensorName[] = {
             "ACCELEROMETER", "MAGNETIC_FIELD",
             "GYROSCOPE", "ROTATION_VECTOR",
             "GRAVITY", "PROXIMITY",
@@ -31,5 +32,14 @@ public class SensorUtil {
             "GYROSCOPE_UNCALIBRATED", "SIGNIFICANT_MOTION",
             "STEP_DETECTOR", "STEP_COUNTER"
     };
+
+    public static final int sensorNum = sensorName.length;
+
+    public static int getSensorID(String name) {
+        for (int i = 0; i < sensorName.length; ++i)
+            if (name == sensorName[i])
+                return i;
+        return -1;
+    }
 
 }
