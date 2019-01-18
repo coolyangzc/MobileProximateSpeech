@@ -10,11 +10,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Created by cxk on 2017/12/8.
- * <p>
- * 这里为了方便，将部分方法封装到这个Util里面
- */
 
 public class Camera2Util {
     //选择合适的视频size，并且不能大于1080p

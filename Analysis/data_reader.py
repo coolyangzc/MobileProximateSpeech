@@ -46,7 +46,6 @@ class FrameList:
                 s.append(v[i] + s[i-1])
         return self.sum
 
-
     def get_slope(self, time_window=100):
         self.slope.clear()
         for w in range(len(self.value)):

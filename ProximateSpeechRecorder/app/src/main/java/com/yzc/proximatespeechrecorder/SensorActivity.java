@@ -60,32 +60,10 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private TextView textView_sensor, textView_touch;
     private Spinner spinner_from, spinner_to;
     private Button button_record;
-    private int sensorType[] = {
-            Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_MAGNETIC_FIELD,
-            Sensor.TYPE_GYROSCOPE, Sensor.TYPE_ROTATION_VECTOR,
-            Sensor.TYPE_GRAVITY, Sensor.TYPE_PROXIMITY,
-            Sensor.TYPE_LIGHT, Sensor.TYPE_LINEAR_ACCELERATION,
 
-            Sensor.TYPE_ACCELEROMETER_UNCALIBRATED, Sensor.TYPE_PRESSURE,
-            Sensor.TYPE_RELATIVE_HUMIDITY, Sensor.TYPE_AMBIENT_TEMPERATURE,
+    private int sensorType[] = SensorUtil.sensorType;
+    private String sensorName[] = SensorUtil.sensorName;
 
-            Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, Sensor.TYPE_GAME_ROTATION_VECTOR,
-            Sensor.TYPE_GYROSCOPE_UNCALIBRATED, Sensor.TYPE_SIGNIFICANT_MOTION,
-            Sensor.TYPE_STEP_DETECTOR, Sensor.TYPE_STEP_COUNTER
-    };
-    private String sensorName[] = {
-            "ACCELEROMETER", "MAGNETIC_FIELD",
-            "GYROSCOPE", "ROTATION_VECTOR",
-            "GRAVITY", "PROXIMITY",
-            "LIGHT", "LINEAR_ACCELERATION",
-
-            "ACCELEROMETER_UNCALIBRATED", "PRESSURE",
-            "RELATIVE_HUMIDITY", "AMBIENT_TEMPERATURE",
-
-            "MAGNETIC_FIELD_UNCALIBRATED", "GAME_ROTATION_VECTOR",
-            "GYROSCOPE_UNCALIBRATED", "SIGNIFICANT_MOTION",
-            "STEP_DETECTOR", "STEP_COUNTER"
-    };
     private float sensorData[][] = new float[sensorType.length][];
 
     private final String pathName =
@@ -116,9 +94,6 @@ public class SensorActivity extends Activity implements SensorEventListener {
         spinner_from = findViewById(R.id.spinner_from);
         spinner_to = findViewById(R.id.spinner_to);
         setSpinners();
-
-
-
     }
 
     private void setSpinners() {
