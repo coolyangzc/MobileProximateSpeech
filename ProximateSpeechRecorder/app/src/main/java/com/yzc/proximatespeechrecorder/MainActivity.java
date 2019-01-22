@@ -38,8 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         Button button_demo = findViewById(R.id.button_demo);
         Button button_record = findViewById(R.id.button_record);
+        Button button_study1 = findViewById(R.id.button_study1);
         button_demo.setOnClickListener(clickListener);
         button_record.setOnClickListener(clickListener);
+        button_study1.setOnClickListener(clickListener);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -55,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
                     intent.setClass(ctx, SensorActivity.class);
                     startActivity(intent);
                     break;
+                case R.id.button_study1:
+                    intent.setClass(ctx, Study1Activity.class);
+                    startActivity(intent);
             }
         }
     };
