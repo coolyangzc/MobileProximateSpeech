@@ -2,7 +2,9 @@ package com.yzc.proximatespeechrecorder;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -26,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +58,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
     private CameraCaptureSession mCaptureSession;
 
     private SensorManager mSensorManager;
-    private Button button_record;
+    private Button button_record, button_goto;
     private TextView textView_description;
 
     private int sensorType[] = SensorUtil.sensorType;
@@ -63,7 +66,8 @@ public class Study1Activity extends Activity implements SensorEventListener {
     private float sensorData[][] = new float[sensorType.length][];
 
     private final String pathName =
-            Environment.getExternalStorageDirectory().getPath() + "/Study1Data/";
+            Environment.getExternalStorageDirectory().getPath() +
+                    "/SensorData/Study1/";
     private FileOutputStream fos;
 
     private Study1Task tasks = new Study1Task();
@@ -85,9 +89,11 @@ public class Study1Activity extends Activity implements SensorEventListener {
 
     private void initViews() {
         textView_description = findViewById(R.id.textView_description);
+        textView_description.setText(tasks.getTaskDescription());
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(clickListener);
-        textView_description.setText(tasks.getCurrentTask());
+        button_goto = findViewById(R.id.button_goto);
+        button_goto.setOnLongClickListener(longClickListener);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -112,11 +118,37 @@ public class Study1Activity extends Activity implements SensorEventListener {
                         stopMediaRecorder();
                         readDiffStop();
                         MediaScannerConnection.scanFile(ctx,
-                                new String[] { file.getAbsolutePath(), videoFile.getAbsolutePath() }, null, null);
+                                new String[] { file.getAbsolutePath(), videoFile.getAbsolutePath() },
+                                null, null);
                         textView_description.setText(tasks.nextTask());
                     }
                     break;
             }
+        }
+    };
+
+    View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+
+        @Override
+        public boolean onLongClick(View v) {
+            switch (v.getId()) {
+                case R.id.button_goto:
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                    builder.setTitle("跳转至");
+                    final EditText et = new EditText(ctx);
+                    builder.setView(et);
+                    builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            tasks.changeTaskId(Integer.valueOf(et.getText().toString()));
+                            textView_description.setText(tasks.getTaskDescription());
+                        }
+                    });
+                    builder.setNegativeButton("否", null);
+                    builder.show();
+                    break;
+            }
+            return false;
         }
     };
 
@@ -234,10 +266,11 @@ public class Study1Activity extends Activity implements SensorEventListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        String ss = tasks.getTaskDescription().replace('\n', ' ') + '\n';
         startTimeMillis = System.currentTimeMillis();
         startUpTimeMillis = SystemClock.uptimeMillis();
         startTimestamp = SystemClock.elapsedRealtimeNanos();
-        String ss = Long.toString(startTimeMillis) + "\n";
+        ss += Long.toString(startTimeMillis) + "\n";
         ss += Long.toString(startUpTimeMillis) + "\n";
         ss += Long.toString(startTimestamp) + "\n";
 
