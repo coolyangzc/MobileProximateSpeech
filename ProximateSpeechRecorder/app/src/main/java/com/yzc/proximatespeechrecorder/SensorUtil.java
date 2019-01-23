@@ -4,7 +4,6 @@ import android.hardware.Sensor;
 
 public class SensorUtil {
 
-
     public static final int sensorType[] = {
             Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_MAGNETIC_FIELD,
             Sensor.TYPE_GYROSCOPE, Sensor.TYPE_ROTATION_VECTOR,

@@ -222,3 +222,33 @@ Java_com_yzc_proximatespeechrecorder_SensorActivity_readDiffStop(JNIEnv *env, jo
     write(pipefd[1],"1",1);
     LOGD("readDiffStop...");
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_yzc_proximatespeechrecorder_Study1Activity_readDiffStart(JNIEnv *env, jobject instance) {
+
+    env->GetJavaVM(&g_jvm); // 保存java虚拟机对象
+    callBack_method = env->GetMethodID(env->GetObjectClass(instance),"processCapa","([SJ)V");
+
+    if(callBack_method == 0){
+        __android_log_print(ANDROID_LOG_DEBUG,TAG,"find callBack_method error");
+        return ;
+    }
+    LOGD("Find Func...");
+    jobject obj = env->NewGlobalRef(instance);
+    pthread_create(&thread_1, NULL, run, obj);
+    LOGD("readDiffStart...");
+}
+
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_yzc_proximatespeechrecorder_Study1Activity_readDiffStop(JNIEnv *env, jobject instance) {
+
+    // TODO
+    if(pipefd[1] < 0)
+        return;
+    write(pipefd[1],"1",1);
+    LOGD("readDiffStop...");
+}

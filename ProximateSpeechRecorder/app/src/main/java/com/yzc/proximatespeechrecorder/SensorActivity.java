@@ -86,7 +86,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
     }
 
     private void initViews() {
-        textView_sensor = findViewById(R.id.textView_sensor);
+        textView_sensor = findViewById(R.id.textView_description);
         textView_touch = findViewById(R.id.textView_touch);
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(clickListener);
@@ -238,12 +238,11 @@ public class SensorActivity extends Activity implements SensorEventListener {
                 List<Float> touchData = new ArrayList<Float>();
                 touchData.add(e.getX(i));
                 touchData.add(e.getY(i));
-
                 touchData.add(e.getPressure(i));
                 touchData.add(e.getSize(i));
                 touchData.add(e.getOrientation(i));
-                touchData.add(e.getTouchMajor(i));
-                touchData.add(e.getTouchMinor(i));
+                touchData.add(e.getTouchMajor(i)); touchData.add(e.getTouchMinor(i));
+                touchData.add(e.getToolMajor(i)); touchData.add(e.getToolMinor(i));
 
                 for (Float data : touchData)
                     s += " " + data.toString();
