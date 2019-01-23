@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -104,12 +105,14 @@ public class Study1Activity extends Activity implements SensorEventListener {
                     isRecording ^= true;
                     if (isRecording) {
                         button_record.setText("结束");
+                        button_record.setTextColor(Color.RED);
                         createDataFile();
                         prepareMediaRecorder();
                         startMediaRecorder();
                         readDiffStart();
                     } else {
                         button_record.setText("开始");
+                        button_record.setTextColor(Color.BLACK);
                         try {
                             fos.close();
                         } catch (IOException e) {
@@ -156,18 +159,11 @@ public class Study1Activity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         float[] values = sensorEvent.values;
         String s = "";
-        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < sensorType.length; i++) {
             if (sensorEvent.sensor.getType() == sensorType[i]) {
                 sensorData[i] = values;
                 s = sensorName[i];
-            }
-
-            if (sensorData[i] != null) {
-                sb.append(sensorName[i]);
-                for (float data : sensorData[i])
-                    sb.append(String.format(Locale.US, " %.2f", data));
-                sb.append("\n");
+                break;
             }
         }
         if (!isRecording)
