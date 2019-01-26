@@ -101,7 +101,7 @@ def visualize_sensor(data_list, sensor_name, kind='value', save_dir='./output/')
 			plt.plot(choice_list[file_id].time_stamp, data[i], plot_format, label=i)
 		plt.legend()
 
-	save_name = sensor_name + '.png'
+	save_name = save_prefix + sensor_name + '.png'
 	plt.savefig(os.path.join(save_dir, save_name))
 	plt.show()
 
@@ -160,7 +160,7 @@ if __name__ == '__main__':
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'slope 1000')
 
-	# compare_files(data_list, False)
+	compare_files(data_list, False)
 
 	# compare_files(files, True)
 	pass
