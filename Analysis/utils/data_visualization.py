@@ -3,8 +3,11 @@ import os
 from utils import data_reader
 from utils.logger import DualLogger
 import matplotlib.pyplot as plt
+import time
 
 remove_sensor = ['TOUCH', 'CAPACITY', 'STEP_COUNTER', 'PRESSURE']
+
+save_prefix = ''  # prefix for save files in this program. using the time
 
 
 def visualize_file(file_path):
@@ -98,10 +101,8 @@ def visualize_sensor(data_list, sensor_name, kind='value', save_dir='./output/')
 			plt.plot(choice_list[file_id].time_stamp, data[i], plot_format, label=i)
 		plt.legend()
 
-		save_name = ''.join(os.path.basename(data_list[file_id].file_path).split('.')[:-1]) + '_' + sensor_name + '.png'
-		plt.savefig(os.path.join(save_dir, save_name))
-
-	# show only the last figure
+	save_name = sensor_name + '.png'
+	plt.savefig(os.path.join(save_dir, save_name))
 	plt.show()
 
 
@@ -121,31 +122,37 @@ def search_files(file_dir: str):
 	return files
 
 
-def read_data(file_path_list: list, show_process=False):
+def read_data(file_path_list: list, show_progress=False):
 	""" get Data list from file path list
 
 	:param file_path_list: list of file path
-	:param show_process: bool, whether to show the reading process
+	:param show_progress: bool, whether to show the reading process
 	:return: list of Data()
 	"""
 	print('reading data...')
 	data_list = []
 	n_file = len(file_path_list)
 	for i, file_path in enumerate(file_path_list):
-		if show_process: print('[%.1f %%] %s' % (i / n_file * 100, file_path))
+		if show_progress: print('\r[%.1f %%] %s' % ((i + 1) / n_file * 100, file_path), end='')
 		d = data_reader.Data()
 		d.read(file_path)
 		data_list.append(d)
+	print()
 	print('data read.')
 	return data_list
 
 
 if __name__ == '__main__':
-	DualLogger('./output/log.txt')
-	file_dir1 = './Data/Study1/Fengshi Zheng/' # data of Fengshi Zheng
+	now = time.localtime(time.time())
+	save_prefix = time.strftime('%y%m%d_%H-%M-%S_')
+	DualLogger('./output/' + save_prefix + 'log.txt')
 
-	file_paths = search_files(file_dir1)
-	data_list = read_data(file_paths, show_process=True)
+	file_dir1 = './Data/Study1/Fengshi Zheng/'  # data of Fengshi Zheng
+	file_dir2 = './Data/Study1/123/'	# just for debugging
+
+	file_paths = search_files(file_dir2)
+	data_list = read_data(file_paths, show_progress=True)
+
 	# visualize_file(file_paths[0])
 
 	# visualize_sensor(data_list, 'ROTATION_VECTOR')
@@ -153,7 +160,7 @@ if __name__ == '__main__':
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'slope 1000')
 
-	compare_files(data_list, False)
+	# compare_files(data_list, False)
 
 	# compare_files(files, True)
 	pass
