@@ -1,18 +1,25 @@
 import os
 
-from utils import data_reader
-from utils.logger import DualLogger
+from utils import data_reader, logger, tools
 import matplotlib.pyplot as plt
-import time
 
 remove_sensor = ['TOUCH', 'CAPACITY', 'STEP_COUNTER', 'PRESSURE']
 
-save_prefix = ''  # prefix for save files in this program. using the time
+save_prefix = tools.gen_prefix()  # prefix for save files in this program. using the time
 
 
-def visualize_file(file_path):
+def visualize_file(file_path, save_dir='./output/', show_msg=False):
+	"""
+	visualize data from a single .txt file
+
+	:param file_path: given file path
+	:param save_dir: saving directory
+	:param show_msg: bool, whether to print message
+	"""
+	if show_msg: print('visualizing %s...  ' % file_path, end='')
 	data = data_reader.Data()
 	data.read(file_path)
+	if show_msg: print(data.description)
 
 	type_list = data.get_types()
 	type_list.remove('TOUCH')
@@ -38,6 +45,7 @@ def visualize_file(file_path):
 
 		plt.legend()
 	plt.suptitle(file_path, x=0.02, y=0.998, horizontalalignment='left')
+	plt.savefig(os.path.join(save_dir, save_prefix + 'file_' + tools.suffix_conv(file_path, '.png')))
 	plt.show()
 
 
@@ -58,10 +66,11 @@ def visualize_sensor(data_list, sensor_name, kind='value', save_dir='./output/')
 	visualize data collected by a sensor
 
 	:param data_list: list of Data()
-	:param sensor_name:
-	:param kind:
+	:param sensor_name: name string of sensor, e.g. 'ACCELEROMETER'
+	:param kind: 'value', 'slope' or 'sum'
 	:param save_dir: directory to save the figure, default: './output/'
 	"""
+	print('visualizing %s data...' % sensor_name)
 	choice_list = []
 	max_time = 0
 	for d in data_list:
@@ -122,7 +131,7 @@ def search_files(file_dir: str):
 	return files
 
 
-def read_data(file_path_list: list, show_progress=False):
+def get_data_list(file_path_list: list, show_progress=False):
 	""" get Data list from file path list
 
 	:param file_path_list: list of file path
@@ -143,24 +152,22 @@ def read_data(file_path_list: list, show_progress=False):
 
 
 if __name__ == '__main__':
-	now = time.localtime(time.time())
-	save_prefix = time.strftime('%y%m%d_%H-%M-%S_')
-	DualLogger('./output/' + save_prefix + 'log.txt')
+	logger.DualLogger('./logs/' + save_prefix + 'data visualization.txt')
 
 	file_dir1 = './Data/Study1/Fengshi Zheng/'  # data of Fengshi Zheng
-	file_dir2 = './Data/Study1/123/'	# just for debugging
+	file_dir2 = './Data/Study1/123/'  # just for debugging
 
 	file_paths = search_files(file_dir2)
-	data_list = read_data(file_paths, show_progress=True)
+	data_list = get_data_list(file_paths, show_progress=True)
 
-	# visualize_file(file_paths[0])
+	visualize_sensor(data_list[:10], 'ROTATION_VECTOR')
+	visualize_file(file_paths[-1], show_msg=True)
 
-	# visualize_sensor(data_list, 'ROTATION_VECTOR')
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION')
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'slope 1000')
 
-	compare_files(data_list, False)
+	# compare_files(data_list, False)
 
 	# compare_files(files, True)
 	pass
