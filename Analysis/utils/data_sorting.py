@@ -9,7 +9,7 @@ import os, shutil, re
 from utils import logger, tools
 from tqdm import tqdm	# progressbar
 
-PREFIX = tools.gen_prefix()
+PREFIX = tools.date_time()
 
 NEG_DESCRIPTIONS = re.compile(' (打字|浏览|拍照|裤兜（坐）|裤兜（走）|握持（走）|桌上|接听) ', re.U)  # 负例
 

@@ -1,14 +1,16 @@
 import os
+import random
 
 from utils import data_reader, logger, tools
+from tqdm import tqdm  # progressbar
 import matplotlib.pyplot as plt
 
 remove_sensor = ['TOUCH', 'CAPACITY', 'STEP_COUNTER', 'PRESSURE']
 
-save_prefix = tools.gen_prefix()  # prefix for save files in this program. using the time
+RUN_TIME = tools.date_time()  # name of save directory
 
 
-def visualize_file(file_path, save_dir='./output/', show_msg=False):
+def visualize_file(file_path, save_dir='../output/%s/' % RUN_TIME, show_msg=False):
 	"""
 	visualize data from a single .txt file
 
@@ -45,7 +47,8 @@ def visualize_file(file_path, save_dir='./output/', show_msg=False):
 
 		plt.legend()
 	plt.suptitle(file_path, x=0.02, y=0.998, horizontalalignment='left')
-	plt.savefig(os.path.join(save_dir, save_prefix + 'file_' + tools.suffix_conv(file_path, '.png')))
+	if not os.path.exists(save_dir): os.mkdir(save_dir)
+	plt.savefig(os.path.join(save_dir, 'file_' + tools.suffix_conv(file_path, '.png')))
 	plt.show()
 
 
@@ -61,15 +64,17 @@ def compare_files(data_list, show_slope=False):
 		visualize_sensor(data_list, sensor_name, 'value')
 
 
-def visualize_sensor(data_list, sensor_name, kind='value', save_dir='./output/'):
+def visualize_sensor(data_list, sensor_name, kind='value', save_dir='../output/%s/' % RUN_TIME, title=None):
 	"""
 	visualize data collected by a sensor
 
 	:param data_list: list of Data()
 	:param sensor_name: name string of sensor, e.g. 'ACCELEROMETER'
 	:param kind: 'value', 'slope' or 'sum'
-	:param save_dir: directory to save the figure, default: './output/'
+	:param save_dir: directory to save the figure, default: './output/SAVE_PREFIX/'
+	:param title: extra assigned title of figure
 	"""
+	if title is None: title = sensor_name
 	print('visualizing %s data...' % sensor_name)
 	choice_list = []
 	max_time = 0
@@ -91,7 +96,7 @@ def visualize_sensor(data_list, sensor_name, kind='value', save_dir='./output/')
 
 	n = len(data_list)
 	plt.figure(figsize=(9, n * 3))
-	plt.suptitle(sensor_name, x=0.02, y=0.998, horizontalalignment='left')
+	plt.suptitle(title, x=0.02, y=0.998, horizontalalignment='left')
 
 	for file_id in range(n):
 		plt.subplot(len(data_list), 1, file_id + 1)
@@ -110,7 +115,8 @@ def visualize_sensor(data_list, sensor_name, kind='value', save_dir='./output/')
 			plt.plot(choice_list[file_id].time_stamp, data[i], plot_format, label=i)
 		plt.legend()
 
-	save_name = save_prefix + sensor_name + '.png'
+	save_name = title + '.png'
+	if not os.path.exists(save_dir): os.mkdir(save_dir)
 	plt.savefig(os.path.join(save_dir, save_name))
 	plt.show()
 
@@ -121,7 +127,7 @@ def search_files(file_dir: str):
 	:param file_dir: file directory
 	:return: list of .txt files
 	"""
-	print('searching files...')
+	print('searching files %s ...' % file_dir)
 	file_list = os.listdir(file_dir)
 	files = []
 	for file_name in file_list:
@@ -131,43 +137,52 @@ def search_files(file_dir: str):
 	return files
 
 
-def get_data_list(file_path_list: list, show_progress=False):
+def get_data_list(file_path_list: list):
 	""" get Data list from file path list
 
 	:param file_path_list: list of file path
-	:param show_progress: bool, whether to show the reading process
 	:return: list of Data()
 	"""
 	print('reading data...')
 	data_list = []
-	n_file = len(file_path_list)
-	for i, file_path in enumerate(file_path_list):
-		if show_progress: print('\r[%.1f %%] %s' % ((i + 1) / n_file * 100, file_path), end='')
+	for file_path in tqdm(file_path_list):  # show progress bar
 		d = data_reader.Data()
 		d.read(file_path)
 		data_list.append(d)
-	print()
 	print('data read.')
 	return data_list
 
 
 if __name__ == '__main__':
-	logger.DualLogger('./logs/' + save_prefix + 'data visualization.txt')
+	logger.DualLogger('../logs/' + RUN_TIME + 'data visualization.txt') # setup logger
+	file_dir1 = '../Data/Study1/Fengshi Zheng/'  # data of Fengshi Zheng
+	file_dir1_P = '../Data/Study1/Fengshi Zheng/Positive/'  # Positive data of Fengshi Zheng
+	file_dir1_N = '../Data/Study1/Fengshi Zheng/Negative/'  # Negative data of Fengshi Zheng
+	file_dir2 = '../Data/Study1/123/'  # just for debugging
+	file_dir2_P = '../Data/Study1/123/Positive/'
+	file_dir2_N = '../Data/Study1/123/Negative/'
 
-	file_dir1 = './Data/Study1/Fengshi Zheng/'  # data of Fengshi Zheng
-	file_dir2 = './Data/Study1/123/'  # just for debugging
+	watched_sensors = ['ROTATION_VECTOR', 'ACCELEROMETER', 'GYROSCOPE', 'PROXIMITY']
+	print('# Make Comparisons Between P/N Data')
 
-	file_paths = search_files(file_dir2)
-	data_list = get_data_list(file_paths, show_progress=True)
+	# 以下为一个随机取样的实验，从正例和反例中各随机选取5次实验的数据，然后对比它们在四个传感器数据上的差异
+	print('\n## Visualizing Positive Data')
+	file_paths = random.choices(search_files(file_dir1_P), k=5)
+	data_list = get_data_list(file_paths)
+	for sensor in watched_sensors:
+		visualize_sensor(data_list, sensor, title='+ %s' % sensor)
 
-	visualize_sensor(data_list[:10], 'ROTATION_VECTOR')
-	visualize_file(file_paths[-1], show_msg=True)
+	print('\n## Visualizing Negative Data')
+	file_paths = random.choices(search_files(file_dir1_N), k=5)
+	data_list = get_data_list(file_paths)
+	for sensor in watched_sensors:
+		visualize_sensor(data_list, sensor, title='- %s' % sensor)
 
+	# visualize_file(file_paths[-1], show_msg=True)
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION')
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
 	# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'slope 1000')
-
 	# compare_files(data_list, False)
-
 	# compare_files(files, True)
+
 	pass

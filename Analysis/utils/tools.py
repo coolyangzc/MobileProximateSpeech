@@ -1,11 +1,12 @@
 import time
 
 
-def gen_prefix() -> str:
-	''' save file prefix generator
-	generate uniform format prefix string from current time
+def date_time() -> str:
+	'''
+	generate uniform format date and time string
+	promissory save file prefix format in our project
 
-	:return: prefix string
+	:return: date_time string
 	'''
 	return time.strftime('%y%m%d %H_%M_%S ')
 
