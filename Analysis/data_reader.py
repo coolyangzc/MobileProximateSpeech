@@ -3,7 +3,7 @@ class FrameList:
 	def __init__(self):
 		self.type = ""
 		self.time_stamp, self.accuracy = [], []
-		self.value, self.slope, self.sum = [], [], []
+		self.value, self.slope, self.sum, self.sqrt = [], [], [], []
 
 	def get_data_way(self):
 		return len(self.value)
@@ -18,6 +18,8 @@ class FrameList:
 			return self.slope
 		elif kind == 'sum':
 			return self.sum
+		elif kind == 'sqrt':
+			return self.sqrt
 		else:
 			return self.value
 
@@ -45,6 +47,18 @@ class FrameList:
 			for i in range(1, len(v)):
 				s.append(v[i] + s[i-1])
 		return self.sum
+
+	def get_sqrt(self):
+		self.sqrt.clear()
+		if self.type == 'TOUCH':
+			return
+		self.sqrt.append([])
+		s = self.sqrt[-1]
+		for i in range(0, len(self.time_stamp)):
+			s.append(0)
+			for w in range(len(self.value)):
+				s[-1] += self.value[w][i] ** 2
+			s[-1] = s[-1] ** 0.5
 
 	def get_slope(self, time_window=100):
 		self.slope.clear()
@@ -92,6 +106,7 @@ class Data:
 			self.__add_frame(line)
 		for (t, l) in self.type_to_list.items():
 			l.get_sum()
+			l.get_sqrt()
 
 	def clear(self):
 		self.min_time = self.max_time = 0
