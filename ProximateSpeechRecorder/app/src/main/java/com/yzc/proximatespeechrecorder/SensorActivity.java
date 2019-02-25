@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -66,8 +67,11 @@ public class SensorActivity extends Activity implements SensorEventListener {
 
     private float sensorData[][] = new float[sensorType.length][];
 
+    private Study1Task task = new Study1Task();
+
     private final String pathName =
-            Environment.getExternalStorageDirectory().getPath() + "/SensorData/";
+            Environment.getExternalStorageDirectory().getPath() +
+                    "/SensorData/Study2/";
     private FileOutputStream fos;
 
     static {
@@ -97,17 +101,11 @@ public class SensorActivity extends Activity implements SensorEventListener {
     }
 
     private void setSpinners() {
-        List<String> from_list = new ArrayList<String>();
         List<String> to_list = new ArrayList<String>();
 
-        from_list.add("桌上");
-        from_list.add("裤兜");
-        from_list.add("握持：浏览");
-        from_list.add("握持：打字");
+        List<String> from_list = new ArrayList<String>(Arrays.asList(task.triggerPosition));
 
-        to_list.add("近距语音:遮挡嘴部");
-        to_list.add("近距语音:水平话筒");
-        to_list.add("握持");
+        to_list.add("Study2");
 
         ArrayAdapter<String> arr_adapter= new ArrayAdapter<String>
                 (this, android.R.layout.simple_spinner_item, from_list);
@@ -471,7 +469,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
             if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_1080P)) {
                 CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_1080P);
                 //profile.videoBitRate = mPreviewSize.getWidth() * mPreviewSize.getHeight();
-                profile.videoBitRate = 10 * 1920 * 1080;
+                profile.videoBitRate = 20 * 1920 * 1080;
                 mMediaRecorder.setProfile(profile);
             }
             mMediaRecorder.setOutputFile(videoFile);
