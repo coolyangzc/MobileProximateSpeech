@@ -29,7 +29,8 @@ public class DemoActivity extends Activity implements SensorEventListener {
     private String sensorName[] = SensorUtil.sensorName;
     private List<ArrayList<Frame>> data = new ArrayList<>();
     private Frame dataOffset[] = new Frame[SensorUtil.sensorNum];
-    private long successTimestamp, triggerTimestamp;
+    private long rapidTimestamp, triggerTimestamp;
+    private boolean proximityHasZero = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,6 @@ public class DemoActivity extends Activity implements SensorEventListener {
                     int id = SensorUtil.getSensorID("LINEAR_ACCELERATION");
                     float copyValues[] = data.get(id).get(data.get(id).size() - 1).values;
                     dataOffset[id].values = copyValues.clone();
-
                     break;
             }
         }
@@ -91,30 +91,37 @@ public class DemoActivity extends Activity implements SensorEventListener {
         float[] values = sensorEvent.values;
         int type = sensorEvent.sensor.getType();
         for (int i = 0; i < sensorType.length; ++i) {
-            ArrayList<Frame> f_list = data.get(i);
             if (type == sensorType[i]) {
+                ArrayList<Frame> f_list = data.get(i);
                 Frame f = new Frame();
                 f.timestamp = sensorEvent.timestamp;
                 f.values = values;
                 f_list.add(f);
                 while(f.timestamp - f_list.get(0).timestamp > 1000 * 1000000L)
                     f_list.remove(0);
+                break;
             }
         }
-        if (type == Sensor.TYPE_LINEAR_ACCELERATION) {
-            boolean res = check_LINEAR_ACCELERATION();
-            if (res)
-                successTimestamp = sensorEvent.timestamp;
-
-            Frame f_proximity = getBack("PROXIMITY");
-            textView_sensor.setText(String.valueOf(f_proximity.values[2]));
-            if (sensorEvent.timestamp - triggerTimestamp <= 500 * 1000000L)
-                return;
-            if (f_proximity.values[2] > 0 && sensorEvent.timestamp - successTimestamp <= 300 * 1000000L) {
-                VibrationEffect ve = VibrationEffect.createOneShot(100, 1);
-                mVibrator.vibrate(ve);
-                triggerTimestamp = sensorEvent.timestamp;
-            }
+        switch (type) {
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                if (check_LINEAR_ACCELERATION())
+                    rapidTimestamp = sensorEvent.timestamp;
+                Frame f_proximity = getBack("PROXIMITY");
+                // textView_sensor.setText(String.valueOf(f_proximity.values[2]));
+                if (sensorEvent.timestamp - triggerTimestamp <= 500 * 1000000L)
+                    return;
+                if (f_proximity.values[2] > 0 && proximityHasZero &&
+                        sensorEvent.timestamp - rapidTimestamp <= 500 * 1000000L) {
+                    VibrationEffect ve = VibrationEffect.createOneShot(100, 1);
+                    mVibrator.vibrate(ve);
+                    triggerTimestamp = sensorEvent.timestamp;
+                    proximityHasZero = false;
+                }
+                break;
+            case Sensor.TYPE_PROXIMITY:
+                if (values[2] == 0)
+                    proximityHasZero = true;
+                break;
         }
 
     }
@@ -126,7 +133,7 @@ public class DemoActivity extends Activity implements SensorEventListener {
         float t = f_list.get(f_list.size() - 1).timestamp;
         float sum[] = new float[3];
         for (Frame f: f_list) {
-            if (t - f.timestamp > 200 * 1000000L)
+            if (t - f.timestamp > 300 * 1000000L)
                 continue;
             float v[] = f.values.clone();
             for (int j = 0; j < dataOffset[id].values.length; ++j)
@@ -135,17 +142,24 @@ public class DemoActivity extends Activity implements SensorEventListener {
                 sum[i] += v[i];
         }
         boolean rapid = false;
+        /*
         for(int i = 0; i < 3; ++i)
             if (Math.abs(sum[i]) > 30)
                 rapid = true;
+         */
+        if (sum[2] > 50)
+            rapid = true;
         if (rapid)
             sb.append("Rapid!!!!\n");
-        sb.append(String.format(Locale.US, " %.1f",
-                Math.abs(sum[0]) + Math.abs(sum[1]) + Math.abs(sum[2])));
+        sb.append(proximityHasZero);
+        for(int i = 0; i < 3; ++i)
+            sb.append(String.format(Locale.US, " %.0f\n", sum[i] / 10));
+        //sb.append(String.format(Locale.US, " %.1f",
+        //        Math.abs(sum[0]) + Math.abs(sum[1]) + Math.abs(sum[2])));
         for (int i = 0; i < 3; ++i)
             sb.append(String.format(Locale.US, " %.1f", Math.abs(sum[i])));
 
-        //textView_sensor.setText(sb.toString());
+        textView_sensor.setText(sb.toString());
         return rapid;
     }
 

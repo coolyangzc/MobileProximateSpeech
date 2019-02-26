@@ -125,7 +125,10 @@ data_list = read_data(file_paths)
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sqrt')
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'slope 1000')
-visualize_sensor(data_list, 'GYROSCOPE')
+visualize_sensor(data_list, 'ROTATION_VECTOR')
+visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sqrt')
+visualize_sensor(data_list, 'LINEAR_ACCELERATION')
+
 
 
 # compare_files(data_list, False)

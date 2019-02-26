@@ -180,7 +180,22 @@ public class SensorActivity extends Activity implements SensorEventListener {
                 sb.append("\n");
             }
         }
+
+        //Calc Orientation
+        float[] ori = new float[3];
+        float[] R = new float[9];
+        float[] gravity = sensorData[SensorUtil.getSensorID("GRAVITY")];
+        float[] geomagnetic = sensorData[SensorUtil.getSensorID("MAGNETIC_FIELD")];
+        if (gravity != null && geomagnetic != null &&
+                SensorManager.getRotationMatrix(R, null, gravity, geomagnetic)) {
+            SensorManager.getOrientation(R, ori);
+            sb.append("Orientation");
+            for (float data : ori)
+                sb.append(String.format(Locale.US, " %.2f", Math.toDegrees(data)));
+            sb.append("\n");
+        }
         textView_sensor.setText(sb.toString());
+
         if (!isRecording)
             return;
         s += " " + Long.toString((sensorEvent.timestamp - startTimestamp) / 1000000L);
