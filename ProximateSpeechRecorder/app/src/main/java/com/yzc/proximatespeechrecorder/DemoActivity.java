@@ -31,6 +31,7 @@ public class DemoActivity extends Activity implements SensorEventListener {
     private Frame dataOffset[] = new Frame[SensorUtil.sensorNum];
     private long rapidTimestamp, triggerTimestamp;
     private boolean proximityHasZero = false;
+    private boolean orientationOK= false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +98,7 @@ public class DemoActivity extends Activity implements SensorEventListener {
                 f.timestamp = sensorEvent.timestamp;
                 f.values = values;
                 f_list.add(f);
-                while(f.timestamp - f_list.get(0).timestamp > 1000 * 1000000L)
+                while(f.timestamp - f_list.get(0).timestamp > 3000 * 1000000L)
                     f_list.remove(0);
                 break;
             }
@@ -106,10 +107,11 @@ public class DemoActivity extends Activity implements SensorEventListener {
             case Sensor.TYPE_LINEAR_ACCELERATION:
                 if (check_LINEAR_ACCELERATION())
                     rapidTimestamp = sensorEvent.timestamp;
-                Frame f_proximity = getBack("PROXIMITY");
-                // textView_sensor.setText(String.valueOf(f_proximity.values[2]));
-                if (sensorEvent.timestamp - triggerTimestamp <= 500 * 1000000L)
+                if (!orientationOK || sensorEvent.timestamp - triggerTimestamp <= 500 * 1000000L)
                     return;
+                Frame f_proximity = getBack("PROXIMITY");
+
+                // textView_sensor.setText(String.valueOf(f_proximity.values[2]));
                 if (f_proximity.values[2] > 0 && proximityHasZero &&
                         sensorEvent.timestamp - rapidTimestamp <= 500 * 1000000L) {
                     VibrationEffect ve = VibrationEffect.createOneShot(100, 1);
@@ -122,6 +124,19 @@ public class DemoActivity extends Activity implements SensorEventListener {
                 if (values[2] == 0)
                     proximityHasZero = true;
                 break;
+            case Sensor.TYPE_GRAVITY:
+                float[] ori = new float[3];
+                float[] R = new float[9];
+                float[] gravity = getBack("GRAVITY").values;
+                if (getBack("MAGNETIC_FIELD") == null)
+                    return;
+                float[] geomagnetic = getBack("MAGNETIC_FIELD").values;
+                if (gravity != null && geomagnetic != null &&
+                        SensorManager.getRotationMatrix(R, null, gravity, geomagnetic)) {
+                    SensorManager.getOrientation(R, ori);
+                    orientationOK = Math.toDegrees(ori[1]) < -50;
+                }
+                break;
         }
 
     }
@@ -132,14 +147,21 @@ public class DemoActivity extends Activity implements SensorEventListener {
         ArrayList<Frame> f_list = data.get(id);
         float t = f_list.get(f_list.size() - 1).timestamp;
         float sum[] = new float[3];
+        float distance = 0, maxDistance = 0;
         for (Frame f: f_list) {
-            if (t - f.timestamp > 300 * 1000000L)
+            if (t - f.timestamp > 2000 * 1000000L)
                 continue;
             float v[] = f.values.clone();
             for (int j = 0; j < dataOffset[id].values.length; ++j)
                 v[j] -= dataOffset[id].values[j];
-            for (int i = 0; i < v.length; ++i)
+            for (int i = 0; i < v.length; ++i) {
                 sum[i] += v[i];
+            }
+            distance += sum[2];
+            /*if (distance < 0) {
+                distance = 0;
+            }*/
+            maxDistance = Math.max(maxDistance, distance);
         }
         boolean rapid = false;
         /*
@@ -147,18 +169,18 @@ public class DemoActivity extends Activity implements SensorEventListener {
             if (Math.abs(sum[i]) > 30)
                 rapid = true;
          */
-        if (sum[2] > 50)
+        if (maxDistance > 2000)
             rapid = true;
-        if (rapid)
-            sb.append("Rapid!!!!\n");
-        sb.append(proximityHasZero);
-        for(int i = 0; i < 3; ++i)
-            sb.append(String.format(Locale.US, " %.0f\n", sum[i] / 10));
-        //sb.append(String.format(Locale.US, " %.1f",
-        //        Math.abs(sum[0]) + Math.abs(sum[1]) + Math.abs(sum[2])));
+        sb.append("Rapid:" + rapid + " ");
+        sb.append(String.format(Locale.US, " %.0f\n", distance / 100) + "\n");
+        sb.append("proximityHasZero:" + proximityHasZero + "\n");
+        sb.append("orientationOK:" + orientationOK + "\n");
+        sb.append("Proximity:" + getBack("PROXIMITY").values[2] + "\n");
         for (int i = 0; i < 3; ++i)
-            sb.append(String.format(Locale.US, " %.1f", Math.abs(sum[i])));
-
+            sb.append(String.format(Locale.US, " %.1f\n", sum[i]));
+        for (int i = 0; i < 3; ++i)
+            sb.append(String.format(Locale.US, " %.1f\n",
+                    getBack("LINEAR_ACCELERATION").values[i]));
         textView_sensor.setText(sb.toString());
         return rapid;
     }

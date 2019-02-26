@@ -36,7 +36,7 @@ public class SensorUtil {
 
     public static int getSensorID(String name) {
         for (int i = 0; i < sensorName.length; ++i)
-            if (name == sensorName[i])
+            if (name.equals(sensorName[i]))
                 return i;
         return -1;
     }

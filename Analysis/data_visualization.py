@@ -92,13 +92,12 @@ def visualize_sensor(data_list, sensor_name, kind='value'):
 	plt.show()
 
 
-def search_files():
+def search_files(file_dir):
 	# files = ['../Data/190111 14_40_17.txt', #'../Data/190111 14_40_36.txt',
 	#         '../Data/190111 14_40_47.txt', '../Data/190111 14_40_56.txt',
 	#         '../Data/190114 10_36_37.txt']
 	# for file in files:
 	# visualize_file(file)
-	file_dir = '../Data/190115/'
 	file_list = os.listdir(file_dir)
 	files = []
 	for file_name in file_list:
@@ -116,7 +115,7 @@ def read_data(file_path_list):
 	return data_list
 
 
-file_paths = search_files()
+file_paths = search_files('../Data/190226/')
 data_list = read_data(file_paths)
 # visualize_file(file_paths[0])
 
@@ -128,6 +127,7 @@ data_list = read_data(file_paths)
 visualize_sensor(data_list, 'ROTATION_VECTOR')
 visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sqrt')
 visualize_sensor(data_list, 'LINEAR_ACCELERATION')
+visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
 
 
 
