@@ -162,18 +162,22 @@ if __name__ == '__main__':
 	file_dir2_P = '../Data/Study1/123/Positive/'
 	file_dir2_N = '../Data/Study1/123/Negative/'
 
+	# watched_sensors = ['ROTATION_VECTOR', 'ACCELEROMETER', 'LINEAR_ACCELEROMETER', 'GYROSCOPE', 'PROXIMITY']
 	watched_sensors = ['ROTATION_VECTOR', 'ACCELEROMETER', 'GYROSCOPE', 'PROXIMITY']
+	# watched_sensors = ['PROXIMITY']
 	print('# Make Comparisons Between P/N Data')
 
-	# 以下为一个随机取样的实验，从正例和反例中各随机选取5次实验的数据，然后对比它们在四个传感器数据上的差异
+	# 以下为一个随机取样的实验，从正例和反例中各随机选取 n_sample 次实验的数据，然后对比它们在四个传感器数据上的差异
+	n_sample = 8
+
 	print('\n## Visualizing Positive Data')
-	file_paths = random.choices(search_files(file_dir1_P), k=5)
+	file_paths = random.choices(search_files(file_dir1_P), k=n_sample)
 	data_list = get_data_list(file_paths)
 	for sensor in watched_sensors:
 		visualize_sensor(data_list, sensor, title='+ %s' % sensor)
 
 	print('\n## Visualizing Negative Data')
-	file_paths = random.choices(search_files(file_dir1_N), k=5)
+	file_paths = random.choices(search_files(file_dir1_N), k=n_sample)
 	data_list = get_data_list(file_paths)
 	for sensor in watched_sensors:
 		visualize_sensor(data_list, sensor, title='- %s' % sensor)

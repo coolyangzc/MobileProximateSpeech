@@ -11,7 +11,7 @@ from tqdm import tqdm	# progressbar
 
 PREFIX = tools.date_time()
 
-NEG_DESCRIPTIONS = re.compile(' (打字|浏览|拍照|裤兜（坐）|裤兜（走）|握持（走）|桌上|接听) ', re.U)  # 负例
+NEG_DESCRIPTIONS = re.compile(' (打字|浏览|拍照|裤兜（坐）|裤兜（走）|握持（走）|桌上|接听|负例) ', re.U)  # 负例
 
 logger.DualLogger('../logs/%sdata_sorting.txt' % PREFIX)
 
@@ -49,5 +49,4 @@ def sort_positive_negative(file_dir):
 
 if __name__ == '__main__':
 	dir1 = '../Data/Study1/Fengshi Zheng'
-	dir2 = '../Data/Study1/123'
 	sort_positive_negative(dir1)
