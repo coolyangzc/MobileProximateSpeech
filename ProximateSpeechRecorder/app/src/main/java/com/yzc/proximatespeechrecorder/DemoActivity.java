@@ -111,8 +111,8 @@ public class DemoActivity extends Activity implements SensorEventListener {
                 if (!orientationOK || sensorEvent.timestamp - triggerTimestamp <= 500 * 1000000L)
                     return;
                 Frame f_proximity = getBack("PROXIMITY");
-
-                // textView_sensor.setText(String.valueOf(f_proximity.values[2]));
+                if (f_proximity == null)
+                    break;
                 if (f_proximity.values[2] > 0 && proximityHasZero &&
                         sensorEvent.timestamp - rapidTimestamp <= 500 * 1000000L) {
                     VibrationEffect ve = VibrationEffect.createOneShot(100, 1);
@@ -128,10 +128,12 @@ public class DemoActivity extends Activity implements SensorEventListener {
             case Sensor.TYPE_GRAVITY:
                 float[] ori = new float[3];
                 float[] R = new float[9];
-                float[] gravity = getBack("GRAVITY").values;
-                if (getBack("MAGNETIC_FIELD") == null)
+                Frame f_gravity = getBack("GRAVITY");
+                Frame f_geomagnetic = getBack("MAGNETIC_FIELD");
+                if (f_gravity == null || f_geomagnetic == null)
                     return;
-                float[] geomagnetic = getBack("MAGNETIC_FIELD").values;
+                float[] gravity = f_gravity.values;
+                float[] geomagnetic = f_geomagnetic.values;
                 if (gravity != null && geomagnetic != null &&
                         SensorManager.getRotationMatrix(R, null, gravity, geomagnetic)) {
                     SensorManager.getOrientation(R, ori);
