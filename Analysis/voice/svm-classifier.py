@@ -32,7 +32,9 @@ def select_mid(sample, length=800):
 os.chdir('./Data/Sounds/MP3/')
 samples = []
 labels = []
-time_len = 800  # 采样帧个数
+time_len = 50  # 采样帧个数
+
+print('time_len =', time_len)
 
 ## 导入正例
 os.chdir('./Positive/')
