@@ -9,6 +9,11 @@ import os
 import os.path as path
 import pickle
 from tqdm import tqdm as progress
+from utils.logger import DualLogger
+from utils.tools import date_time
+
+os.chdir('../')
+DualLogger('logs/%ssvm-classifier.txt' % date_time())  # 输出日志
 
 
 ## 对每个样本抽取时间序列的中间长度为800帧的子序列
