@@ -96,7 +96,8 @@ public class DemoActivity extends Activity implements SensorEventListener {
                 ArrayList<Frame> f_list = data.get(i);
                 Frame f = new Frame();
                 f.timestamp = sensorEvent.timestamp;
-                f.values = values;
+                f.values = new float[values.length];
+                System.arraycopy(values, 0, f.values, 0, values.length);
                 f_list.add(f);
                 while(f.timestamp - f_list.get(0).timestamp > 3000 * 1000000L)
                     f_list.remove(0);
@@ -149,7 +150,7 @@ public class DemoActivity extends Activity implements SensorEventListener {
         float sum[] = new float[3];
         float distance = 0, maxDistance = 0;
         for (Frame f: f_list) {
-            if (t - f.timestamp > 2000 * 1000000L)
+            if (t - f.timestamp > 1000 * 1000000L)
                 continue;
             float v[] = f.values.clone();
             for (int j = 0; j < dataOffset[id].values.length; ++j)
@@ -158,9 +159,6 @@ public class DemoActivity extends Activity implements SensorEventListener {
                 sum[i] += v[i];
             }
             distance += sum[2];
-            /*if (distance < 0) {
-                distance = 0;
-            }*/
             maxDistance = Math.max(maxDistance, distance);
         }
         boolean rapid = false;
@@ -169,13 +167,16 @@ public class DemoActivity extends Activity implements SensorEventListener {
             if (Math.abs(sum[i]) > 30)
                 rapid = true;
          */
-        if (maxDistance > 2000)
+        if (maxDistance > 1000)
             rapid = true;
-        sb.append("Rapid:" + rapid + " ");
-        sb.append(String.format(Locale.US, " %.0f\n", distance / 100) + "\n");
+        sb.append(rapidTimestamp);
+        sb.append("\n");
+        sb.append("Rapid:" + rapid + "\n");
+        sb.append(String.format(Locale.US, " %.0f\n", maxDistance / 10) + "\n");
         sb.append("proximityHasZero:" + proximityHasZero + "\n");
         sb.append("orientationOK:" + orientationOK + "\n");
         sb.append("Proximity:" + getBack("PROXIMITY").values[2] + "\n");
+        sb.append("Light:" + getBack("LIGHT").values[0] + "\n");
         for (int i = 0; i < 3; ++i)
             sb.append(String.format(Locale.US, " %.1f\n", sum[i]));
         for (int i = 0; i < 3; ++i)
@@ -187,6 +188,8 @@ public class DemoActivity extends Activity implements SensorEventListener {
 
     private Frame getBack(String name) {
         int id = SensorUtil.getSensorID(name);
+        if (data.get(id).size() == 0)
+            return null;
         return data.get(id).get(data.get(id).size() - 1);
     }
     private class Frame {
