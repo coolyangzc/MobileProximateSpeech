@@ -1,6 +1,6 @@
 # load voice data from .ftr files
 
-from utils.io import *
+from utils.io import load_from_file
 import os
 import os.path as path
 from collections import namedtuple
@@ -69,6 +69,7 @@ def load_ftr_from_dir(wkdir, shuffle=True, random_seed=None):
 		for obj in ftrs, labels, names:
 			random.seed(random_seed)
 			random.shuffle(obj)
+		print('shuffled.')
 
 	print('loaded.')
 	os.chdir(old_path)
@@ -164,7 +165,7 @@ def apply_subsampling_grouping(ftrs, labels, names, offset, duration, window, st
 	return DataPack(new_data, new_labels, new_names)
 
 
-def train_test_split(dataset, labels, names, test_size):
+def train_test_split(data, labels, names, test_size):
 	'''
 	files or groups (DataPack) -> train_pack + test_pack
 
@@ -172,9 +173,9 @@ def train_test_split(dataset, labels, names, test_size):
 	:return: train_pack, test_pack
 	'''
 	assert 0.0 <= test_size <= 1.0
-	cut = int(len(dataset) * test_size)
-	return DataPack(dataset[cut:], labels[cut:], names[cut:]), \
-		   DataPack(dataset[:cut], labels[:cut], names[:cut])
+	cut = int(len(data) * test_size)
+	return DataPack(data[cut:], labels[cut:], names[cut:]), \
+		   DataPack(data[:cut], labels[:cut], names[:cut])
 
 
 if __name__ == '__main__':
