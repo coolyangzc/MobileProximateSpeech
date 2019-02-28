@@ -54,7 +54,24 @@ def train_test_sort(wkdir, test_ratio, random_state=None):
 	print('Done.')
 
 
+def renamer(wkdir, prefix):
+	'''
+	rename all .ftr files in wkdir
+	'''
+	print('Renaming %s...', wkdir)
+	old_path = os.getcwd()
+	os.chdir(wkdir)
+
+	files = filter(lambda x: x.endswith('.ftr'), os.listdir('.'))
+	for filename in files:
+		os.rename(filename, prefix + filename)
+
+	os.chdir(old_path)
+	print('Done.')
+
+
 if __name__ == '__main__':
 	os.chdir('..')
-	wkdir = 'Data/Sounds/yzc'
-	train_test_sort(wkdir, 0.1)
+	wkdir = 'Data/Sounds/yzc/'
+	train_test_sort(wkdir, 0.2, random_state=19)
+
