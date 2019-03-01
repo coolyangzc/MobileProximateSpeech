@@ -31,11 +31,11 @@ public class VoiceActivity extends Activity {
 
     private Context ctx;
     private Button button_record, button_goto;
-    private TextView textView_description;
+    private TextView textView_description, textView_sentence;
     private boolean isRecording = false;
     private File file, audioFile;
-    private MediaRecorder mMediaRecorder = new MediaRecorder();
-    private Study1Task tasks = new Study1Task();
+    private MediaRecorder mMediaRecorder;
+    private VoiceTask tasks = new VoiceTask();
 
     private String TAG = "VoiceActivity";
 
@@ -50,11 +50,14 @@ public class VoiceActivity extends Activity {
         setContentView(R.layout.activity_voice);
         ctx = this;
         initViews();
+        mMediaRecorder = new MediaRecorder();
     }
 
     private void initViews() {
         textView_description = findViewById(R.id.textView_description);
+        textView_sentence = findViewById(R.id.textView_sentence);
         textView_description.setText(tasks.getTaskDescription());
+        textView_sentence.setText(tasks.getSpeechSentence());
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(clickListener);
         button_goto = findViewById(R.id.button_goto);
@@ -73,7 +76,6 @@ public class VoiceActivity extends Activity {
                         createDataFile();
                         setupMediaRecorder();
                         mMediaRecorder.start();
-
                     } else {
                         button_record.setText("开始");
                         button_record.setTextColor(Color.BLACK);
@@ -84,10 +86,12 @@ public class VoiceActivity extends Activity {
                         }
                         mMediaRecorder.stop();
                         mMediaRecorder.reset();
+                        mMediaRecorder = new MediaRecorder();
                         MediaScannerConnection.scanFile(ctx,
                                 new String[] { file.getAbsolutePath(), audioFile.getAbsolutePath() },
                                 null, null);
                         textView_description.setText(tasks.nextTask());
+                        textView_sentence.setText(tasks.getSpeechSentence());
                     }
                     break;
             }
@@ -109,6 +113,7 @@ public class VoiceActivity extends Activity {
                         public void onClick(DialogInterface dialog, int which) {
                             tasks.changeTaskId(Integer.valueOf(et.getText().toString()));
                             textView_description.setText(tasks.getTaskDescription());
+                            textView_sentence.setText(tasks.getSpeechSentence());
                         }
                     });
                     builder.setNegativeButton("否", null);
@@ -137,7 +142,13 @@ public class VoiceActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        String ss = tasks.getTaskDescription();
+        ss += tasks.getSpeechSentence();
+        try {
+            fos.write(ss.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupMediaRecorder() {
@@ -145,8 +156,10 @@ public class VoiceActivity extends Activity {
             mMediaRecorder.reset();
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setAudioChannels(2);
-            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+            mMediaRecorder.setAudioEncodingBitRate(16 * 44100);
+            mMediaRecorder.setAudioSamplingRate(44100);
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             mMediaRecorder.setOutputFile(audioFile);
             mMediaRecorder.prepare();
         } catch (Exception e) {
