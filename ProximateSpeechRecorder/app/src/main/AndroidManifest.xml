@@ -42,6 +42,10 @@
             android:name="com.yzc.proximatespeechrecorder.Study1Activity"
             android:label="Study1Activity"  >
         </activity>
+        <activity
+            android:name="com.yzc.proximatespeechrecorder.VoiceActivity"
+            android:label="VoiceActivity"  >
+        </activity>
     </application>
 
 </manifest>

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.speech.tts.Voice;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,9 +40,11 @@ public class MainActivity extends AppCompatActivity {
         Button button_demo = findViewById(R.id.button_demo);
         Button button_record = findViewById(R.id.button_record);
         Button button_study1 = findViewById(R.id.button_study1);
+        Button button_voice = findViewById(R.id.button_voice);
         button_demo.setOnClickListener(clickListener);
         button_record.setOnClickListener(clickListener);
         button_study1.setOnClickListener(clickListener);
+        button_voice.setOnClickListener(clickListener);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -60,6 +63,11 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.button_study1:
                     intent.setClass(ctx, Study1Activity.class);
                     startActivity(intent);
+                    break;
+                case R.id.button_voice:
+                    intent.setClass(ctx, VoiceActivity.class);
+                    startActivity(intent);
+                    break;
             }
         }
     };

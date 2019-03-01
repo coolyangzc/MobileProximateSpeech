@@ -365,7 +365,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
     private void prepareMediaRecorder() {
         try {
             Log.d(TAG, "prepareMediaRecorder");
-            setUpMediaRecorder();
+            setupMediaRecorder();
 
             mCaptureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
             List<Surface> surfaces = new ArrayList<>();
@@ -425,9 +425,9 @@ public class Study1Activity extends Activity implements SensorEventListener {
         openCamera(mCameraIdFront);
     }
 
-    private void setUpMediaRecorder() {
+    private void setupMediaRecorder() {
         try {
-            Log.d(TAG, "setUpMediaRecorder");
+            Log.d(TAG, "setupMediaRecorder");
             mMediaRecorder.reset();
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
