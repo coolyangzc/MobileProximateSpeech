@@ -11,8 +11,8 @@ import java.util.Random;
 public class VoiceTask {
 
     public int task_id, repeat_times;
-    public int sentence_id;
     public List<String> tasks, sentences;
+    public List<Integer> speechList;
     private Random random = new Random();
 
     public VoiceTask() {
@@ -25,9 +25,7 @@ public class VoiceTask {
                 tasks.add(p + " " + v);
         for(String task: tasks)
             Log.d("VOICE_TASKS", task);
-        sentences = new ArrayList<>(Arrays.asList(simpleCommands));
-        sentences.addAll(Arrays.asList(commands));
-        sentences.addAll(Arrays.asList(naturalLanguage));
+        initSpeechList();
     }
 
     public String triggerPosition[] = new String[] {
@@ -51,6 +49,19 @@ public class VoiceTask {
             "小声"
     };
 
+    private void initSpeechList() {
+        sentences = new ArrayList<>(Arrays.asList(simpleCommands));
+        sentences.addAll(Arrays.asList(commands));
+        sentences.addAll(Arrays.asList(naturalLanguage));
+        speechList = new ArrayList<>();
+        for (int i = 0; i < tasks.size(); ++i) {
+            speechList.add(random.nextInt(simpleCommands.length));
+            speechList.add(random.nextInt(commands.length) + simpleCommands.length);
+            speechList.add(random.nextInt(naturalLanguage.length) +
+                    simpleCommands.length + commands.length);
+        }
+    }
+
     public String getTaskDescription() {
         String s = String.valueOf(task_id + 1) + " / " + String.valueOf(tasks.size()) +
                 ": " + String.valueOf(repeat_times + 1) + "\n";
@@ -61,14 +72,25 @@ public class VoiceTask {
     }
 
     public String getSpeechSentence() {
-        return sentences.get(sentence_id);
+        return sentences.get(speechList.get(task_id * 3 + repeat_times));
     }
 
     public void changeTaskId(int id) {
         if (id <= 0) return;
         task_id = id - 1;
         repeat_times = 0;
-        sentence_id = random.nextInt(simpleCommands.length);
+    }
+
+    public String prevTask() {
+        repeat_times -= 1;
+        if (repeat_times < 0) {
+            if (task_id > 0) {
+                task_id -= 1;
+                repeat_times = 2;
+            } else
+                repeat_times = 0;
+        }
+        return getTaskDescription();
     }
 
     public String nextTask() {
@@ -79,15 +101,8 @@ public class VoiceTask {
             if (task_id >= tasks.size())
                 task_id = 0;
         }
-        if (repeat_times == 0)
-            sentence_id = random.nextInt(simpleCommands.length);
-        else if (repeat_times == 1)
-            sentence_id = random.nextInt(commands.length) + simpleCommands.length;
-        else
-            sentence_id = random.nextInt(naturalLanguage.length) +
-                    simpleCommands.length + commands.length;
         return getTaskDescription();
-    };
+    }
 
 
     public String simpleCommands[] = new String[] {

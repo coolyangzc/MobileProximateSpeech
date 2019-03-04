@@ -115,7 +115,7 @@ def read_data(file_path_list):
 	return data_list
 
 
-file_paths = search_files('../Data/190226/')
+file_paths = search_files('../Data/190115/')
 data_list = read_data(file_paths)
 # visualize_file(file_paths[0])
 
@@ -124,10 +124,11 @@ data_list = read_data(file_paths)
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sqrt')
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'slope 1000')
-visualize_sensor(data_list, 'ROTATION_VECTOR')
-visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sqrt')
-visualize_sensor(data_list, 'LINEAR_ACCELERATION')
-visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
+# visualize_sensor(data_list, 'ROTATION_VECTOR')
+# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sqrt')
+# visualize_sensor(data_list, 'LINEAR_ACCELERATION')
+# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
+visualize_sensor(data_list, 'PROXIMITY')
 
 
 

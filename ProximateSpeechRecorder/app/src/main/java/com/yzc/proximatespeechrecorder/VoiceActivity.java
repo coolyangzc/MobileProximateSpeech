@@ -30,7 +30,7 @@ import java.util.Locale;
 public class VoiceActivity extends Activity {
 
     private Context ctx;
-    private Button button_record, button_goto;
+    private Button button_record, button_goto, button_redo;
     private TextView textView_description, textView_sentence;
     private boolean isRecording = false;
     private File file, audioFile;
@@ -62,6 +62,8 @@ public class VoiceActivity extends Activity {
         button_record.setOnClickListener(clickListener);
         button_goto = findViewById(R.id.button_goto);
         button_goto.setOnLongClickListener(longClickListener);
+        button_redo = findViewById(R.id.button_redo);
+        button_redo.setOnLongClickListener(longClickListener);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -104,6 +106,8 @@ public class VoiceActivity extends Activity {
         public boolean onLongClick(View v) {
             switch (v.getId()) {
                 case R.id.button_goto:
+                    if (isRecording)
+                        break;
                     AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
                     builder.setTitle("跳转至");
                     final EditText et = new EditText(ctx);
@@ -118,6 +122,12 @@ public class VoiceActivity extends Activity {
                     });
                     builder.setNegativeButton("否", null);
                     builder.show();
+                    break;
+                case R.id.button_redo:
+                    if (isRecording)
+                        break;
+                    textView_description.setText(tasks.prevTask());
+                    textView_sentence.setText(tasks.getSpeechSentence());
                     break;
             }
             return false;
