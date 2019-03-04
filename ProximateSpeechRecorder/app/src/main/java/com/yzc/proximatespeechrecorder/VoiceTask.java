@@ -14,7 +14,7 @@ public class VoiceTask {
 
     public int task_id, repeat_times;
     public List<String> tasks, sentences;
-    public List<Integer> speechList;
+    public List<Integer> speechList = new ArrayList<>();
     private Random random;
 
     public VoiceTask(int seed) {
@@ -56,7 +56,6 @@ public class VoiceTask {
         sentences = new ArrayList<>(Arrays.asList(simpleCommands));
         sentences.addAll(Arrays.asList(commands));
         sentences.addAll(Arrays.asList(naturalLanguage));
-        speechList = new ArrayList<>();
         for (int i = 0; i < tasks.size(); ++i) {
             speechList.add(random.nextInt(simpleCommands.length));
             speechList.add(random.nextInt(commands.length) + simpleCommands.length);

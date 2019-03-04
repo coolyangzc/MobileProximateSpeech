@@ -62,7 +62,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
     private CameraCaptureSession mCaptureSession;
 
     private SensorManager mSensorManager;
-    private Button button_record, button_goto;
+    private Button button_record, button_goto, button_redo;
     private TextView textView_description;
 
     private int sensorType[] = SensorUtil.sensorType;
@@ -101,6 +101,8 @@ public class Study1Activity extends Activity implements SensorEventListener {
         button_record.setOnClickListener(clickListener);
         button_goto = findViewById(R.id.button_goto);
         button_goto.setOnLongClickListener(longClickListener);
+        button_redo = findViewById(R.id.button_redo);
+        button_redo.setOnLongClickListener(longClickListener);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -109,16 +111,13 @@ public class Study1Activity extends Activity implements SensorEventListener {
             switch (view.getId()) {
                 case R.id.button_record:
                     isRecording ^= true;
+                    changeButtonText(isRecording);
                     if (isRecording) {
-                        button_record.setText("结束");
-                        button_record.setTextColor(Color.RED);
                         createDataFile();
                         prepareMediaRecorder();
                         startMediaRecorder();
                         readDiffStart();
                     } else {
-                        button_record.setText("开始");
-                        button_record.setTextColor(Color.BLACK);
                         try {
                             fos.close();
                         } catch (IOException e) {
@@ -136,10 +135,26 @@ public class Study1Activity extends Activity implements SensorEventListener {
         }
     };
 
+    private void changeButtonText(boolean startRecording) {
+        if (startRecording) {
+            button_record.setText("结束");
+            button_record.setTextColor(Color.RED);
+            button_goto.setText("");
+            button_redo.setText("");
+        } else {
+            button_record.setText("开始");
+            button_record.setTextColor(Color.BLACK);
+            button_goto.setText("跳转");
+            button_redo.setText("重做");
+        }
+    }
+
     View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
 
         @Override
         public boolean onLongClick(View v) {
+            if (isRecording)
+                return false;
             switch (v.getId()) {
                 case R.id.button_goto:
                     AlertDialog.Builder builder = new AlertDialog.Builder(ctx);

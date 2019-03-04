@@ -140,10 +140,10 @@ public class VoiceActivity extends Activity {
 
         @Override
         public boolean onLongClick(View v) {
+            if (isRecording)
+                return false;
             switch (v.getId()) {
                 case R.id.button_goto:
-                    if (isRecording)
-                        break;
                     AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
                     builder.setTitle("跳转至");
                     final EditText et = new EditText(ctx);
@@ -161,8 +161,6 @@ public class VoiceActivity extends Activity {
                     builder.show();
                     break;
                 case R.id.button_redo:
-                    if (isRecording)
-                        break;
                     textView_description.setText(tasks.prevTask());
                     textView_sentence.setText(tasks.getSpeechSentence());
                     break;

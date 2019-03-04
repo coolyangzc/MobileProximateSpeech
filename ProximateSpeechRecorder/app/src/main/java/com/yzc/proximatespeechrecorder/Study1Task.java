@@ -9,19 +9,13 @@ import java.util.Random;
 public class Study1Task {
 
     public int task_id, repeat_times;
-    public List<String> positiveTasks, tasks;
+    public List<String> tasks = new ArrayList<>();
+    public List<Integer> speechList = new ArrayList<>();
     private Random random;
 
     Study1Task(int seed) {
         random = new Random(seed);
         initTasks();
-        positiveTasks = new ArrayList<>();
-        for (String u: userPosition)
-            for (String s: startPosition)
-                for (String t: triggerPosition)
-                    positiveTasks.add(u + " " + s + " " + t);
-        tasks = positiveTasks;
-        Collections.addAll(tasks, negativeTask);
         task_id = repeat_times = 0;
     }
 
@@ -36,13 +30,47 @@ public class Study1Task {
                 "手中",
                 "桌上"
         );
+        List<String> user = Arrays.asList(
+                "坐",
+                "站"
+        ); // do not random
         Collections.shuffle(pos, random);
         Collections.shuffle(start, random);
-        /*for (String s: start)
+        for (String u : user) {
+            for (String s : start)
+                for (String p : pos)
+                    tasks.add(u + "\n" + s + "\n" + p);
+            tasks.add(u + "\n横屏" + "\n横屏遮嘴");
+        }
+        for (String p: pos)
+            tasks.add("站\n" + "裤兜\n" + p);
+
+        List<String> lying = Arrays.asList(
+                "平躺",
+                "侧躺"
+        );
+        Collections.shuffle(lying, random);
+        for (String l: lying) {
             for (String p : pos)
-                tasks.add(s + )*/
+                tasks.add(l + "\n" + "手中\n" + p);
+            tasks.add(l + "\n" + "横屏\n" + "横屏遮嘴");
+        }
+        for (String p : pos)
+            tasks.add("走\n" + "手中\n" + p);
 
+        List<String> negativeTasks = Arrays.asList(
+                "坐\n手中\n打字",
+                "坐\n手中\n浏览",
+                "坐\n手中\n拍照",
+                "坐\n手中\n接听"
+        );
+        Collections.shuffle(negativeTasks, random);
+        tasks.add("走\n裤兜\n裤兜");
+        tasks.add("走\n手中\n手中");
+        tasks.addAll(negativeTasks);
 
+        for(int i = 0; i < tasks.size() * 10; ++i)
+            speechList.add(random.nextInt(commands.length));
     }
 
     public String startPosition[] = new String[] {
@@ -53,15 +81,6 @@ public class Study1Task {
             "横屏握持（正面）",
             "裤兜",
             "手机架"
-    };
-
-    public String triggerPosition[] = new String[] {
-            "竖直对脸，碰触鼻子",
-            "竖直对脸，不碰鼻子",
-            "竖屏握持，上端遮嘴",
-            "水平端起，倒话筒",
-            "话筒",
-            "横屏"
     };
 
     public String userPosition[] = new String[] {
@@ -84,28 +103,46 @@ public class Study1Task {
     public String getTaskDescription() {
         String s = String.valueOf(task_id + 1) + " / " + String.valueOf(tasks.size()) +
                 ": " + String.valueOf(repeat_times + 1) + "\n";
-        String comp[] = tasks.get(task_id).split(" ");
-        for (String c: comp)
-            s += c + "\n";
+        s += tasks.get(task_id) + "\n";
+        if (repeat_times < 5)
+            s += "右手\n";
+        else
+            s += "左手\n";
+        s += commands[speechList.get(task_id * 10 + repeat_times)];
         return s;
     }
 
     public void changeTaskId(int id) {
         if (id <= 0) return;
-        task_id = id - 1;
+        if (id >= tasks.size())
+            task_id = tasks.size() - 1;
+        else
+            task_id = id - 1;
         repeat_times = 0;
+    }
+
+    public String prevTask() {
+        repeat_times -= 1;
+        if (repeat_times < 0) {
+            if (task_id > 0) {
+                task_id -= 1;
+                repeat_times = 9;
+            } else
+                repeat_times = 0;
+        }
+        return getTaskDescription();
     }
 
     public String nextTask() {
         repeat_times += 1;
-        if (repeat_times >= 3) {
+        if (repeat_times >= 10) {
             repeat_times = 0;
             task_id += 1;
             if (task_id >= tasks.size())
                 task_id = 0;
         }
         return getTaskDescription();
-    };
+    }
 
     public String commands[] = new String[] {
             "1.	打开微信，给我妈发消息。",
@@ -141,5 +178,15 @@ public class Study1Task {
             "31. 收藏这首歌曲。",
             "32. 收藏上一首歌曲。"
 
-};
+    };
+
+    //SensorActivity
+    public String triggerPosition[] = new String[] {
+            "竖直对脸，碰触鼻子",
+            "竖直对脸，不碰鼻子",
+            "竖屏握持，上端遮嘴",
+            "水平端起，倒话筒",
+            "话筒",
+            "横屏"
+    };
 }
