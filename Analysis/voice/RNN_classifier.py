@@ -49,6 +49,7 @@ if __name__ == '__main__':
 	train2, test2 = load_train_test(wkdir2, test_size=0)
 
 	model = build_model()
+	print(model.summary())
 	model.fit(train.data, train.labels, batch_size=10, epochs=1)
 	train_loss, train_acc = model.evaluate(train.data, train.labels, batch_size=10)
 	test_loss, test_acc = model.evaluate(test.data, test.labels, batch_size=10)

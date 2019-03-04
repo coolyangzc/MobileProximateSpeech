@@ -29,34 +29,35 @@ def visualize_mfcc(filename, sr=None):
 	return mfccs
 
 
-os.chdir('./Data/Sounds/MP3/Positive/')
-file_list = os.listdir()
+if __name__ == '__main__':
+	os.chdir('./Data/Sounds/MP3/Positive/')
+	file_list = os.listdir()
 
-## 预览第一个音频
-filename = file_list[0]
-visualize_mfcc(filename)
+	## 预览第一个音频
+	filename = file_list[0]
+	visualize_mfcc(filename)
 
-## 开始处理音频
-print('Positive...')
-for filename in progress(file_list):
-	mfccs = get_mfcc(filename)
-	portions = filename.split('.')
-	assert portions[-1] == 'mp3'
-	portions[-1] = 'ftr'  # stands for feature
-	newname = '.'.join(portions)
-	with open(newname, 'wb') as f:
-		pickle.dump(mfccs, f)
-print('Done.')
+	## 开始处理音频
+	print('Positive...')
+	for filename in progress(file_list):
+		mfccs = get_mfcc(filename)
+		portions = filename.split('.')
+		assert portions[-1] == 'mp3'
+		portions[-1] = 'ftr'  # stands for feature
+		newname = '.'.join(portions)
+		with open(newname, 'wb') as f:
+			pickle.dump(mfccs, f)
+	print('Done.')
 
-os.chdir('../Negative/')
-file_list = os.listdir()
-print('Negative...')
-for filename in progress(file_list):
-	mfccs = get_mfcc(filename)
-	portions = filename.split('.')
-	assert portions[-1] == 'mp3'
-	portions[-1] = 'ftr'  # stands for feature
-	newname = '.'.join(portions)
-	with open(newname, 'wb') as f:
-		pickle.dump(mfccs, f)
-print('Done.')
+	os.chdir('../Negative/')
+	file_list = os.listdir()
+	print('Negative...')
+	for filename in progress(file_list):
+		mfccs = get_mfcc(filename)
+		portions = filename.split('.')
+		assert portions[-1] == 'mp3'
+		portions[-1] = 'ftr'  # stands for feature
+		newname = '.'.join(portions)
+		with open(newname, 'wb') as f:
+			pickle.dump(mfccs, f)
+	print('Done.')

@@ -47,7 +47,7 @@ def load_ftr_from_dir(wkdir, shuffle=True, random_seed=None):
 	dir -> ftr data (DataPack)
 
     wkdir has '/Positive/' and '/Negative/' directory
-    return batches, labels and descriptions
+    return ftrs, labels and descriptions
     '''
 	old_path = os.getcwd()
 	os.chdir(wkdir)
