@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -22,7 +23,9 @@ import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.renderscript.ScriptGroup;
 import android.support.v4.app.ActivityCompat;
+import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -71,7 +74,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
                     "/SensorData/Study1/";
     private FileOutputStream fos;
 
-    private Study1Task tasks = new Study1Task();
+    private Study1Task tasks;
 
     static {
         System.loadLibrary("native-lib");
@@ -82,6 +85,9 @@ public class Study1Activity extends Activity implements SensorEventListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study1);
         ctx = this;
+        Intent intent = getIntent();
+        int seed = intent.getIntExtra("randomSeed", 0);
+        tasks = new Study1Task(seed);
         initViews();
         loadSensor();
         setupCamera();
@@ -139,6 +145,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
                     AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
                     builder.setTitle("跳转至");
                     final EditText et = new EditText(ctx);
+                    et.setInputType(InputType.TYPE_CLASS_NUMBER);
                     builder.setView(et);
                     builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override

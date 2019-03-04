@@ -1,6 +1,8 @@
 package com.yzc.proximatespeechrecorder;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,12 +15,13 @@ public class VoiceTask {
     public int task_id, repeat_times;
     public List<String> tasks, sentences;
     public List<Integer> speechList;
-    private Random random = new Random();
+    private Random random;
 
-    public VoiceTask() {
+    public VoiceTask(int seed) {
+        random = new Random(seed);
         List<String> pos = new ArrayList<>(Arrays.asList(triggerPosition));
         pos.addAll(Arrays.asList(otherPosition));
-        Collections.shuffle(pos);
+        Collections.shuffle(pos, random);
         tasks = new ArrayList<>();
         for (String p: pos)
             for (String v: volume)
@@ -77,7 +80,10 @@ public class VoiceTask {
 
     public void changeTaskId(int id) {
         if (id <= 0) return;
-        task_id = id - 1;
+        if (id >= tasks.size())
+            task_id = tasks.size() - 1;
+        else
+            task_id = id - 1;
         repeat_times = 0;
     }
 
@@ -122,7 +128,7 @@ public class VoiceTask {
             "12. 查看最近的短信。回复刚刚的来信。 查看未接来电。 回拨第一个号码。",
             "13. 告诉我现在的位置。 告诉我回家的路。 告诉我最近的洗手间位置。 附近有哪些餐馆？",
             "14. 播放我最喜爱的音乐。 播放下一首歌曲。 收藏这首歌曲。 收藏上一首歌曲。"
-};
+    };
 
     public String naturalLanguage[] = new String[] {
             "15. 小奥斯卡发现周围的世界太过荒诞，就暗下决心要永远做小孩子。",
@@ -136,5 +142,5 @@ public class VoiceTask {
             "23. 她要学习，又要帮奶奶持家。可翻阅她的作业本，根本看不到八十分以下的成绩。",
             "24. 他的时装设计既有融入前卫意识的先锋派作品，又有将艺术性与实用性完美结合的佳作。",
             "25. 这样的修养的演员即使正走红，也不过如过眼云烟而已，成不了真正意义上的艺术家。",
-};
+    };
 }

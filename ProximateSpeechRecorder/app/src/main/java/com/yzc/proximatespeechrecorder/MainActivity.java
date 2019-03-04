@@ -11,10 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
     private Context ctx;
+    private EditText et_randomSeed;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -45,12 +47,19 @@ public class MainActivity extends AppCompatActivity {
         button_record.setOnClickListener(clickListener);
         button_study1.setOnClickListener(clickListener);
         button_voice.setOnClickListener(clickListener);
+
+        et_randomSeed = findViewById(R.id.editText_randomSeed);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Intent intent = new Intent();
+            String seed = et_randomSeed.getText().toString();
+            if (seed.equals(""))
+                intent.putExtra("randomSeed", 0);
+            else
+                intent.putExtra("randomSeed", Integer.valueOf(seed));
             switch (view.getId()) {
                 case R.id.button_demo:
                     intent.setClass(ctx, DemoActivity.class);

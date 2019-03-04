@@ -67,7 +67,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
 
     private float sensorData[][] = new float[sensorType.length][];
 
-    private Study1Task task = new Study1Task();
+    private Study1Task task = new Study1Task(0);
 
     private final String pathName =
             Environment.getExternalStorageDirectory().getPath() +

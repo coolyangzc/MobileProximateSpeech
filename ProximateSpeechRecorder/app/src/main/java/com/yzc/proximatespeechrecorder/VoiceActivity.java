@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.SensorEventListener;
 import android.media.CamcorderProfile;
@@ -15,6 +16,7 @@ import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.provider.MediaStore;
+import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -38,7 +40,7 @@ public class VoiceActivity extends Activity {
     private File file, audioFile;
     private MediaRecorder mMediaRecorder;
     private Vibrator mVibrator;
-    private VoiceTask tasks = new VoiceTask();
+    private VoiceTask tasks;
 
     private String TAG = "VoiceActivity";
 
@@ -52,6 +54,9 @@ public class VoiceActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice);
         ctx = this;
+        Intent intent = getIntent();
+        int seed = intent.getIntExtra("randomSeed", 0);
+        tasks = new VoiceTask(seed);
         initViews();
         mMediaRecorder = new MediaRecorder();
         mVibrator = (Vibrator)getApplication().getSystemService(VIBRATOR_SERVICE);
@@ -142,6 +147,7 @@ public class VoiceActivity extends Activity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
                     builder.setTitle("跳转至");
                     final EditText et = new EditText(ctx);
+                    et.setInputType(InputType.TYPE_CLASS_NUMBER);
                     builder.setView(et);
                     builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override
