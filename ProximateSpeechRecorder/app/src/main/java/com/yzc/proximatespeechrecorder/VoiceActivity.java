@@ -12,6 +12,8 @@ import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -35,6 +37,7 @@ public class VoiceActivity extends Activity {
     private boolean isRecording = false;
     private File file, audioFile;
     private MediaRecorder mMediaRecorder;
+    private Vibrator mVibrator;
     private VoiceTask tasks = new VoiceTask();
 
     private String TAG = "VoiceActivity";
@@ -51,6 +54,7 @@ public class VoiceActivity extends Activity {
         ctx = this;
         initViews();
         mMediaRecorder = new MediaRecorder();
+        mVibrator = (Vibrator)getApplication().getSystemService(VIBRATOR_SERVICE);
     }
 
     private void initViews() {
@@ -66,21 +70,48 @@ public class VoiceActivity extends Activity {
         button_redo.setOnLongClickListener(longClickListener);
     }
 
+    private void changeButtonText(boolean startRecording) {
+        if (startRecording) {
+            button_record.setText("结束");
+            button_record.setTextColor(Color.RED);
+            button_goto.setText("");
+            button_redo.setText("");
+        } else {
+            button_record.setText("开始");
+            button_record.setTextColor(Color.BLACK);
+            button_goto.setText("跳转");
+            button_redo.setText("重做");
+        }
+    }
+
+    private void vibration() {
+        long[] timings = {1000, 100};
+        int[] amplitudes = {0, VibrationEffect.DEFAULT_AMPLITUDE};
+        if (tasks.getTaskDescription().contains("反面")) {
+            timings[0] = 2000;
+        }
+        if (tasks.getTaskDescription().contains("裤兜")) {
+            timings[0] = 5000;
+            timings[1] = 1000;
+            amplitudes[1] = 255;
+        }
+        VibrationEffect ve = VibrationEffect.createWaveform(timings, amplitudes, -1);
+        mVibrator.vibrate(ve);
+    }
+
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.button_record:
                     isRecording ^= true;
+                    changeButtonText(isRecording);
                     if (isRecording) {
-                        button_record.setText("结束");
-                        button_record.setTextColor(Color.RED);
                         createDataFile();
                         setupMediaRecorder();
                         mMediaRecorder.start();
+                        vibration();
                     } else {
-                        button_record.setText("开始");
-                        button_record.setTextColor(Color.BLACK);
                         try {
                             fos.close();
                         } catch (IOException e) {
@@ -166,8 +197,8 @@ public class VoiceActivity extends Activity {
             mMediaRecorder.reset();
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setAudioChannels(2);
-            mMediaRecorder.setAudioEncodingBitRate(16 * 44100);
             mMediaRecorder.setAudioSamplingRate(44100);
+            mMediaRecorder.setAudioEncodingBitRate(16 * 44100);
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             mMediaRecorder.setOutputFile(audioFile);
