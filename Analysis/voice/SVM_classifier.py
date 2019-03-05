@@ -10,6 +10,8 @@ wkdir = 'Data/Sounds/yzc/'
 dataset = load_ftr_from_dir(wkdir)
 dataset = apply_subsampling(*dataset, **subsampling_config)
 show_shape(dataset.data)
+
+# flatten data
 dataset = DataPack([unit.flatten() for unit in dataset.data], dataset.labels, dataset.names)
 show_shape(dataset.data)
 
@@ -20,4 +22,4 @@ clf.fit(train.data, train.labels)
 print('on train', clf.score(train.data, train.labels))
 print('on test ', clf.score(test.data, test.labels))
 
-save_to_file(clf, 'voice/model_states/svm98-89.clf')
+# save_to_file(clf, 'voice/model_states/svm98-89.clf')

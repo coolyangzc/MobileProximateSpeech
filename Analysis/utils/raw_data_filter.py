@@ -21,25 +21,27 @@ class TriList(list):
 		while len(self) > 3: del self[0]
 
 
-def filter_(file_dir, n_test, deal_individual=False):
+def filter_(file_dir, n_test, deal_individual=False, audio_format='mp4'):
 	'''
 	general raw file filter
 
 	:param file_dir: raw data directory
 	:param n_test: test count
 	:param deal_individual: whether to view three repeated experiments as individual experiments
+	:param audio_format: format of audio files
 	'''
 	if deal_individual:
 		progress_re = re.compile('(\d+) / %d: ([123])' % n_test, re.U)
 	else:
 		progress_re = re.compile('(\d+) / %d' % n_test, re.U)  # pattern for progress number
 
-	sub_dir = './Filtered/'
 	print('filtering in %s' % file_dir)
+	old_dir = os.getcwd()
 	os.chdir(file_dir)
-	if os.path.exists(sub_dir):
+	dst_dir = '../filtered/'
+	if os.path.exists(dst_dir):
 		raise FileExistsError('the subdirectory already exists.')
-	os.mkdir(sub_dir)
+	os.mkdir(dst_dir)
 	selected_files = {}
 	if not deal_individual:
 		for i in range(1, n_test + 1):
@@ -70,11 +72,11 @@ def filter_(file_dir, n_test, deal_individual=False):
 				file_count += 1
 				file_name = selected_files[(i, j)]
 				# .txt
-				dst_path = os.path.join(sub_dir, file_name)
+				dst_path = os.path.join(dst_dir, file_name)
 				shutil.copyfile(file_name, dst_path)
-				# .mp4
-				file_name = tools.suffix_conv(file_name, '.mp4')
-				dst_path = os.path.join(sub_dir, file_name)
+				# audio
+				file_name = tools.suffix_conv(file_name, audio_format)
+				dst_path = os.path.join(dst_dir, file_name)
 				shutil.copyfile(file_name, dst_path)
 	else:
 		for i in tqdm(range(1, n_test + 1)):
@@ -82,38 +84,40 @@ def filter_(file_dir, n_test, deal_individual=False):
 			for file_name in cur_list:
 				file_count += 1
 				# .txt
-				dst_path = os.path.join(sub_dir, file_name)
+				dst_path = os.path.join(dst_dir, file_name)
 				shutil.copyfile(file_name, dst_path)
-				# .mp4
-				file_name = tools.suffix_conv(file_name, '.mp4')
-				dst_path = os.path.join(sub_dir, file_name)
+				# audio
+				file_name = tools.suffix_conv(file_name, audio_format)
+				dst_path = os.path.join(dst_dir, file_name)
 				shutil.copyfile(file_name, dst_path)
 
 	assert file_count == n_test * 3
-	print('filtered files copied to %s' % os.path.join(file_dir, sub_dir))
+	print('filtered files copied to %s' % os.path.join(file_dir, dst_dir))
+	os.chdir(old_dir)
 
 
-def filter1(file_dir):
+def filter1(file_dir, audio_format='mp4'):
 	"""
-	filter for study1, copying selected files to `Filtered`
+	filter for study1, copying selected files to `filtered`
 
 	:param file_dir: raw data directory
 	"""
 	print('Study 1')
-	filter_(file_dir, N_STUDY1)
+	filter_(file_dir, N_STUDY1, audio_format=audio_format)
 
 
-def filter3(file_dir, deal_individual=False):
+def filter3(file_dir, deal_individual=False, audio_format='mp4'):
 	"""
-	filter for study3, copying selected files to `Filtered`
+	filter for study3, copying selected files to `filtered`
 
 	:param file_dir: raw data directory
 	:param deal_individual: whether to view three repeated experiments as individual experiments
+	:param audio_format: format of audio files
 	"""
 	print('Study 3')
-	filter_(file_dir, N_STUDY3, deal_individual)
+	filter_(file_dir, N_STUDY3, deal_individual=deal_individual, audio_format=audio_format)
 
 
 if __name__ == '__main__':
 	logger.DualLogger('../logs/%svoice file filtering.txt' % DATE_TIME)
-	filter3('../Data/Study3/Raw Data/xy', deal_individual=True)
+	filter3('../Data/Study3/subjects/xy/original', deal_individual=True, audio_format='wav')

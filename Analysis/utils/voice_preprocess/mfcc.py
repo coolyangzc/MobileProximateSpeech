@@ -30,7 +30,7 @@ def visualize_mfcc(filename, sr=None):
 
 
 if __name__ == '__main__':
-	os.chdir('./Data/Sounds/MP3/Positive/')
+	os.chdir('../Data/Sounds/MP3/Positive/')
 	file_list = os.listdir()
 
 	## 预览第一个音频

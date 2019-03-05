@@ -8,7 +8,6 @@ from tqdm import tqdm
 
 from utils.tools import suffix_conv, date_time
 from utils.logger import DualLogger
-from utils.voice_preprocess.VAD import get_voice_chunks
 
 start_sec_dict = {  # in second
 	'竖直对脸，碰触鼻子': 1.1,
@@ -55,7 +54,7 @@ def trim_head(file_path, dst_dir, in_format='wav', out_format='wav'):
 	return dst_path
 
 
-def trim_in_dir(wk_dir, dst_dir, in_format='wav', out_format='wav'):
+def trim_in_dir(wk_dir, dst_dir=None, in_format='wav', out_format='wav'):
 	'''
 	trim head of audios in wk_dir and output to dst_dir
 
@@ -65,10 +64,10 @@ def trim_in_dir(wk_dir, dst_dir, in_format='wav', out_format='wav'):
 	:param out_format: output format
 	'''
 	old_path = os.getcwd()
-	if not os.path.exists(dst_dir):
-		os.mkdir(dst_dir)
-	assert os.path.exists(wk_dir)
 	os.chdir(wk_dir)
+	if dst_dir is None: dst_dir = '../trimmed'
+	if not os.path.exists(dst_dir): os.mkdir(dst_dir)
+
 	print('trimming in %s ...' % wk_dir)
 	files = filter(lambda x: x.endswith('.%s' % in_format), os.listdir('.'))
 	for file_path in tqdm(files):
@@ -78,6 +77,6 @@ def trim_in_dir(wk_dir, dst_dir, in_format='wav', out_format='wav'):
 
 if __name__ == '__main__':
 	DualLogger('../logs/%svoice_trimmer.txt' % date_time())
-	# wk_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/Raw Data/xy/Filtered'
-	# dst_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/Raw Data/xy/trimmed'
+	wk_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/Raw Data/xy/filtered'
 	# trim_in_dir(wk_dir, dst_dir)
+	pass
