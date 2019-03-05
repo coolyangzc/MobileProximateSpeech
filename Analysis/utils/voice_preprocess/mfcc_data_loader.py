@@ -403,15 +403,20 @@ if __name__ == '__main__':
 	# # show_shape(subsampling(test_pack.data[1], **subsampling_config))
 	wkdirs = [
 		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
+		# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
 		# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed'
 	]
-	pack = load_ftr_from_chunks_dir(wkdirs, shuffle=True, random_seed=1, cache=True)
+	# wkdir2 = '/Users/james/MobileProximateSpeech/Analysis/Data/Sounds/yzc'
+	pack = load_ftr_from_wav_dir(wkdirs, shuffle=True, random_seed=1, cache=True)
+	# pack = load_ftr_from_pn_dir(wkdir2)
+	pack = apply_subsampling(*pack, **subsampling_config, shuffle=True)
 	print('loaded.')
-	print(pack.labels)
-	print(pack.names)
+	print(len(pack.data))
+	print(len(pack.labels))
+	print(len(pack.names))
 	pack = apply_subsampling(*pack, **subsampling_config, shuffle=True)
 	print('applied.')
-	print(pack.labels)
-	print(pack.names)
+	show_shape(pack.data)
+	print(len(pack.labels))
+	print(len(pack.names))
 	pass

@@ -5,6 +5,8 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 import os
+from tqdm import tqdm
+
 
 ## 定义返回并可视化MFCC的函数
 
@@ -24,9 +26,24 @@ def visualize_mfcc(filename, sr=None):
 	return mfccs
 
 
+def compute_frame_ms_ratio(wkdir):
+	old_path = os.getcwd()
+	os.chdir(wkdir)
+	res = 0.0
+	files = list(filter(lambda x: x.endswith('.wav'), os.listdir('.')))
+	for file in tqdm(files):
+		y, sr = librosa.load(file)
+		duration = len(y) / sr
+		mfcc = librosa.feature.mfcc(y, sr, n_mfcc=40)
+		res += len(mfcc) / duration
+	res /= len(files)
+	return res
+
+
 if __name__ == '__main__':
 	from tqdm import tqdm as progress
 	import pickle
+
 	# 以下是正负例分类程序
 	os.chdir('../Data/Sounds/MP3/Positive/')
 	file_list = os.listdir()
