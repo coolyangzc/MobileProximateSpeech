@@ -6,8 +6,8 @@ import os
 from utils.logger import DualLogger
 from utils.tools import date_time
 
-import utils.voice_preprocess.voice_data_loader as loader
-from utils.voice_preprocess.voice_data_loader import show_shape, DataPack
+import utils.voice_preprocess.mfcc_data_loader as loader
+from utils.voice_preprocess.mfcc_data_loader import show_shape, DataPack
 from configs.subsampling_config import subsampling_config
 
 
@@ -26,7 +26,7 @@ def build_model():
 
 
 def load_train_test(wkdir, test_size):
-	dataset = loader.load_ftr_from_dir(wkdir)
+	dataset = loader.load_ftr_from_pn_dir(wkdir)
 	dataset = loader.apply_subsampling(*dataset, **subsampling_config)
 	# reshape to (n_units, n_frame, n_mfcc)
 	# dataset = DataPack([unit.flatten() for unit in dataset.data], dataset.labels, dataset.names)

@@ -1,5 +1,5 @@
 from sklearn.svm import SVC
-from utils.voice_preprocess.voice_data_loader import load_ftr_from_dir, apply_subsampling, DataPack, show_shape, train_test_split
+from utils.voice_preprocess.mfcc_data_loader import load_ftr_from_pn_dir, apply_subsampling, DataPack, show_shape, train_test_split
 from configs.subsampling_config import subsampling_config
 import os
 from utils.io import *
@@ -7,7 +7,7 @@ from utils.io import *
 os.chdir('..')
 wkdir = 'Data/Sounds/yzc/'
 
-dataset = load_ftr_from_dir(wkdir)
+dataset = load_ftr_from_pn_dir(wkdir)
 dataset = apply_subsampling(*dataset, **subsampling_config)
 show_shape(dataset.data)
 

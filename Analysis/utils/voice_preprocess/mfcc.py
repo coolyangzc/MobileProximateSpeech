@@ -4,12 +4,7 @@
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
-import numpy as np
 import os
-import os.path as path
-from tqdm import tqdm as progress
-import pickle
-
 
 ## 定义返回并可视化MFCC的函数
 
@@ -30,6 +25,9 @@ def visualize_mfcc(filename, sr=None):
 
 
 if __name__ == '__main__':
+	from tqdm import tqdm as progress
+	import pickle
+	# 以下是正负例分类程序
 	os.chdir('../Data/Sounds/MP3/Positive/')
 	file_list = os.listdir()
 
