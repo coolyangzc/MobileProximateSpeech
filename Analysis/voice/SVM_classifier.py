@@ -1,5 +1,5 @@
 from sklearn.svm import SVC
-from utils.voice_data_loader import load_ftr_from_dir, apply_subsampling, DataPack, show_shape, train_test_split
+from utils.voice_preprocess.voice_data_loader import load_ftr_from_dir, apply_subsampling, DataPack, show_shape, train_test_split
 from configs.subsampling_config import subsampling_config
 import os
 from utils.io import *

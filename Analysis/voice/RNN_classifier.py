@@ -6,8 +6,8 @@ import os
 from utils.logger import DualLogger
 from utils.tools import date_time
 
-import utils.voice_data_loader as loader
-from utils.voice_data_loader import show_shape, DataPack
+import utils.voice_preprocess.voice_data_loader as loader
+from utils.voice_preprocess.voice_data_loader import show_shape, DataPack
 from configs.subsampling_config import subsampling_config
 
 

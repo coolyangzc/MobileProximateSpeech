@@ -20,7 +20,7 @@ def suffix_conv(file_name: str, suffix):
 	:return: converted file name
 	"""
 	if not suffix.startswith('.'):
-		raise ValueError('suffix `%s` is not valid' % suffix)
+		suffix = '.' + suffix
 	segments = file_name.split('.')
 	if len(segments) <= 1:
 		raise ValueError('file_name `%s` got no suffix' % file_name)

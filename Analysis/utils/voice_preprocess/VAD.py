@@ -9,17 +9,28 @@ import wave
 
 import webrtcvad
 
+from utils.logger import DualLogger
+from utils.tools import date_time
+
+
 def read_wave(path):
 	"""Reads a .wav file.
 	Takes the path, and returns (PCM audio data, sample rate).
 	"""
 	with contextlib.closing(wave.open(path, 'rb')) as wf:
 		num_channels = wf.getnchannels()
-		assert num_channels == 1
 		sample_width = wf.getsampwidth()
-		assert sample_width == 2
 		sample_rate = wf.getframerate()
-		assert sample_rate in (8000, 16000, 32000, 48000)
+
+		if num_channels != 1:
+			raise TypeError('num_channels = %d, not 1.' % num_channels)
+
+		if sample_width != 2:
+			raise TypeError('sample_width = %d, not 2.' % sample_width)
+
+		if sample_rate not in (8000, 16000, 32000, 48000):
+			raise TypeError('sample_rate = %d, not in (8000, 16000, 32000, 48000)' % sample_rate)
+
 		pcm_data = wf.readframes(wf.getnframes())
 		return pcm_data, sample_rate
 
@@ -148,11 +159,33 @@ def main(*args):
 		write_wave(path, segment, sample_rate)
 
 
-if __name__ == '__main__':
-	# Usage: example.py <aggressiveness> <path to wav file>
-	# path = "/Users/james/MobileProximateSpeech/Analysis/Data/Study3/Test/clean_speech.wav"
-	path = "/Users/james/MobileProximateSpeech/Analysis/Data/Study3/Test/pocket_loud.wav"
-	dst_dir = path.split('.')[0]
+def get_voice_chunks(file_path, aggressiveness):
+	'''
+	generate human voice chunks from .wav file and output to subdirectory
+
+	:return dst_dir
+	'''
+	dst_dir = file_path.split('.')[0]
 	os.mkdir(dst_dir)
-	aggressiveness = 3
-	main(aggressiveness, path, dst_dir)
+	main(aggressiveness, file_path, dst_dir)
+	return dst_dir
+
+
+def get_voice_chunks_in_dir(wk_dir, aggressiveness):
+	'''
+	generate human voice chunks from all .wav files in wk_dir and output to subdirectory
+	'''
+	old_path = os.getcwd()
+	os.chdir(wk_dir)
+	print('vad in %s ...' % wk_dir)
+	files = filter(lambda x: x.endswith('.wav'), os.listdir('.'))
+	for file_path in files:
+		get_voice_chunks(file_path, aggressiveness)
+	print('done.')
+	os.chdir(old_path)
+
+
+if __name__ == '__main__':
+	DualLogger('../logs/%svad' % date_time())
+	# wk_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/wwn/trimmed'
+	# get_voice_chunks_in_dir(wk_dir, 3)
