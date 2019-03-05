@@ -60,15 +60,15 @@ def __scan_pn_dir(wkdir, label):
 	return DataPack(ftrs, labels, names)
 
 
-def __load_sequential(func: callable, wkdir, txtdir=None, shuffle=True, random_seed=None):
+def __load_sequential(func: callable, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
 	if type(wkdir) == str:
-		return func(wkdir, txtdir, shuffle, random_seed)
+		return func(wkdir, txtdir, shuffle, random_seed, cache)
 	elif type(wkdir) == list:
 		if txtdir == None: txtdir = [None for _ in wkdir]
 
 		ftrs, labels, descriptions = [], [], []
 		for wkdir_, txtdir_ in zip(wkdir, txtdir):
-			pack = func(wkdir_, txtdir_, shuffle=False)  # shuffle at last
+			pack = func(wkdir_, txtdir_, shuffle=False, cache=cache)  # shuffle at last
 			# concatenate
 			ftrs += pack.data
 			labels += pack.labels
@@ -85,7 +85,7 @@ def __load_sequential(func: callable, wkdir, txtdir=None, shuffle=True, random_s
 		raise TypeError('type of wkdir which equals %s is neither str nor list.' % type(wkdir))
 
 
-def __load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None):
+def __load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
 	'''
 	dir -> ftr DataPack
 
@@ -93,6 +93,7 @@ def __load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None):
 	:param txtdir: .txt files directory, default: wkdir.parent.original
 	:param shuffle: whether to shuffle
 	:param random_seed: random seed
+	:param cache: whether to store ftr data as cache to expedite future loading
 	:return: DataPack of ftrs, labels, descriptions
 	'''
 	old_path = os.getcwd()
@@ -103,9 +104,14 @@ def __load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None):
 
 	ftrs, labels, descriptions = [], [], []
 
-	files = suffix_filter(os.listdir('.'), '.wav')
+	cached = True if path.exists('.ftrexist') else False  # cached
+	files = suffix_filter(os.listdir('.'), '.ftr' if cached else '.wav')
+
 	for file_name in files:
-		ftr = mfcc.get_mfcc(file_name)
+		ftr = io.load_from_file(file_name) if cached else mfcc.get_mfcc(file_name)
+		if cache == True and cached == False:
+			io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
+
 		txt_path = path.join(txtdir, suffix_conv(file_name, '.txt'))
 		with open(txt_path, 'r') as f:
 			f.readline()
@@ -122,11 +128,14 @@ def __load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None):
 			random.seed(random_seed)
 			random.shuffle(obj)
 
+	if cache == True:
+		with open('.ftrexist', 'w'): pass # a mark
+
 	os.chdir(old_path)
 	return DataPack(ftrs, labels, descriptions)
 
 
-def load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None):
+def load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
 	''' entrance
 	dir or dirs -> ftr DataPack
 
@@ -134,12 +143,13 @@ def load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None):
 	:param txtdir: str or list, .txt files directory, default: list of wkdir.parent.original
 	:param shuffle: whether to shuffle
 	:param random_seed: random seed
+	:param cache: whether to store ftr data as cache to expedite future loading
 	:return: DataPack of ftrs, labels, descriptions
 	'''
-	return __load_sequential(__load_ftr_from_wav_dir, wkdir, txtdir=None, shuffle=True, random_seed=None)
+	return __load_sequential(__load_ftr_from_wav_dir, wkdir, txtdir, shuffle, random_seed, cache)
 
 
-def __load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=None):
+def __load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
 	'''
 	dir -> ftr DataPack
 
@@ -147,6 +157,7 @@ def __load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=Non
 	:param txtdir: .txt files directory, default: wkdir.parent.original
 	:param shuffle: whether to shuffle
 	:param random_seed: random seed
+	:param cache: whether to store ftr data as cache to expedite future loading
 	:return: DataPack of ftrs, labels, descriptions
 	'''
 	old_path = os.getcwd()
@@ -156,6 +167,7 @@ def __load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=Non
 	assert path.exists(txtdir)
 
 	ftrs, labels, descriptions = [], [], []
+	wk_cached = True if path.exists('.ftrexist') else False  # wkdir cached
 
 	chunk_dirs = filter(lambda x: path.isdir(x), os.listdir('.'))
 	for chunk_dir in chunk_dirs:
@@ -166,17 +178,28 @@ def __load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=Non
 			description = f.readline().strip()
 		label = label_dict[description]
 
-		chunks = suffix_filter(os.listdir(chunk_dir), '.wav')
+		cached = True if path.exists(path.join(chunk_dir, '.ftrexist')) else False
+		chunks = suffix_filter(os.listdir(chunk_dir), '.ftr' if cached else '.wav')
 		if len(chunks) == 0:
 			# 声音太小，没有被识别出来，就在同级目录下寻找.wav
-			file_name = chunk_dir + '.wav'
-			assert path.exists(file_name)
-			ftrs.append(mfcc.get_mfcc(file_name))
+			if wk_cached:
+				file_name = chunk_dir + '.ftr'
+				ftr = io.load_from_file(file_name)
+			else:
+				file_name = chunk_dir + '.wav'
+				ftr = mfcc.get_mfcc(file_name)
+				if cache == True: io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
+			ftrs.append(ftr)
 			labels.append(label)
 			descriptions.append(description)
 		else:
 			for chunk in chunks:
-				ftrs.append(mfcc.get_mfcc(path.join(chunk_dir, chunk)))
+				chunk_path = path.join(chunk_dir, chunk)
+				ftr = io.load_from_file(chunk_path) if cached else mfcc.get_mfcc(chunk_path)
+				if cache == True:
+					if cached == False: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
+					with open(path.join(chunk_dir, '.ftrexist'), 'w'): pass # a mark
+				ftrs.append(ftr)
 				labels.append(label)
 				descriptions.append(description)
 
@@ -186,11 +209,14 @@ def __load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=Non
 			random.seed(random_seed)
 			random.shuffle(obj)
 
+	if cache == True:
+		with open('.ftrexist', 'w'): pass # a mark
+
 	os.chdir(old_path)
 	return DataPack(ftrs, labels, descriptions)
 
 
-def load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=None):
+def load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
 	'''
 	dir(s) -> ftr DataPack
 
@@ -198,9 +224,10 @@ def load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=None)
 	:param txtdir: str or list, .txt files directory, default: wkdir.parent.original
 	:param shuffle: whether to shuffle
 	:param random_seed: random seed
+	:param cache: whether to store ftr data as cache to expedite future loading
 	:return: DataPack of ftrs, labels, descriptions
 	'''
-	return __load_sequential(__load_ftr_from_chunks_dir, wkdir, txtdir=None, shuffle=True, random_seed=None)
+	return __load_sequential(__load_ftr_from_chunks_dir, wkdir, txtdir, shuffle, random_seed, cache)
 
 
 def load_ftr_from_pn_dir(wkdir, shuffle=True, random_seed=None):
@@ -379,7 +406,7 @@ if __name__ == '__main__':
 		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
 		# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed'
 	]
-	pack = load_ftr_from_chunks_dir(wkdirs, shuffle=True, random_seed=1)
+	pack = load_ftr_from_chunks_dir(wkdirs, shuffle=True, random_seed=1, cache=True)
 	print('loaded.')
 	print(pack.labels)
 	print(pack.names)
