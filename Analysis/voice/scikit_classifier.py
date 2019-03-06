@@ -43,9 +43,8 @@ def flattened_pack(pack: DataPack) -> DataPack:
 
 
 os.chdir('..')
-DATE_TIME = date_time()
-DualLogger('logs/%ssklearn train' % DATE_TIME)
 
+# todo adjustable
 wkdirs = [
 	'Data/Study3/subjects/gfz/trimmed',
 	'Data/Study3/subjects/xy/trimmed',
@@ -57,22 +56,12 @@ wkdirs = [
 
 valdir = 'Data/Study3/subjects/wwn/trimmed'
 
-# X, y = load_data(wkdirs, chunks=False)
-#
-# print('val')
-# X_val, y_val = load_data(valid_dir, chunks=False) # for validation
-#
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-#
-# clf = SVC(kernel='rbf', gamma=3e-5, C=1.0)
-# clf.fit(X_train, y_train)
-# print('training finished.')
-# print('on train', clf.score(X_train, y_train))
-# print('on test ', clf.score(X_test, y_test))
-# print('on val  ', clf.score(X_val, y_val))
+DATE_TIME = date_time()
+DualLogger('logs/%sMLP(chunk) train' % DATE_TIME)
 
-dataset = mfcc_data_loader.load_ftr_from_wav_dir(wkdirs, shuffle=False, cache=True)
-valset = mfcc_data_loader.load_ftr_from_wav_dir(valdir, shuffle=False, cache=True)
+# todo can use load from chunks
+dataset = mfcc_data_loader.load_ftr_from_chunks_dir(wkdirs, shuffle=False, cache=True)
+valset = mfcc_data_loader.load_ftr_from_chunks_dir(valdir, shuffle=False, cache=True)
 print('data loaded.')
 dataset = mfcc_data_loader.apply_subsampling(*dataset, **subsampling_config, shuffle=True)
 valset = mfcc_data_loader.apply_subsampling(*valset, **subsampling_config, shuffle=True)
@@ -92,8 +81,11 @@ print()
 train, test = mfcc_data_loader.train_test_split(*dataset, test_size=0.1)
 
 print('===train & test===')
+# todo adjustable
 # clf = SVC(kernel='rbf', gamma=1e-5, C=1.0, verbose=1)
-clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10), activation='relu', learning_rate_init=1e-5, verbose=True)
+clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
+					activation='relu', solver='adam',
+					learning_rate_init=1e-5, verbose=True, shuffle=True)
 print('\nclf config:\n%s\n' % clf)
 
 print('tranning on :')
@@ -115,8 +107,21 @@ show_shape(valset.names)
 print('evaluating...\n')
 print('on val  ', clf.score(valset.data, valset.labels))
 
-save_to_file(clf, 'voice/model_state/%s%s.h5' % (DATE_TIME, type(clf)))
+save_to_file(clf, 'voice/model_state/%s%s(chunk).clf' % (DATE_TIME, type(clf)))
 
+# X, y = load_data(wkdirs, chunks=False)
+#
+# print('val')
+# X_val, y_val = load_data(valid_dir, chunks=False) # for validation
+#
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+#
+# clf = SVC(kernel='rbf', gamma=3e-5, C=1.0)
+# clf.fit(X_train, y_train)
+# print('training finished.')
+# print('on train', clf.score(X_train, y_train))
+# print('on test ', clf.score(X_test, y_test))
+# print('on val  ', clf.score(X_val, y_val))
 # clf = load_from_file('/Users/james/MobileProximateSpeech/Analysis/voice/model_state/190305 22_25_44 svm(chunks).clf')
 # for dir in wkdirs:
 # 	X_val, y_val = load_data(dir, chunks=False) # for validation

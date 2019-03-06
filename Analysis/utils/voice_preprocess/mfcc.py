@@ -37,6 +37,7 @@ def compute_frame_ms_ratio(wkdir):
 		mfcc = librosa.feature.mfcc(y, sr, n_mfcc=40)
 		res += len(mfcc) / duration
 	res /= len(files)
+	os.chdir(old_path)
 	return res
 
 

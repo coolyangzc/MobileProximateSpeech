@@ -37,7 +37,10 @@ def suffix_filter(files, suffix):
 
 
 def show_shape(iterable):
-	print(np.array(iterable).shape)
+	try:
+		print(np.array(iterable).shape)
+	except ValueError:
+		print('the shape is not standard.')
 
 
 def __scan_pn_dir(wkdir, label):
@@ -275,8 +278,10 @@ def subsampling(ftr, offset, duration, window, stride):
 	:param stride: 每次采样的步长
 	:return: list of units, shape like (n_unit, n_mfcc, n_frame)
 	'''
+	if offset >= ftr.shape[-1]:
+		raise ValueError('subsampling offset %d is greater than length of ftr %d.' % (offset, len(ftr)))
 	units = []
-	high = offset + duration
+	high = min(offset + duration, ftr.shape[-1])
 	left = offset
 	right = left + window
 	while right <= high:
@@ -336,6 +341,7 @@ def apply_subsampling(ftrs, labels, names, offset, duration, window, stride, shu
 			random.seed(random_seed)
 			random.shuffle(obj)
 
+	assert len(new_data) > 0
 	return DataPack(new_data, new_labels, new_names)
 
 
@@ -363,6 +369,7 @@ def apply_subsampling_grouping(ftrs, labels, names, offset, duration, window, st
 			random.seed(random_seed)
 			random.shuffle(obj)
 
+	assert len(new_data) > 0
 	return DataPack(new_data, new_labels, new_names)
 
 
@@ -381,42 +388,27 @@ def train_test_split(data, labels, names, test_size):
 
 if __name__ == '__main__':
 	from configs.subsampling_config import subsampling_config
-
-	#
-	# os.chdir('..')
-	# wkdir = 'Data/Sounds/yzc/'
-	# data_pack = load_ftr_from_pn_dir(wkdir)
-	#
-	# data_pack = apply_subsampling_grouping(*data_pack, **subsampling_config, group_size=11)
-	# # data_pack = apply_subsampling(*data_pack, **subsampling_config)
-	# show_shape(data_pack.data)
-	# show_shape(data_pack.labels)
-	# show_shape(data_pack.names)
-	#
-	# train_pack, test_pack = train_test_split(*data_pack, test_size=0.1)
-	# # print(len(test_pack.names), len(train_pack.names))
-	#
-	# show_shape(test_pack.data)
-	# show_shape(train_pack.data)
-	#
-	# # show_shape(subsampling(test_pack.data[0], **subsampling_config))
-	# # show_shape(subsampling(test_pack.data[1], **subsampling_config))
-	wkdirs = [
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed',
-		# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
-		# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed'
-	]
-	# wkdir2 = '/Users/james/MobileProximateSpeech/Analysis/Data/Sounds/yzc'
-	pack = load_ftr_from_wav_dir(wkdirs, shuffle=True, random_seed=1, cache=True)
-	# pack = load_ftr_from_pn_dir(wkdir2)
-	pack = apply_subsampling(*pack, **subsampling_config, shuffle=True)
-	print('loaded.')
-	print(len(pack.data))
-	print(len(pack.labels))
-	print(len(pack.names))
-	pack = apply_subsampling(*pack, **subsampling_config, shuffle=True)
-	print('applied.')
+	wkdir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/test/test'
+	pack = load_ftr_from_wav_dir(wkdir, txtdir=wkdir, shuffle=False)
 	show_shape(pack.data)
-	print(len(pack.labels))
-	print(len(pack.names))
+	pack = apply_subsampling_grouping(*pack, **subsampling_config ,group_size=5, shuffle=False)
+	show_shape(pack.data)
+	# wkdirs = [
+	# 	'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed',
+	# 	# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
+	# 	# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed'
+	# ]
+	# wkdir2 = '/Users/james/MobileProximateSpeech/Analysis/Data/Sounds/yzc'
+	# pack = load_ftr_from_wav_dir(wkdirs, shuffle=True, random_seed=1, cache=True)
+	# # pack = load_ftr_from_pn_dir(wkdir2)
+	# pack = apply_subsampling(*pack, **subsampling_config, shuffle=True)
+	# print('loaded.')
+	# # print(len(pack.data))
+	# # print(len(pack.labels))
+	# # print(len(pack.names))
+	# # print('applied.')
+	# print(len(pack.data))
+	# print(len(pack.labels))
+	# show_shape(pack.data[0])
+	# show_shape(pack.data)
 	pass
