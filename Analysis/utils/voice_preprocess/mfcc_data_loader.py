@@ -116,7 +116,7 @@ class DataPack:
 
 		ftrs, labels, descriptions = [], [], []
 
-		cached = True if path.exists('.ftrexist') else False  # cached
+		cached = True if path.exists('.ftrexist.') else False  # cached
 		files = suffix_filter(os.listdir('.'), '.ftr' if cached else '.wav')
 
 		for file_name in files:
@@ -125,7 +125,7 @@ class DataPack:
 				io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
 
 			txt_path = path.join(txtdir, suffix_conv(file_name, '.txt'))
-			with open(txt_path, 'r') as f:
+			with open(txt_path, 'r', encoding='utf-8') as f:
 				f.readline()
 				description = f.readline().strip()
 			label = label_dict[description]
@@ -135,7 +135,7 @@ class DataPack:
 			descriptions.append(description)
 
 		if cache == True:
-			with open('.ftrexist', 'w'): pass  # a mark
+			with open('.ftrexist.', 'w'): pass  # a mark
 
 		os.chdir(old_path)
 		self.data, self.labels, self.names = ftrs, labels, descriptions
@@ -158,18 +158,18 @@ class DataPack:
 		assert path.exists(txtdir)
 
 		ftrs, labels, descriptions = [], [], []
-		wk_cached = True if path.exists('.ftrexist') else False  # wkdir cached
+		wk_cached = True if path.exists('.ftrexist.') else False  # wkdir cached
 
 		chunk_dirs = filter(lambda x: path.isdir(x), os.listdir('.'))
 		for chunk_dir in chunk_dirs:
 
 			txt_path = path.join(txtdir, chunk_dir + '.txt')
-			with open(txt_path, 'r') as f:
+			with open(txt_path, 'r', encoding='utf-8') as f:
 				f.readline()
 				description = f.readline().strip()
 			label = label_dict[description]
 
-			cached = True if path.exists(path.join(chunk_dir, '.ftrexist')) else False
+			cached = True if path.exists(path.join(chunk_dir, '.ftrexist.')) else False
 			chunks = suffix_filter(os.listdir(chunk_dir), '.ftr' if cached else '.wav')
 			if len(chunks) == 0:
 				# 声音太小，没有被识别出来，就在同级目录下寻找.wav
@@ -189,14 +189,14 @@ class DataPack:
 					ftr = io.load_from_file(chunk_path) if cached else mfcc.get_mfcc(chunk_path)
 					if cache == True:
 						if cached == False: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
-						with open(path.join(chunk_dir, '.ftrexist'), 'w'):
+						with open(path.join(chunk_dir, '.ftrexist.'), 'w'):
 							pass  # a mark
 					ftrs.append(ftr)
 					labels.append(label)
 					descriptions.append(description)
 
 		if cache == True:
-			with open('.ftrexist', 'w'): pass  # a mark
+			with open('.ftrexist.', 'w'): pass  # a mark
 
 		os.chdir(old_path)
 		self.data, self.labels, self.names = ftrs, labels, descriptions
@@ -376,12 +376,16 @@ if __name__ == '__main__':
 	from configs.subsampling_config import subsampling_config
 
 	wkdirs = [
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/zfs/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wj/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wwn/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed',
 		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed'
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wwn/trimmed',
 	]
 	pack = DataPack()
-	pack.from_wav_dir(wkdirs, shuffle=True)
+	pack.from_wav_dir(wkdirs, shuffle=True, cache=True)
 	pack.show_shape()
 	pack.apply_subsampling_grouping(shuffle=False)
 	print('aftrer subsampling')

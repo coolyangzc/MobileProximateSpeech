@@ -76,7 +76,7 @@ def trim_in_dir(wk_dir, dst_dir=None, in_format='wav', out_format='wav'):
 	os.chdir(old_path)
 
 if __name__ == '__main__':
-	DualLogger('../logs/%svoice_trimmer.txt' % date_time())
-	wk_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/Raw Data/xy/filtered'
-	# trim_in_dir(wk_dir, dst_dir)
+	DualLogger('../../logs/%svoice_trimmer.txt' % date_time())
+	wk_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/temp/wwn_pls/original'
+	trim_in_dir(wk_dir)
 	pass

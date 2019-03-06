@@ -186,6 +186,6 @@ def get_voice_chunks_in_dir(wk_dir, aggressiveness):
 
 
 if __name__ == '__main__':
-	DualLogger('../logs/%svad' % date_time())
-	# wk_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/wwn/trimmed'
-	# get_voice_chunks_in_dir(wk_dir, 3)
+	DualLogger('../../logs/%svad' % date_time())
+	wk_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/temp/wwn_pls/trimmed'
+	get_voice_chunks_in_dir(wk_dir, 3)
