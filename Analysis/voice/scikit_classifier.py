@@ -1,7 +1,7 @@
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 from utils.voice_preprocess import mfcc_data_loader
-from utils.voice_preprocess.mfcc_data_loader import show_shape, DataPack
+from utils.voice_preprocess.mfcc_data_loader import DataPack
 from configs.subsampling_config import subsampling_config
 from utils.tools import date_time
 from utils.logger import DualLogger
@@ -27,10 +27,15 @@ def leave_one_out_val(wkdirs):
 		print('\n=== leave one out val %d / %d ===' % (i + 1, len(wkdirs)))
 		train_dirs = copy.copy(wkdirs)
 		train_dirs.remove(val_dir)
-		train = mfcc_data_loader.load_ftr_from_chunks_dir(train_dirs, shuffle=False, cache=True)
-		val = mfcc_data_loader.load_ftr_from_chunks_dir(val_dir, shuffle=False, cache=True)
-		train = flattened_pack(mfcc_data_loader.apply_subsampling(*train, **subsampling_config, shuffle=True))
-		val = flattened_pack(mfcc_data_loader.apply_subsampling(*val, **subsampling_config, shuffle=True))
+
+		train = DataPack()
+		train.from_wav_dir(train_dirs, cache=True)
+		val = DataPack()
+		val.from_wav_dir(val_dir, cache=True)
+		train.apply_subsampling()
+		train = flattened_pack(train)
+		val.apply_subsampling()
+		val = flattened_pack(val)
 		clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
 							activation='relu', solver='adam',
 							learning_rate_init=1e-5, verbose=False, shuffle=True)

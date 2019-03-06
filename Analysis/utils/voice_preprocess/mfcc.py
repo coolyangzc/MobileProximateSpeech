@@ -2,10 +2,9 @@
 ## （频率x时间）
 
 import librosa
-import librosa.display
-import matplotlib.pyplot as plt
+# import librosa.display
+# import matplotlib.pyplot as plt
 import os
-from tqdm import tqdm
 
 
 ## 定义返回并可视化MFCC的函数
@@ -15,15 +14,15 @@ def get_mfcc(filename, sr=None):
 	return librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
 
 
-def visualize_mfcc(filename, sr=None):
-	mfccs = get_mfcc(filename, sr)
-	plt.figure(figsize=(10, 4))
-	librosa.display.specshow(mfccs, x_axis='time')
-	plt.colorbar()
-	plt.title('MFCC')
-	plt.tight_layout()
-	plt.show()
-	return mfccs
+# def visualize_mfcc(filename, sr=None):
+# 	mfccs = get_mfcc(filename, sr)
+# 	plt.figure(figsize=(10, 4))
+# 	librosa.display.specshow(mfccs, x_axis='time')
+# 	plt.colorbar()
+# 	plt.title('MFCC')
+# 	plt.tight_layout()
+# 	plt.show()
+# 	return mfccs
 
 
 def compute_frame_ms_ratio(wkdir):
@@ -31,7 +30,7 @@ def compute_frame_ms_ratio(wkdir):
 	os.chdir(wkdir)
 	res = 0.0
 	files = list(filter(lambda x: x.endswith('.wav'), os.listdir('.')))
-	for file in tqdm(files):
+	for file in files:
 		y, sr = librosa.load(file)
 		duration = len(y) / sr
 		mfcc = librosa.feature.mfcc(y, sr, n_mfcc=40)

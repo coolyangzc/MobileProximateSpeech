@@ -5,12 +5,12 @@ from utils.voice_preprocess import mfcc
 from utils.tools import suffix_conv
 import os
 import os.path as path
-from collections import namedtuple
 import random
 import time
 import numpy as np
+from configs.subsampling_config import subsampling_config
 
-DataPack = namedtuple('DataPack', 'data labels names')
+# DataPack = namedtuple('DataPack', 'data labels names')
 
 label_dict = {  # 正负例分类字典
 	'竖直对脸，碰触鼻子': 1,
@@ -40,232 +40,285 @@ def show_shape(iterable):
 	try:
 		print(np.array(iterable).shape)
 	except ValueError:
-		print('the shape is not standard.')
+		print('the shape is not standard, len = %d.' % len(iterable))
 
 
-def __scan_pn_dir(wkdir, label):
+class DataPack:
 	'''
-	scan .ftr files in file_dir and return (data, labels, names)
-	labels are copies of label (1: positive, 0: negative)
+	mfcc data pack class
 	'''
-	assert label == 1 or label == 0
-	old_path = os.getcwd()
-	os.chdir(wkdir)
 
-	ftrs, names = [], []
-	files = suffix_filter(os.listdir('.'), '.ftr')
-	for filename in files:
-		ftrs.append(io.load_from_file(filename))
-		names.append(filename)
-	labels = [label for _ in ftrs]
+	def __init__(self, data=None, labels=None, names=None):
+		self.data = [] if data is None else data  # list of samples
+		self.labels = [] if labels is None else labels  # list of numbers
+		self.names = [] if names is None else names  # list of str
 
-	os.chdir(old_path)
-	return DataPack(ftrs, labels, names)
+	def __iter__(self):
+		self.n_var = 0
+		return self
 
+	def __next__(self):
+		n_var = self.n_var
+		self.n_var += 1
+		if n_var == 0:
+			return self.data
+		elif n_var == 1:
+			return self.labels
+		elif n_var == 2:
+			return self.names
+		else:
+			raise StopIteration
 
-def __load_sequential(func: callable, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
-	if type(wkdir) == str:
-		return func(wkdir, txtdir, shuffle, random_seed, cache)
-	elif type(wkdir) == list:
-		if txtdir == None: txtdir = [None for _ in wkdir]
+	def show_shape(self):
+		print('data: ', end='')
+		show_shape(self.data)
+		print('labels: ', end='')
+		show_shape(self.labels)
+		print('names: ', end='')
+		show_shape(self.names)
+
+	def shuffle_all(self, random_seed=None):
+		if random_seed is None: random_seed = time.time()
+		random.seed(random_seed)
+		random.shuffle(self.data)
+		random.seed(random_seed)
+		random.shuffle(self.labels)
+		random.seed(random_seed)
+		random.shuffle(self.names)
+
+	def __add__(self, other):
+		'''
+		concatenate another DataPack
+		:param other:  DataPack
+		'''
+		self.data += other.data
+		self.labels += other.labels
+		self.names += other.names
+		return self
+
+	# loading method
+
+	def __from_wav_dir(self, wkdir, txtdir=None, cache=False):
+		'''
+		dir -> ftr DataPack
+
+		:param wkdir: has lots of wav files, named with date_time
+		:param txtdir: .txt files directory, default: wkdir.parent.original
+		:param shuffle: whether to shuffle
+		:param random_seed: random seed
+		:param cache: whether to store ftr data as cache to expedite future loading
+		'''
+		old_path = os.getcwd()
+		os.chdir(wkdir)
+		if txtdir is None:
+			txtdir = '../original'
+		assert path.exists(txtdir)
 
 		ftrs, labels, descriptions = [], [], []
-		for wkdir_, txtdir_ in zip(wkdir, txtdir):
-			pack = func(wkdir_, txtdir_, shuffle=False, cache=cache)  # shuffle at last
-			# concatenate
-			ftrs += pack.data
-			labels += pack.labels
-			descriptions += pack.names
 
-		if shuffle == True:
-			if random_seed is None: random_seed = time.time()
-			for obj in ftrs, labels, descriptions:
-				random.seed(random_seed)
-				random.shuffle(obj)
+		cached = True if path.exists('.ftrexist') else False  # cached
+		files = suffix_filter(os.listdir('.'), '.ftr' if cached else '.wav')
 
-		return DataPack(ftrs, labels, descriptions)
-	else:
-		raise TypeError('type of wkdir which equals %s is neither str nor list.' % type(wkdir))
+		for file_name in files:
+			ftr = io.load_from_file(file_name) if cached else mfcc.get_mfcc(file_name)
+			if cache == True and cached == False:
+				io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
 
+			txt_path = path.join(txtdir, suffix_conv(file_name, '.txt'))
+			with open(txt_path, 'r') as f:
+				f.readline()
+				description = f.readline().strip()
+			label = label_dict[description]
 
-def __load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
-	'''
-	dir -> ftr DataPack
-
-	:param wkdir: has lots of wav files, named with date_time
-	:param txtdir: .txt files directory, default: wkdir.parent.original
-	:param shuffle: whether to shuffle
-	:param random_seed: random seed
-	:param cache: whether to store ftr data as cache to expedite future loading
-	:return: DataPack of ftrs, labels, descriptions
-	'''
-	old_path = os.getcwd()
-	os.chdir(wkdir)
-	if txtdir is None:
-		txtdir = '../original'
-	assert path.exists(txtdir)
-
-	ftrs, labels, descriptions = [], [], []
-
-	cached = True if path.exists('.ftrexist') else False  # cached
-	files = suffix_filter(os.listdir('.'), '.ftr' if cached else '.wav')
-
-	for file_name in files:
-		ftr = io.load_from_file(file_name) if cached else mfcc.get_mfcc(file_name)
-		if cache == True and cached == False:
-			io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
-
-		txt_path = path.join(txtdir, suffix_conv(file_name, '.txt'))
-		with open(txt_path, 'r') as f:
-			f.readline()
-			description = f.readline().strip()
-		label = label_dict[description]
-
-		ftrs.append(ftr)
-		labels.append(label)
-		descriptions.append(description)
-
-	if shuffle == True:
-		if random_seed is None: random_seed = time.time()
-		for obj in ftrs, labels, descriptions:
-			random.seed(random_seed)
-			random.shuffle(obj)
-
-	if cache == True:
-		with open('.ftrexist', 'w'): pass # a mark
-
-	os.chdir(old_path)
-	return DataPack(ftrs, labels, descriptions)
-
-
-def load_ftr_from_wav_dir(wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
-	''' entrance
-	dir or dirs -> ftr DataPack
-
-	:param wkdir: str or list, has lots of wav files, named with date_time
-	:param txtdir: str or list, .txt files directory, default: list of wkdir.parent.original
-	:param shuffle: whether to shuffle
-	:param random_seed: random seed
-	:param cache: whether to store ftr data as cache to expedite future loading
-	:return: DataPack of ftrs, labels, descriptions
-	'''
-	return __load_sequential(__load_ftr_from_wav_dir, wkdir, txtdir, shuffle, random_seed, cache)
-
-
-def __load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
-	'''
-	dir -> ftr DataPack
-
-	:param wkdir: has lots of chunk directories, named with date_time
-	:param txtdir: .txt files directory, default: wkdir.parent.original
-	:param shuffle: whether to shuffle
-	:param random_seed: random seed
-	:param cache: whether to store ftr data as cache to expedite future loading
-	:return: DataPack of ftrs, labels, descriptions
-	'''
-	old_path = os.getcwd()
-	os.chdir(wkdir)
-	if txtdir is None:
-		txtdir = '../original'
-	assert path.exists(txtdir)
-
-	ftrs, labels, descriptions = [], [], []
-	wk_cached = True if path.exists('.ftrexist') else False  # wkdir cached
-
-	chunk_dirs = filter(lambda x: path.isdir(x), os.listdir('.'))
-	for chunk_dir in chunk_dirs:
-
-		txt_path = path.join(txtdir, chunk_dir + '.txt')
-		with open(txt_path, 'r') as f:
-			f.readline()
-			description = f.readline().strip()
-		label = label_dict[description]
-
-		cached = True if path.exists(path.join(chunk_dir, '.ftrexist')) else False
-		chunks = suffix_filter(os.listdir(chunk_dir), '.ftr' if cached else '.wav')
-		if len(chunks) == 0:
-			# 声音太小，没有被识别出来，就在同级目录下寻找.wav
-			if wk_cached:
-				file_name = chunk_dir + '.ftr'
-				ftr = io.load_from_file(file_name)
-			else:
-				file_name = chunk_dir + '.wav'
-				ftr = mfcc.get_mfcc(file_name)
-				if cache == True: io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
 			ftrs.append(ftr)
 			labels.append(label)
 			descriptions.append(description)
-		else:
-			for chunk in chunks:
-				chunk_path = path.join(chunk_dir, chunk)
-				ftr = io.load_from_file(chunk_path) if cached else mfcc.get_mfcc(chunk_path)
-				if cache == True:
-					if cached == False: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
-					with open(path.join(chunk_dir, '.ftrexist'), 'w'): pass # a mark
+
+		if cache == True:
+			with open('.ftrexist', 'w'): pass  # a mark
+
+		os.chdir(old_path)
+		self.data, self.labels, self.names = ftrs, labels, descriptions
+
+	def __from_chunks_dir(self, wkdir, txtdir=None, cache=False):
+		'''
+		dir -> ftr DataPack
+
+		:param wkdir: has lots of chunk directories, named with date_time
+		:param txtdir: .txt files directory, default: wkdir.parent.original
+		:param shuffle: whether to shuffle
+		:param random_seed: random seed
+		:param cache: whether to store ftr data as cache to expedite future loading
+		:return: DataPack of ftrs, labels, descriptions
+		'''
+		old_path = os.getcwd()
+		os.chdir(wkdir)
+		if txtdir is None:
+			txtdir = '../original'
+		assert path.exists(txtdir)
+
+		ftrs, labels, descriptions = [], [], []
+		wk_cached = True if path.exists('.ftrexist') else False  # wkdir cached
+
+		chunk_dirs = filter(lambda x: path.isdir(x), os.listdir('.'))
+		for chunk_dir in chunk_dirs:
+
+			txt_path = path.join(txtdir, chunk_dir + '.txt')
+			with open(txt_path, 'r') as f:
+				f.readline()
+				description = f.readline().strip()
+			label = label_dict[description]
+
+			cached = True if path.exists(path.join(chunk_dir, '.ftrexist')) else False
+			chunks = suffix_filter(os.listdir(chunk_dir), '.ftr' if cached else '.wav')
+			if len(chunks) == 0:
+				# 声音太小，没有被识别出来，就在同级目录下寻找.wav
+				if wk_cached:
+					file_name = chunk_dir + '.ftr'
+					ftr = io.load_from_file(file_name)
+				else:
+					file_name = chunk_dir + '.wav'
+					ftr = mfcc.get_mfcc(file_name)
+					if cache == True: io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
 				ftrs.append(ftr)
 				labels.append(label)
 				descriptions.append(description)
+			else:
+				for chunk in chunks:
+					chunk_path = path.join(chunk_dir, chunk)
+					ftr = io.load_from_file(chunk_path) if cached else mfcc.get_mfcc(chunk_path)
+					if cache == True:
+						if cached == False: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
+						with open(path.join(chunk_dir, '.ftrexist'), 'w'):
+							pass  # a mark
+					ftrs.append(ftr)
+					labels.append(label)
+					descriptions.append(description)
 
-	if shuffle == True:
-		if random_seed is None: random_seed = time.time()
-		for obj in ftrs, labels, descriptions:
-			random.seed(random_seed)
-			random.shuffle(obj)
+		if cache == True:
+			with open('.ftrexist', 'w'): pass  # a mark
 
-	if cache == True:
-		with open('.ftrexist', 'w'): pass # a mark
+		os.chdir(old_path)
+		self.data, self.labels, self.names = ftrs, labels, descriptions
 
-	os.chdir(old_path)
-	return DataPack(ftrs, labels, descriptions)
+	def __load_sequential(self, one_step: callable, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
+		if type(wkdir) == str:
+			one_step(wkdir, txtdir, cache)
+			if shuffle == True: self.shuffle_all(random_seed)
+		elif type(wkdir) == list:
+			if txtdir == None: txtdir = [None for _ in wkdir]
+
+			total = DataPack()
+			for wkdir_, txtdir_ in zip(wkdir, txtdir):
+				one_step(wkdir_, txtdir_, cache=cache)
+				# concatenate
+				total += self
+
+			self.data, self.labels, self.names = total
+			if shuffle == True: self.shuffle_all(random_seed)
+		else:
+			raise TypeError('type of wkdir which equals %s is neither str nor list.' % type(wkdir))
+
+	def from_wav_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
+		''' entrance
+		dir or dirs -> ftr DataPack
+
+		:param wkdir: str or list, has lots of wav files, named with date_time
+		:param txtdir: str or list, .txt files directory, default: list of wkdir.parent.original
+		:param cache: whether to store ftr data as cache to expedite future loading
+		:return: DataPack of ftrs, labels, descriptions
+		'''
+		self.__load_sequential(self.__from_wav_dir, wkdir, txtdir, shuffle, random_seed, cache)
+
+	def from_chunks_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
+		'''
+		dir(s) -> ftr DataPack
+
+		:param wkdir: str or list, has lots of chunk directories, named with date_time
+		:param txtdir: str or list, .txt files directory, default: wkdir.parent.original
+		:param cache: whether to store ftr data as cache to expedite future loading
+		:return: DataPack of ftrs, labels, descriptions
+		'''
+		self.__load_sequential(self.__from_chunks_dir, wkdir, txtdir, shuffle, random_seed, cache)
+
+	# subsampling methods
+
+	def apply_subsampling(self,
+						  offset=subsampling_config['offset'],
+						  duration=subsampling_config['duration'],
+						  window=subsampling_config['window'],
+						  stride=subsampling_config['stride'],
+						  shuffle=True, random_seed=None):
+		'''
+		对 DataPack 施用采样，并保持labels，names长度平齐
+
+		:return: new DataPack after conversion
+		'''
+		new_data = []
+		new_labels = []
+		new_names = []
+		for ftr, label, name in zip(self.data, self.labels, self.names):
+			new_elem = _subsampling(ftr, offset, duration, window, stride)
+			new_data += new_elem
+			extended = _extend_labels_names(new_elem, label, name)
+			new_labels += extended.labels
+			new_names += extended.names
+
+		self.data, self.labels, self.names = new_data, new_labels, new_names
+		if shuffle == True: self.shuffle_all(random_seed)
+		assert len(new_data) > 0
+
+	def apply_subsampling_grouping(self,
+								   offset=subsampling_config['offset'],
+								   duration=subsampling_config['duration'],
+								   window=subsampling_config['window'],
+								   stride=subsampling_config['stride'],
+								   group_size=subsampling_config['group_size'],
+								   shuffle=True, random_seed=None):
+		'''
+		对 DataPack 施用子采样和重组，并保持labels，names长度平齐
+
+		:return: new DataPack after conversion
+		'''
+		new_data = []
+		new_labels = []
+		new_names = []
+		for ftr, label, name in zip(self.data, self.labels, self.names):
+			units = _subsampling(ftr, offset, duration, window, stride)
+			groups = _grouping(units, group_size)
+			new_data += groups
+			extended = _extend_labels_names(groups, label, name)
+			new_labels += extended.labels
+			new_names += extended.names
+
+		self.data, self.labels, self.names = new_data, new_labels, new_names
+		if shuffle == True: self.shuffle_all(random_seed)
+		assert len(new_data) > 0
+
+	def train_test_split(self, test_size=None):
+		'''
+		files or groups (DataPack) -> train_pack + test_pack
+
+		:param test_size: test size ratio, float number
+		:return: train_pack, test_pack
+		'''
+		if test_size is None:  # auto
+			if len(self.data) < 5000:
+				test_size = 0.3
+			elif len(self.data) < 10000:
+				test_size = 0.2
+			elif len(self.data) < 50000:
+				test_size = 0.1
+			else:
+				test_size = 0.05
+		else:
+			assert 0.0 <= test_size <= 1.0
+		cut = int(len(self.data) * test_size)
+		return DataPack(self.data[cut:], self.labels[cut:], self.names[cut:]), \
+			   DataPack(self.data[:cut], self.labels[:cut], self.names[:cut])
 
 
-def load_ftr_from_chunks_dir(wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
-	'''
-	dir(s) -> ftr DataPack
-
-	:param wkdir: str or list, has lots of chunk directories, named with date_time
-	:param txtdir: str or list, .txt files directory, default: wkdir.parent.original
-	:param shuffle: whether to shuffle
-	:param random_seed: random seed
-	:param cache: whether to store ftr data as cache to expedite future loading
-	:return: DataPack of ftrs, labels, descriptions
-	'''
-	return __load_sequential(__load_ftr_from_chunks_dir, wkdir, txtdir, shuffle, random_seed, cache)
-
-
-def load_ftr_from_pn_dir(wkdir, shuffle=True, random_seed=None):
-	'''
-	dir -> ftr data (DataPack)
-
-    wkdir has '/Positive/' and '/Negative/' directory
-    return ftrs, labels and descriptions
-    '''
-	old_path = os.getcwd()
-	os.chdir(wkdir)
-	assert path.exists('Positive')
-	assert path.exists('Negative')
-
-	print('loading from %s...' % wkdir)
-	p_ftrs, p_labels, p_names = __scan_pn_dir('Positive', 1)
-	n_ftrs, n_labels, n_names = __scan_pn_dir('Negative', 0)
-
-	ftrs = p_ftrs + n_ftrs
-	labels = p_labels + n_labels
-	names = p_names + n_names
-
-	if shuffle == True:
-		if random_seed is None: random_seed = time.time()
-		for obj in ftrs, labels, names:
-			random.seed(random_seed)
-			random.shuffle(obj)
-		print('shuffled.')
-
-	print('loaded.')
-	os.chdir(old_path)
-	return DataPack(ftrs, labels, names)
-
-
-def subsampling(ftr, offset, duration, window, stride):
+def _subsampling(ftr, offset, duration, window, stride):
 	'''
 	ftr data -> list of units
 
@@ -291,7 +344,7 @@ def subsampling(ftr, offset, duration, window, stride):
 	return units
 
 
-def grouping(units, group_size):
+def _grouping(units, group_size):
 	'''
 	从单元列表得到组合列表，会忽略末尾凑不足group_size的单元
 	可以不用这种表示方法
@@ -309,7 +362,7 @@ def grouping(units, group_size):
 	return groups
 
 
-def extend_labels_names(data, label, name):
+def _extend_labels_names(data, label, name):
 	'''
 	.ftr 数据经过 subsampling 或者 grouping 处理后会变成多份，此函数可以将 label, name 也补齐
 
@@ -319,96 +372,19 @@ def extend_labels_names(data, label, name):
 	return DataPack(data, [label for _ in data], [name for _ in data])
 
 
-def apply_subsampling(ftrs, labels, names, offset, duration, window, stride, shuffle=False, random_seed=None):
-	'''
-	对 DataPack 施用采样，并保持labels，names长度平齐
-
-	:return: new DataPack after conversion
-	'''
-	new_data = []
-	new_labels = []
-	new_names = []
-	for ftr, label, name in zip(ftrs, labels, names):
-		new_elem = subsampling(ftr, offset, duration, window, stride)
-		new_data += new_elem
-		extended = extend_labels_names(new_elem, label, name)
-		new_labels += extended.labels
-		new_names += extended.names
-
-	if shuffle == True:
-		if random_seed is None: random_seed = time.time()
-		for obj in new_data, new_labels, new_names:
-			random.seed(random_seed)
-			random.shuffle(obj)
-
-	assert len(new_data) > 0
-	return DataPack(new_data, new_labels, new_names)
-
-
-def apply_subsampling_grouping(ftrs, labels, names, offset, duration, window, stride, group_size, shuffle=False,
-							   random_seed=None):
-	'''
-	对 DataPack 施用子采样和重组，并保持labels，names长度平齐
-
-	:return: new DataPack after conversion
-	'''
-	new_data = []
-	new_labels = []
-	new_names = []
-	for ftr, label, name in zip(ftrs, labels, names):
-		units = subsampling(ftr, offset, duration, window, stride)
-		groups = grouping(units, group_size)
-		new_data += groups
-		extended = extend_labels_names(groups, label, name)
-		new_labels += extended.labels
-		new_names += extended.names
-
-	if shuffle == True:
-		if random_seed is None: random_seed = time.time()
-		for obj in new_data, new_labels, new_names:
-			random.seed(random_seed)
-			random.shuffle(obj)
-
-	assert len(new_data) > 0
-	return DataPack(new_data, new_labels, new_names)
-
-
-def train_test_split(data, labels, names, test_size):
-	'''
-	files or groups (DataPack) -> train_pack + test_pack
-
-	:param test_size: test size ratio, float number
-	:return: train_pack, test_pack
-	'''
-	assert 0.0 <= test_size <= 1.0
-	cut = int(len(data) * test_size)
-	return DataPack(data[cut:], labels[cut:], names[cut:]), \
-		   DataPack(data[:cut], labels[:cut], names[:cut])
-
-
 if __name__ == '__main__':
 	from configs.subsampling_config import subsampling_config
-	wkdir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/test/test'
-	pack = load_ftr_from_wav_dir(wkdir, txtdir=wkdir, shuffle=False)
-	show_shape(pack.data)
-	pack = apply_subsampling_grouping(*pack, **subsampling_config ,group_size=5, shuffle=False)
-	show_shape(pack.data)
-	# wkdirs = [
-	# 	'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed',
-	# 	# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
-	# 	# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed'
-	# ]
-	# wkdir2 = '/Users/james/MobileProximateSpeech/Analysis/Data/Sounds/yzc'
-	# pack = load_ftr_from_wav_dir(wkdirs, shuffle=True, random_seed=1, cache=True)
-	# # pack = load_ftr_from_pn_dir(wkdir2)
-	# pack = apply_subsampling(*pack, **subsampling_config, shuffle=True)
-	# print('loaded.')
-	# # print(len(pack.data))
-	# # print(len(pack.labels))
-	# # print(len(pack.names))
-	# # print('applied.')
-	# print(len(pack.data))
-	# print(len(pack.labels))
-	# show_shape(pack.data[0])
-	# show_shape(pack.data)
+
+	wkdirs = [
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed'
+	]
+	pack = DataPack()
+	pack.from_wav_dir(wkdirs, shuffle=True)
+	pack.show_shape()
+	pack.apply_subsampling_grouping(shuffle=False)
+	print('aftrer subsampling')
+	print(pack.labels[:5], pack.names[:5])
+	pack.show_shape()
 	pass
