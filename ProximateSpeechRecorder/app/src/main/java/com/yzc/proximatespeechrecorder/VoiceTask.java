@@ -1,8 +1,6 @@
 package com.yzc.proximatespeechrecorder;
 
-import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,9 +10,9 @@ import java.util.Random;
 
 public class VoiceTask {
 
-    public int task_id, repeat_times;
-    public List<String> tasks, sentences;
-    public List<Integer> speechList = new ArrayList<>();
+    private int task_id, repeat_times;
+    private List<String> tasks, sentences;
+    private List<Integer> speechList = new ArrayList<>();
     private Random random;
 
     public VoiceTask(int seed) {

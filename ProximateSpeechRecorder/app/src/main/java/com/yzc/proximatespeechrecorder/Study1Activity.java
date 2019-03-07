@@ -23,7 +23,8 @@ import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
-import android.renderscript.ScriptGroup;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
 import android.text.InputType;
 import android.util.Log;
@@ -62,6 +63,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
     private CameraCaptureSession mCaptureSession;
 
     private SensorManager mSensorManager;
+    private Vibrator mVibrator;
     private Button button_record, button_goto, button_redo;
     private TextView textView_description;
 
@@ -92,6 +94,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
         loadSensor();
         setupCamera();
         openCamera(mCameraIdFront);
+        mVibrator = (Vibrator)getApplication().getSystemService(VIBRATOR_SERVICE);
     }
 
     private void initViews() {
@@ -129,6 +132,9 @@ public class Study1Activity extends Activity implements SensorEventListener {
                                 new String[] { file.getAbsolutePath(), videoFile.getAbsolutePath() },
                                 null, null);
                         textView_description.setText(tasks.nextTask());
+                        long[] timings = {0, 100};
+                        VibrationEffect ve = VibrationEffect.createWaveform(timings, -1);
+                        mVibrator.vibrate(ve);
                     }
                     break;
             }
@@ -171,6 +177,9 @@ public class Study1Activity extends Activity implements SensorEventListener {
                     });
                     builder.setNegativeButton("否", null);
                     builder.show();
+                    break;
+                case R.id.button_redo:
+                    textView_description.setText(tasks.prevTask());
                     break;
             }
             return false;
@@ -284,7 +293,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String ss = tasks.getTaskDescription().replace('\n', ' ') + '\n';
+        String ss = tasks.getTaskDescription();
         startTimeMillis = System.currentTimeMillis();
         startUpTimeMillis = SystemClock.uptimeMillis();
         startTimestamp = SystemClock.elapsedRealtimeNanos();
@@ -452,12 +461,21 @@ public class Study1Activity extends Activity implements SensorEventListener {
             Log.d(TAG, "setupMediaRecorder");
             mMediaRecorder.reset();
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mMediaRecorder.setAudioChannels(2);
+            mMediaRecorder.setAudioSamplingRate(44100);
+            mMediaRecorder.setAudioEncodingBitRate(16 * 44100);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
             if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_1080P)) {
                 CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_1080P);
-                profile.videoBitRate = 8 * 1920 * 1080;
+                //profile.videoBitRate = 8 * 1920 * 1080;
+                //profile.videoCodec = MediaRecorder.VideoEncoder.H264;
+                profile.audioCodec = MediaRecorder.AudioEncoder.AAC;
+                profile.audioChannels = 2;
+                profile.audioSampleRate = 44100;
+                profile.audioBitRate = 16 * 44100;
                 mMediaRecorder.setProfile(profile);
             }
+            //mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             mMediaRecorder.setOutputFile(videoFile);
             mMediaRecorder.setOrientationHint(270);
             mMediaRecorder.prepare();
