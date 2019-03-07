@@ -91,10 +91,7 @@ class DataPack:
 		concatenate another DataPack
 		:param other:  DataPack
 		'''
-		self.data += other.data
-		self.labels += other.labels
-		self.names += other.names
-		return self
+		return DataPack(self.data + other.data, self.labels + other.labels, self.names + other.names)
 
 	# loading method
 
@@ -317,6 +314,30 @@ class DataPack:
 		return DataPack(self.data[cut:], self.labels[cut:], self.names[cut:]), \
 			   DataPack(self.data[:cut], self.labels[:cut], self.names[:cut])
 
+	def to_flatten(self):
+		'''
+		压扁时间维度的数据
+		'''
+		dim = np.ndim(self.data)
+		if  dim == 3:
+			self.data = [sample.flatten() for sample in self.data]
+		elif dim == 4:
+			self.data = [[sample.flatten() for sample in batch] for batch in self.data]
+		else:
+			raise ValueError('n_dim of data %d is not valid.' % dim)
+
+	def roll_f_as_last(self):
+		'''
+		将频率维度后置
+		'''
+		dim = np.ndim(self.data)
+		if  dim == 3:
+			self.data = np.rollaxis(np.array(self.data), 1, 3)
+		elif dim == 4:
+			self.data = np.rollaxis(np.array(self.data), 2, 4)
+		else:
+			raise ValueError('n_dim of data %d is not valid.' % dim)
+
 
 def _subsampling(ftr, offset, duration, window, stride):
 	'''
@@ -376,18 +397,21 @@ if __name__ == '__main__':
 	from configs.subsampling_config import subsampling_config
 
 	wkdirs = [
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/zfs/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wj/trimmed',
+		# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/zfs/trimmed',
+		# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wj/trimmed',
 		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wwn/trimmed',
 		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed',
 		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
 		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wwn/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/yzc/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/0305_1/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/0305_2/trimmed',
+		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/cjr/trimmed',
 	]
 	pack = DataPack()
-	pack.from_wav_dir(wkdirs, shuffle=True, cache=True)
+	pack.from_wav_dir(wkdirs, shuffle=False, cache=True)
 	pack.show_shape()
-	pack.apply_subsampling_grouping(shuffle=False)
+	pack.apply_subsampling(shuffle=True)
 	print('aftrer subsampling')
 	print(pack.labels[:5], pack.names[:5])
 	pack.show_shape()

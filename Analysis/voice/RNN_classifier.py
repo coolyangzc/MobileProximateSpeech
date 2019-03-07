@@ -6,10 +6,7 @@ import os
 from utils.logger import DualLogger
 from utils.tools import date_time
 
-import utils.voice_preprocess.mfcc_data_loader as loader
-from utils.voice_preprocess.mfcc_data_loader import show_shape, DataPack
-from configs.subsampling_config import subsampling_config
-
+from utils.voice_preprocess.mfcc_data_loader import DataPack
 
 def build_model():
 	print('building model...')
@@ -25,17 +22,17 @@ def build_model():
 	return model
 
 
-def load_train_test(wkdir, test_size):
-	dataset = loader.load_ftr_from_pn_dir(wkdir)
-	dataset = loader.apply_subsampling(*dataset, **subsampling_config)
+def load_train_test(wkdir, test_size=None):
+	dataset = DataPack()
+	dataset.from_chunks_dir(wkdir)
+	dataset.apply_subsampling()
+	dataset.roll_f_as_last()
 	# reshape to (n_units, n_frame, n_mfcc)
 	# dataset = DataPack([unit.flatten() for unit in dataset.data], dataset.labels, dataset.names)
-	dataset = DataPack(np.rollaxis(np.array(dataset.data), 1, 3), dataset.labels, dataset.names)
-	print('data shape like:')
-	show_shape(dataset.data)
+	print('shape like:')
+	dataset.show_shape()
 	print('data loaded.\n')
-	return loader.train_test_split(*dataset, test_size=test_size)
-
+	return dataset.train_test_split(test_size=test_size)
 
 if __name__ == '__main__':
 	os.chdir('..')
@@ -43,8 +40,8 @@ if __name__ == '__main__':
 	date_time = date_time()
 	DualLogger('logs/%sRNN.txt' % date_time)
 	print(os.getcwd())
-	wkdir = 'Data/Sounds/yzc'
-	wkdir2 = 'Data/Sounds/zfs'
+	wkdir = 'Data/Study3/subjects/yzc/trimmed'
+	wkdir2 = 'Data/Study3/subjects/zfs//trimmed'
 	train, test = load_train_test(wkdir, test_size=0.1)
 	train2, test2 = load_train_test(wkdir2, test_size=0)
 
@@ -55,5 +52,5 @@ if __name__ == '__main__':
 	test_loss, test_acc = model.evaluate(test.data, test.labels, batch_size=10)
 	print('acc on mix train:', train_acc)
 	print('acc on mix test :', test_acc)
-	# print('on zfs test ', model.evaluate(train2.data, train2.labels, batch_size=10))
+	print('on zfs test ', model.evaluate(train2.data, train2.labels, batch_size=10))
 	model.save('voice/model_state/%sRNN mix%d-%d.model' % (date_time, train_acc * 100, test_acc * 100))

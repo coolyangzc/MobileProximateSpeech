@@ -1,5 +1,6 @@
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import Perceptron
 from utils.voice_preprocess import mfcc_data_loader
 from utils.voice_preprocess.mfcc_data_loader import DataPack
 from configs.subsampling_config import subsampling_config
@@ -10,9 +11,6 @@ from utils.io import *
 import copy
 import numpy as np
 
-
-def flattened_pack(pack: DataPack) -> DataPack:
-	return DataPack([x.flatten() for x in pack.data], pack.labels, pack.names)
 
 
 def leave_one_out_val(wkdirs):
@@ -33,12 +31,12 @@ def leave_one_out_val(wkdirs):
 		val = DataPack()
 		val.from_wav_dir(val_dir, cache=True)
 		train.apply_subsampling()
-		train = flattened_pack(train)
+		train.to_flatten()
 		val.apply_subsampling()
-		val = flattened_pack(val)
+		val.to_flatten()
 		clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
 							activation='relu', solver='adam',
-							learning_rate_init=1e-5, verbose=False, shuffle=True)
+							learning_rate_init=1e-5, verbose=True, shuffle=True)
 		print('clf ready.\n', clf)
 		print()
 		clf.fit(train.data, train.labels)
@@ -60,67 +58,64 @@ wkdirs = [
 	'Data/Study3/subjects/gfz/trimmed',
 	'Data/Study3/subjects/xy/trimmed',
 	'Data/Study3/subjects/wty/trimmed',
-	'Data/Study3/subjects/zfs/trimmed',
+	# 'Data/Study3/subjects/zfs/trimmed',
 	'Data/Study3/subjects/wj/trimmed',
-	'Data/Study3/subjects/wwn/trimmed'
+	'Data/Study3/subjects/wwn/trimmed',
 ]
+testdir = 'Data/Study3/subjects/yzc/trimmed'
 
 DATE_TIME = date_time()
 DualLogger('logs/%sMLP(chunk) train' % DATE_TIME)
+# res = leave_one_out_val(wkdirs)
 
-res = leave_one_out_val(wkdirs)
 
-save_to_file(res, 'logs/%sEvaluation Result' % DATE_TIME)
+# save_to_file(res, 'logs/%sEvaluation Result' % DATE_TIME)
 
-# valdir = 'Data/Study3/subjects/wwn/trimmed'
-#
-#
-# # todo can use load from chunks
-# dataset = mfcc_data_loader.load_ftr_from_chunks_dir(wkdirs, shuffle=False, cache=True)
-# valset = mfcc_data_loader.load_ftr_from_chunks_dir(valdir, shuffle=False, cache=True)
-# print('data loaded.')
-# dataset = mfcc_data_loader.apply_subsampling(*dataset, **subsampling_config, shuffle=True)
-# valset = mfcc_data_loader.apply_subsampling(*valset, **subsampling_config, shuffle=True)
-# print('before flatten\n  data.shape  = ', end='')
-# show_shape(dataset.data)
-# dataset = flattened_pack(dataset)
-# valset = flattened_pack(valset)
-#
-# print('after flatten\n  data.shape   = ', end='')
-# show_shape(dataset.data)
-# print('  labels.shape = ', end='')
-# show_shape(dataset.labels)
-# print('  names.shape  = ', end='')
-# show_shape(dataset.names)
-# print()
-#
-# train, test = mfcc_data_loader.train_test_split(*dataset, test_size=0.1)
-#
-# print('===train & test===')
-# # todo adjustable
-# # clf = SVC(kernel='rbf', gamma=1e-5, C=1.0, verbose=1)
+
+
+# todo can use load from chunks
+dataset = DataPack()
+dataset.from_chunks_dir(wkdirs)
+
+testset = DataPack()
+testset.from_chunks_dir(testdir)
+print('data loaded.')
+
+print('train shape:')
+dataset.show_shape()
+
+print('test  shape:')
+testset.show_shape()
+
+dataset.apply_subsampling()
+testset.apply_subsampling()
+
+dataset.to_flatten()
+testset.to_flatten()
+print('\nafter flatten:')
+print('train shape:')
+dataset.show_shape()
+
+print('test  shape:')
+testset.show_shape()
+
+train, val = dataset.train_test_split(test_size=0.1)
+
+print('\n\n=== train & dev ===')
+# todo adjustable
+# clf = SVC(kernel='linear', gamma=1e-5, C=1.0, verbose=1)
 # clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
 # 					activation='relu', solver='adam',
 # 					learning_rate_init=1e-5, verbose=True, shuffle=True)
-# print('\nclf config:\n%s\n' % clf)
-#
-# print('tranning on :')
-# for wkdir in wkdirs: print(' ', wkdir)
-# print()
-#
-# clf.fit(train.data, train.labels)
-# print('\ntrain over.\n')
-# print('on train', clf.score(train.data, train.labels))
-# print('on test ', clf.score(test.data, test.labels))
-#
-# print('\n===evaluating===')
-# print('  val.shape = ', end='')
-# show_shape(valset.data)
-# print('  val.shape = ', end='')
-# show_shape(valset.labels)
-# print('  val.shape = ', end='')
-# show_shape(valset.names)
-# print('evaluating...\n')
-# print('on val  ', clf.score(valset.data, valset.labels))
-#
-# save_to_file(clf, 'voice/model_state/%s%s(chunk).clf' % (DATE_TIME, type(clf)))
+clf = Perceptron(alpha=1e3)
+print('\nclf config:\n%s\n' % clf)
+
+clf.fit(train.data, train.labels)
+print('\ntrain over.\n')
+print('on train', clf.score(train.data, train.labels))
+print('on val  ', clf.score(val.data, val.labels))
+
+print('\n\n=== evaluating ===')
+print('on test  ', clf.score(testset.data, testset.labels))
+
+save_to_file(clf, 'voice/model_state/%s%s(chunk).clf' % (DATE_TIME, type(clf)))

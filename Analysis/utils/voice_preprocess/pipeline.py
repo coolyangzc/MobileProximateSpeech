@@ -19,4 +19,3 @@ if __name__ == '__main__':
 
 	print('\nvad...')
 	VAD.get_voice_chunks_in_dir('../../Data/Study3/subjects/%s/trimmed' % subject_name, aggressiveness=3)
-
