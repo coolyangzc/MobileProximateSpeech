@@ -12,7 +12,7 @@ from configs.subsampling_config import subsampling_config
 
 # DataPack = namedtuple('DataPack', 'data labels names')
 
-label_dict = {  # 正负例分类字典
+label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数据
 	'竖直对脸，碰触鼻子': 1,
 	'竖直对脸，不碰鼻子': 1,
 	'竖屏握持，上端遮嘴': 1,
@@ -117,15 +117,18 @@ class DataPack:
 		files = suffix_filter(os.listdir('.'), '.ftr' if cached else '.wav')
 
 		for file_name in files:
-			ftr = io.load_from_file(file_name) if cached else mfcc.get_mfcc(file_name)
-			if cache == True and cached == False:
-				io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
-
 			txt_path = path.join(txtdir, suffix_conv(file_name, '.txt'))
 			with open(txt_path, 'r', encoding='utf-8') as f:
 				f.readline()
 				description = f.readline().strip()
 			label = label_dict[description]
+
+			if label == -1:  # abandon this piece of data if label == -1
+				continue
+
+			ftr = io.load_from_file(file_name) if cached else mfcc.get_mfcc(file_name)
+			if cache == True and cached == False:
+				io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
 
 			ftrs.append(ftr)
 			labels.append(label)
@@ -159,12 +162,14 @@ class DataPack:
 
 		chunk_dirs = filter(lambda x: path.isdir(x), os.listdir('.'))
 		for chunk_dir in chunk_dirs:
-
 			txt_path = path.join(txtdir, chunk_dir + '.txt')
 			with open(txt_path, 'r', encoding='utf-8') as f:
 				f.readline()
 				description = f.readline().strip()
 			label = label_dict[description]
+
+			if label == -1:  # abandon this piece of data if label == -1
+				continue
 
 			cached = True if path.exists(path.join(chunk_dir, '.ftrexist.')) else False
 			chunks = suffix_filter(os.listdir(chunk_dir), '.ftr' if cached else '.wav')
@@ -319,7 +324,7 @@ class DataPack:
 		压扁时间维度的数据
 		'''
 		dim = np.ndim(self.data)
-		if  dim == 3:
+		if dim == 3:
 			self.data = [sample.flatten() for sample in self.data]
 		elif dim == 4:
 			self.data = [[sample.flatten() for sample in batch] for batch in self.data]
@@ -331,7 +336,7 @@ class DataPack:
 		将频率维度后置
 		'''
 		dim = np.ndim(self.data)
-		if  dim == 3:
+		if dim == 3:
 			self.data = np.rollaxis(np.array(self.data), 1, 3)
 		elif dim == 4:
 			self.data = np.rollaxis(np.array(self.data), 2, 4)

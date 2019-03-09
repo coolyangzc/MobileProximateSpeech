@@ -59,8 +59,8 @@ wkdirs = [
 	'Data/Study3/subjects/xy/trimmed',
 	'Data/Study3/subjects/wty/trimmed',
 	# 'Data/Study3/subjects/zfs/trimmed',
-	'Data/Study3/subjects/wj/trimmed',
-	'Data/Study3/subjects/wwn/trimmed',
+	# 'Data/Study3/subjects/wj/trimmed',
+	# 'Data/Study3/subjects/wwn/trimmed',
 ]
 testdir = 'Data/Study3/subjects/yzc/trimmed'
 
@@ -103,11 +103,11 @@ train, val = dataset.train_test_split(test_size=0.1)
 
 print('\n\n=== train & dev ===')
 # todo adjustable
-# clf = SVC(kernel='linear', gamma=1e-5, C=1.0, verbose=1)
+clf = SVC(kernel='rbf', gamma=1e-5, C=1.0, verbose=True)
 # clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
 # 					activation='relu', solver='adam',
 # 					learning_rate_init=1e-5, verbose=True, shuffle=True)
-clf = Perceptron(alpha=1e3)
+# clf = Perceptron(alpha=1e3)
 print('\nclf config:\n%s\n' % clf)
 
 clf.fit(train.data, train.labels)
