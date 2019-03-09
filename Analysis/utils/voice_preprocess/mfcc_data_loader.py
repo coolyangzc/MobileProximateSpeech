@@ -8,6 +8,7 @@ import os.path as path
 import random
 import time
 import numpy as np
+from tqdm import tqdm
 from configs.subsampling_config import subsampling_config
 
 # DataPack = namedtuple('DataPack', 'data labels names')
@@ -95,7 +96,7 @@ class DataPack:
 
 	# loading method
 
-	def __from_wav_dir(self, wkdir, txtdir=None, cache=False):
+	def __from_wav_dir(self, wkdir, txtdir=None, cache=False, reload=False):
 		'''
 		dir -> ftr DataPack
 
@@ -104,6 +105,7 @@ class DataPack:
 		:param shuffle: whether to shuffle
 		:param random_seed: random seed
 		:param cache: whether to store ftr data as cache to expedite future loading
+		:param reload: whether to reload from wav file to update mfcc data
 		'''
 		old_path = os.getcwd()
 		os.chdir(wkdir)
@@ -114,7 +116,7 @@ class DataPack:
 		ftrs, labels, descriptions = [], [], []
 
 		cached = True if path.exists('.ftrexist.') else False  # cached
-		files = suffix_filter(os.listdir('.'), '.ftr' if cached else '.wav')
+		files = suffix_filter(os.listdir('.'), '.ftr' if cached and not reload else '.wav')
 
 		for file_name in files:
 			txt_path = path.join(txtdir, suffix_conv(file_name, '.txt'))
@@ -126,7 +128,7 @@ class DataPack:
 			if label == -1:  # abandon this piece of data if label == -1
 				continue
 
-			ftr = io.load_from_file(file_name) if cached else mfcc.get_mfcc(file_name)
+			ftr = io.load_from_file(file_name) if cached and not reload else mfcc.get_mfcc(file_name)
 			if cache == True and cached == False:
 				io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
 
@@ -140,7 +142,7 @@ class DataPack:
 		os.chdir(old_path)
 		self.data, self.labels, self.names = ftrs, labels, descriptions
 
-	def __from_chunks_dir(self, wkdir, txtdir=None, cache=False):
+	def __from_chunks_dir(self, wkdir, txtdir=None, cache=False, reload=False):
 		'''
 		dir -> ftr DataPack
 
@@ -149,6 +151,7 @@ class DataPack:
 		:param shuffle: whether to shuffle
 		:param random_seed: random seed
 		:param cache: whether to store ftr data as cache to expedite future loading
+		:param reload: whether to reload from wav file to update mfcc data
 		:return: DataPack of ftrs, labels, descriptions
 		'''
 		old_path = os.getcwd()
@@ -172,10 +175,10 @@ class DataPack:
 				continue
 
 			cached = True if path.exists(path.join(chunk_dir, '.ftrexist.')) else False
-			chunks = suffix_filter(os.listdir(chunk_dir), '.ftr' if cached else '.wav')
+			chunks = suffix_filter(os.listdir(chunk_dir), '.ftr' if cached and not reload else '.wav')
 			if len(chunks) == 0:
 				# 声音太小，没有被识别出来，就在同级目录下寻找.wav
-				if wk_cached:
+				if wk_cached and not reload:
 					file_name = chunk_dir + '.ftr'
 					ftr = io.load_from_file(file_name)
 				else:
@@ -188,9 +191,9 @@ class DataPack:
 			else:
 				for chunk in chunks:
 					chunk_path = path.join(chunk_dir, chunk)
-					ftr = io.load_from_file(chunk_path) if cached else mfcc.get_mfcc(chunk_path)
+					ftr = io.load_from_file(chunk_path) if cached and not reload else mfcc.get_mfcc(chunk_path)
 					if cache == True:
-						if cached == False: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
+						if cached and not reload == False: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
 						with open(path.join(chunk_dir, '.ftrexist.'), 'w'):
 							pass  # a mark
 					ftrs.append(ftr)
@@ -203,16 +206,16 @@ class DataPack:
 		os.chdir(old_path)
 		self.data, self.labels, self.names = ftrs, labels, descriptions
 
-	def __load_sequential(self, one_step: callable, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
+	def __load_sequential(self, one_step: callable, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False):
 		if type(wkdir) == str:
-			one_step(wkdir, txtdir, cache)
+			one_step(wkdir, txtdir=txtdir, cache=cache, reload=reload)
 			if shuffle == True: self.shuffle_all(random_seed)
 		elif type(wkdir) == list:
 			if txtdir == None: txtdir = [None for _ in wkdir]
 
 			total = DataPack()
-			for wkdir_, txtdir_ in zip(wkdir, txtdir):
-				one_step(wkdir_, txtdir_, cache=cache)
+			for wkdir_, txtdir_ in tqdm(zip(wkdir, txtdir)):
+				one_step(wkdir_, txtdir=txtdir_, cache=cache, reload=reload)
 				# concatenate
 				total += self
 
@@ -221,27 +224,29 @@ class DataPack:
 		else:
 			raise TypeError('type of wkdir which equals %s is neither str nor list.' % type(wkdir))
 
-	def from_wav_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
+	def from_wav_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False):
 		''' entrance
 		dir or dirs -> ftr DataPack
 
 		:param wkdir: str or list, has lots of wav files, named with date_time
 		:param txtdir: str or list, .txt files directory, default: list of wkdir.parent.original
 		:param cache: whether to store ftr data as cache to expedite future loading
+		:param reload: whether to reload from wav file to update mfcc data
 		:return: DataPack of ftrs, labels, descriptions
 		'''
-		self.__load_sequential(self.__from_wav_dir, wkdir, txtdir, shuffle, random_seed, cache)
+		self.__load_sequential(self.__from_wav_dir, wkdir, txtdir, shuffle, random_seed, cache, reload)
 
-	def from_chunks_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False):
+	def from_chunks_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False):
 		'''
 		dir(s) -> ftr DataPack
 
 		:param wkdir: str or list, has lots of chunk directories, named with date_time
 		:param txtdir: str or list, .txt files directory, default: wkdir.parent.original
 		:param cache: whether to store ftr data as cache to expedite future loading
+		:param reload: whether to load from wav file to update mfcc data
 		:return: DataPack of ftrs, labels, descriptions
 		'''
-		self.__load_sequential(self.__from_chunks_dir, wkdir, txtdir, shuffle, random_seed, cache)
+		self.__load_sequential(self.__from_chunks_dir, wkdir, txtdir, shuffle, random_seed, cache, reload)
 
 	# subsampling methods
 

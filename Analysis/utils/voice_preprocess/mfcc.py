@@ -5,13 +5,25 @@ import librosa
 # import librosa.display
 # import matplotlib.pyplot as plt
 import os
+from numpy import array
+
+
+def normalize(y, axis=-1):
+	'''
+	normalize y by eliminating its mean and std
+	'''
+	z = array(y)
+	E = z.mean(axis=axis, keepdims=True)
+	S = z.std(axis=axis, keepdims=True)
+	return (z - E) / S
 
 
 ## 定义返回并可视化MFCC的函数
 
-def get_mfcc(filename, sr=None):
+def get_mfcc(filename, sr=16000):  # todo sr = 16000
 	y, sr = librosa.load(filename, sr=sr)
-	return librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
+	y = normalize(y, axis=-1)
+	return normalize(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=24), axis=-1)
 
 
 # def visualize_mfcc(filename, sr=None):

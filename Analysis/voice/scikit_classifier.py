@@ -3,14 +3,54 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import Perceptron
 from utils.voice_preprocess import mfcc_data_loader
 from utils.voice_preprocess.mfcc_data_loader import DataPack
-from configs.subsampling_config import subsampling_config
 from utils.tools import date_time
 from utils.logger import DualLogger
 import os
 from utils.io import *
 import copy
+from collections import Counter
+from utils.voice_preprocess.mfcc_data_loader import label_dict
 import numpy as np
 
+gestures = label_dict.keys()
+
+class MySVC(SVC):
+	'''
+	Support Vector Classifier which provide feedback of incorrect classified samples' descriptions
+	'''
+	def score(self, dataset: DataPack):
+		'''
+		score dataset with mistake count
+
+		:param dataset: test datapack
+		:return: tuple, (accuracy, f1, mistake rate dict)
+		'''
+		counter = Counter(dataset.names) # count each gesture
+		mistakes = {} # incorrect rates for all gestures
+		for gesture in gestures: mistakes[gesture] = 0
+		tp, tn, fp, fn = 0, 0, 0, 0
+		predictions = self.predict(dataset.data)
+		for prediction, label, gesture in zip(predictions, dataset.labels, dataset.names):
+			if prediction == label:
+				if label == 1:
+					tp += 1
+				else:
+					tn += 1
+			else: # classified wrongly
+				if label == 1:
+					fn += 1
+				else:
+					fp += 1
+				mistakes[gesture] += 1
+		precision = tp / (tp + fp)
+		recall = tp / (tp + fn)
+		acc = (tp + tn) / (tp + tn + fp + fn)
+		f1 = 2 * precision * recall / (precision + recall)
+
+		for gesture in mistakes:
+			mistakes[gesture] /= counter[gesture]
+
+		return acc, f1, mistakes
 
 
 def leave_one_out_val(wkdirs):
@@ -58,9 +98,9 @@ wkdirs = [
 	'Data/Study3/subjects/gfz/trimmed',
 	'Data/Study3/subjects/xy/trimmed',
 	'Data/Study3/subjects/wty/trimmed',
-	# 'Data/Study3/subjects/zfs/trimmed',
-	# 'Data/Study3/subjects/wj/trimmed',
-	# 'Data/Study3/subjects/wwn/trimmed',
+	'Data/Study3/subjects/zfs/trimmed',
+	'Data/Study3/subjects/wj/trimmed',
+	'Data/Study3/subjects/wwn/trimmed',
 ]
 testdir = 'Data/Study3/subjects/yzc/trimmed'
 
@@ -75,35 +115,35 @@ DualLogger('logs/%sMLP(chunk) train' % DATE_TIME)
 
 # todo can use load from chunks
 dataset = DataPack()
-dataset.from_chunks_dir(wkdirs)
+dataset.from_chunks_dir(wkdirs, cache=True, reload=True)
 
-testset = DataPack()
-testset.from_chunks_dir(testdir)
+test = DataPack()
+test.from_chunks_dir(testdir, cache=True, reload=True)
 print('data loaded.')
 
 print('train shape:')
 dataset.show_shape()
 
 print('test  shape:')
-testset.show_shape()
+test.show_shape()
 
 dataset.apply_subsampling()
-testset.apply_subsampling()
+test.apply_subsampling()
 
 dataset.to_flatten()
-testset.to_flatten()
+test.to_flatten()
 print('\nafter flatten:')
 print('train shape:')
 dataset.show_shape()
 
 print('test  shape:')
-testset.show_shape()
+test.show_shape()
 
 train, val = dataset.train_test_split(test_size=0.1)
 
 print('\n\n=== train & dev ===')
 # todo adjustable
-clf = SVC(kernel='rbf', gamma=1e-5, C=1.0, verbose=True)
+clf = MySVC(kernel='rbf', gamma='auto', C=1.0, verbose=True)
 # clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
 # 					activation='relu', solver='adam',
 # 					learning_rate_init=1e-5, verbose=True, shuffle=True)
@@ -112,10 +152,20 @@ print('\nclf config:\n%s\n' % clf)
 
 clf.fit(train.data, train.labels)
 print('\ntrain over.\n')
-print('on train', clf.score(train.data, train.labels))
-print('on val  ', clf.score(val.data, val.labels))
 
-print('\n\n=== evaluating ===')
-print('on test  ', clf.score(testset.data, testset.labels))
+print('=== evaluating ===\n')
+
+def evaluate(which, dataset: DataPack):
+	print('== on %s ==' % which)
+	acc, f1, mistakes = clf.score(dataset)
+	print('acc = %.4f%%, f1 = %.4f%%' % (acc * 100, f1 * 100))
+	print('mistakes rate:')
+	for description in mistakes:
+		print('\t%s:  %.2f%%' % (description, mistakes[description] * 100))
+	print()
+
+evaluate('train', train)
+evaluate('dev', val)
+evaluate('test', test)
 
 save_to_file(clf, 'voice/model_state/%s%s(chunk).clf' % (DATE_TIME, type(clf)))
