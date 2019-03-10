@@ -1,15 +1,17 @@
 # load voice mfcc data from .ftr files
 
-from utils import io
-from utils.voice_preprocess import mfcc
-from utils.tools import suffix_conv
 import os
 import os.path as path
 import random
 import time
+
 import numpy as np
 from tqdm import tqdm
+
 from configs.subsampling_config import subsampling_config
+from utils import io
+from utils.tools import suffix_conv, suffix_filter
+from utils.voice_preprocess import mfcc
 
 # DataPack = namedtuple('DataPack', 'data labels names')
 
@@ -29,6 +31,7 @@ label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数
 	'裤兜': 0,
 }
 
+
 # label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数据
 # 	'竖直对脸，碰触鼻子': -1,
 # 	'竖直对脸，不碰鼻子': 1,
@@ -44,14 +47,6 @@ label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数
 # 	'手上反面': 0,
 # 	'裤兜': 0,
 # }
-
-
-
-def suffix_filter(files, suffix):
-	'''
-	return list of files with given suffix
-	'''
-	return list(filter(lambda x: x.endswith(suffix), files))
 
 
 def show_shape(iterable):
