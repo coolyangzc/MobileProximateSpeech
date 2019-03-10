@@ -7,7 +7,8 @@ from tqdm import tqdm
 from utils.tools import suffix_filter
 
 
-def extract_frames(video_path, start_time=0., minus_time=0., stride_time=1., threshold=None, progress_bar=False):
+def extract_frames(video_path, start_time=0., minus_time=0., stride_time=None, stride_frame=10,
+				   threshold=None, progress_bar=False):
 	'''
 	从视频中提取帧，输出到子目录
 	extract picture frames from mp4 video, starting from `start_time`, ending at `time duration of the video - end_time`
@@ -17,6 +18,7 @@ def extract_frames(video_path, start_time=0., minus_time=0., stride_time=1., thr
 	:param start_time: float, start time in seconds
 	:param minus_time: float, length minus time in seconds
 	:param stride_time: float, how long to skip after one output frame (in seconds)
+	:param stride_frame: int, how many frames to skip after one output frame
 	:param threshold: float, how bright a frame should at least be to be regarded as valid
 	:param progress_bar: whether to display a progress bar
 	'''
@@ -34,14 +36,15 @@ def extract_frames(video_path, start_time=0., minus_time=0., stride_time=1., thr
 
 	# creating a sub folder
 	dst_dir = video_name.split('.')[0]
-	assert not os.path.exists(dst_dir)
+	if os.path.exists(dst_dir):
+		raise FileExistsError
 	os.makedirs(dst_dir)
 
 	cur_frame = 0
 	start_frame = int(start_time * fps)
 	end_frame = int(tot_frame - minus_time * fps)
 	step = 0  # count valid frame
-	stride = int(stride_time * fps)
+	stride = int(stride_time * fps) if stride_time is not None else stride_frame
 	progress = tqdm(total=(end_frame - start_frame)) if progress_bar else None
 	while True:
 		# reading from frame
@@ -80,7 +83,7 @@ def extract_frames(video_path, start_time=0., minus_time=0., stride_time=1., thr
 	os.chdir(old_path)
 
 
-def extract_frames_in_dir(wkdir, start_time=0., minus_time=0., stride_time=1., threshold=None):
+def extract_frames_in_dir(wkdir, start_time=0., minus_time=0., stride_time=None, stride_frame=10, threshold=None):
 	'''
 	从视频目录中批量提取帧，输出到许多子目录
 	extract picture frames from mp4 video directory
@@ -89,6 +92,7 @@ def extract_frames_in_dir(wkdir, start_time=0., minus_time=0., stride_time=1., t
 	:param start_time: float, start time in seconds
 	:param minus_time: float, length minus time in seconds
 	:param stride_time: float, how long to skip after one output frame (in seconds)
+	:param stride_frame: int, how many frames to skip after one output frame
 	:param threshold: float, how bright a frame should at least be to be regarded as valid
 	'''
 	old_path = os.getcwd()
@@ -96,11 +100,20 @@ def extract_frames_in_dir(wkdir, start_time=0., minus_time=0., stride_time=1., t
 	print('Extracting frames in directory %s...' % wkdir)
 	video_paths = suffix_filter(os.listdir('.'), suffix='.mp4')
 	for video_path in tqdm(video_paths):
-		extract_frames(video_path, start_time=start_time, minus_time=minus_time, stride_time=stride_time,
-					   threshold=threshold)
+		try:
+			extract_frames(video_path,
+						   start_time=start_time, minus_time=minus_time, stride_time=stride_time,
+						   stride_frame=stride_frame,
+						   threshold=threshold)
+		except FileExistsError:
+			pass
 	os.chdir(old_path)
 
 
 if __name__ == '__main__':
-	wkdir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study2/test'
-	extract_frames_in_dir(wkdir)
+	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study2/subjects')
+	subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	print(subjects)
+	for subject in subjects:
+		wkdir = os.path.join(subject, 'trimmed')
+		extract_frames_in_dir(wkdir, stride_frame=10)
