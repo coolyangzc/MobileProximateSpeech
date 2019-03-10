@@ -28,6 +28,8 @@ label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数
 	'手上反面': 0,
 	'裤兜': 0,
 }
+
+
 # label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数据
 # 	'竖直对脸，碰触鼻子': -1,
 # 	'竖直对脸，不碰鼻子': -1,
@@ -115,6 +117,15 @@ class DataPack:
 				labels.append(label)
 				gestures.append(gesture)
 		return DataPack(samples, labels, gestures)
+
+	def crop(self, size: int):
+		'''
+		crop the datapack to the designated size ( ≤ len(self.data) )
+		'''
+		assert size <= len(self.data)
+		self.data = self.data[:size]
+		self.labels = self.labels[:size]
+		self.names = self.names[:size]
 
 	def __add__(self, other):
 		'''

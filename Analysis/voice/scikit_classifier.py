@@ -1,25 +1,28 @@
-from sklearn.svm import SVC
-from sklearn.neural_network import MLPClassifier
-from sklearn.linear_model import Perceptron
-from sklearn.decomposition import PCA
-from utils.voice_preprocess import mfcc_data_loader
-from utils.voice_preprocess.mfcc_data_loader import DataPack
-from utils.tools import date_time
-from utils.logger import DualLogger
-import os
-from utils.io import *
 import copy
+import os
 from collections import Counter
-from utils.voice_preprocess.mfcc_data_loader import label_dict
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
+
+from utils.io import *
+from utils.logger import DualLogger
+from utils.tools import date_time
+from utils.voice_preprocess.mfcc_data_loader import DataPack, label_dict
 
 gestures = label_dict.keys()
+
 
 class MySVC(SVC):
 	'''
 	Support Vector Classifier which provide feedback of incorrect classified samples' descriptions
 	'''
+
+	def fit(self, dataset: DataPack):
+		super().fit(dataset.data, dataset.labels)
 
 	def score(self, dataset: DataPack):
 		'''
@@ -146,10 +149,10 @@ DualLogger('logs/%sSVM.txt' % DATE_TIME)
 # load ######################################################
 # todo can use load from chunks
 dataset = DataPack()
-dataset.from_chunks_dir(wkdirs, cache=True, reload=False)
+dataset.from_chunks_dir(wkdirs, cache=True, reload=True)
 
 test = DataPack()
-test.from_chunks_dir(testdir, cache=True, reload=False)
+test.from_chunks_dir(testdir, cache=True, reload=True)
 print('data loaded.')
 
 print('train shape:')
@@ -201,7 +204,7 @@ clf = MySVC(kernel='rbf', gamma='scale', C=1., verbose=True)
 print('\nclf config:\n%s\n' % clf)
 print('gamma =', clf.gamma)
 
-clf.fit(train.data, train.labels)
+clf.fit(train)
 print('\ntrain over.\n')
 
 # evaluate ######################################################

@@ -8,8 +8,9 @@ import os
 from numpy import array
 
 
-def normalize(y, axis=-1):
+def normalize(y, axis):
 	'''
+	归一化
 	normalize y by eliminating its mean and std
 	'''
 	z = array(y)
@@ -22,8 +23,9 @@ def normalize(y, axis=-1):
 
 def get_mfcc(filename, sr=16000):
 	y, sr = librosa.load(filename, sr=sr)
-	y = normalize(y, axis=-1)
-	return normalize(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=24), axis=-1)
+	# y = normalize(y, axis=-1)
+	# 这里要对频率归一化处理，因为不同人说话频率不同，归一化后的迁移效果斐然！
+	return normalize(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=24), axis=0)
 
 
 # def visualize_mfcc(filename, sr=None):
