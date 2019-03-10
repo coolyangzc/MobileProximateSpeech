@@ -1,6 +1,7 @@
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import Perceptron
+from sklearn.decomposition import PCA
 from utils.voice_preprocess import mfcc_data_loader
 from utils.voice_preprocess.mfcc_data_loader import DataPack
 from utils.tools import date_time
@@ -11,6 +12,7 @@ import copy
 from collections import Counter
 from utils.voice_preprocess.mfcc_data_loader import label_dict
 import numpy as np
+import matplotlib.pyplot as plt
 
 gestures = label_dict.keys()
 
@@ -18,15 +20,16 @@ class MySVC(SVC):
 	'''
 	Support Vector Classifier which provide feedback of incorrect classified samples' descriptions
 	'''
+
 	def score(self, dataset: DataPack):
 		'''
 		score dataset with mistake count
 
 		:param dataset: test datapack
-		:return: tuple, (accuracy, f1, mistake rate dict)
+		:return: tuple, (accuracy, f1, mistake rate dict, counter of each gesture)
 		'''
-		counter = Counter(dataset.names) # count each gesture
-		mistakes = {} # incorrect rates for all gestures
+		counter = Counter(dataset.names)  # count each gesture
+		mistakes = {}  # incorrect rates for all gestures
 		for gesture in gestures: mistakes[gesture] = 0
 		tp, tn, fp, fn = 0, 0, 0, 0
 		predictions = self.predict(dataset.data)
@@ -36,7 +39,7 @@ class MySVC(SVC):
 					tp += 1
 				else:
 					tn += 1
-			else: # classified wrongly
+			else:  # classified wrongly
 				if label == 1:
 					fn += 1
 				else:
@@ -48,9 +51,38 @@ class MySVC(SVC):
 		f1 = 2 * precision * recall / (precision + recall)
 
 		for gesture in mistakes:
-			mistakes[gesture] /= counter[gesture]
+			if counter[gesture] > 0:
+				mistakes[gesture] /= counter[gesture]
+			else:
+				mistakes[gesture] = float('nan')
 
-		return acc, f1, mistakes
+		return acc, f1, mistakes, counter
+
+
+def visualize_distribution(dataset: DataPack, dim1: int = 0, dim2: int = 1, title: str = '???'):
+	'''
+	scatter the distribution of dataset projected on dim1 and dim2, with color of each class
+	'''
+	X0 = np.array(dataset.select_class(0).data)
+	n, p = None, None
+	if X0.ndim > 1: n = plt.scatter(X0[:, dim1], X0[:, dim2], s=1, c='blue')
+	X1 = np.array(dataset.select_class(1).data)
+	if X1.ndim > 1: p = plt.scatter(X1[:, dim1], X1[:, dim2], s=1, c='red')
+	plt.title('Distribution of %s' % title)
+	plt.xlabel('Dim %d' % dim1)
+	plt.ylabel('Dim %d' % dim2)
+	plt.legend([n, p], ['-', '+'])
+	plt.show()
+
+
+def evaluate(which, dataset: DataPack):
+	print('== on %s ==' % which)
+	acc, f1, mistakes, counter = clf.score(dataset)
+	print('acc = %.4f%%, f1 = %.4f%%' % (acc * 100, f1 * 100))
+	print('\tgesture \tmistakes rate \tgesture count')
+	for gesture in mistakes:
+		print('\t%s:  %.2f%%,  \t%d' % (gesture, mistakes[gesture] * 100, counter[gesture]))
+	print()
 
 
 def leave_one_out_val(wkdirs):
@@ -93,6 +125,7 @@ def leave_one_out_val(wkdirs):
 
 os.chdir('..')
 
+# data config ######################################################
 # todo adjustable
 wkdirs = [
 	'Data/Study3/subjects/gfz/trimmed',
@@ -105,20 +138,18 @@ wkdirs = [
 testdir = 'Data/Study3/subjects/yzc/trimmed'
 
 DATE_TIME = date_time()
-DualLogger('logs/%sMLP(chunk) train' % DATE_TIME)
+DualLogger('logs/%sSVM.txt' % DATE_TIME)
+
 # res = leave_one_out_val(wkdirs)
-
-
 # save_to_file(res, 'logs/%sEvaluation Result' % DATE_TIME)
 
-
-
+# load ######################################################
 # todo can use load from chunks
 dataset = DataPack()
-dataset.from_chunks_dir(wkdirs, cache=True, reload=True)
+dataset.from_chunks_dir(wkdirs, cache=True, reload=False)
 
 test = DataPack()
-test.from_chunks_dir(testdir, cache=True, reload=True)
+test.from_chunks_dir(testdir, cache=True, reload=False)
 print('data loaded.')
 
 print('train shape:')
@@ -135,34 +166,46 @@ test.to_flatten()
 print('\nafter flatten:')
 print('train shape:')
 dataset.show_shape()
+print()
 
 print('test  shape:')
 test.show_shape()
+print()
+
+# PCA ######################################################
+# todo adjustable
+print('=== PCA ===')
+pca = PCA(n_components=20)
+print('pca config: \n%s\n' % pca)
+pca.fit(dataset.data)
+print('predicted n_components =', pca.n_components_)
+print('variances ratio =', pca.explained_variance_ratio_)
+dataset.data = pca.transform(dataset.data)
+test.data = pca.transform(test.data)
+print('applied transform on train, dev & test.')
+
+# visualize ######################################################
+visualize_distribution(dataset, title='train & dev')
+visualize_distribution(test, title='test')
 
 train, val = dataset.train_test_split(test_size=0.1)
 
-print('\n\n=== train & dev ===')
+# classifier ######################################################
 # todo adjustable
-clf = MySVC(kernel='rbf', gamma='auto', C=1.0, verbose=True)
+print('\n\n=== train & dev ===')
+clf = MySVC(kernel='rbf', gamma='scale', C=1., verbose=True)
 # clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
 # 					activation='relu', solver='adam',
 # 					learning_rate_init=1e-5, verbose=True, shuffle=True)
 # clf = Perceptron(alpha=1e3)
 print('\nclf config:\n%s\n' % clf)
+print('gamma =', clf.gamma)
 
 clf.fit(train.data, train.labels)
 print('\ntrain over.\n')
 
+# evaluate ######################################################
 print('=== evaluating ===\n')
-
-def evaluate(which, dataset: DataPack):
-	print('== on %s ==' % which)
-	acc, f1, mistakes = clf.score(dataset)
-	print('acc = %.4f%%, f1 = %.4f%%' % (acc * 100, f1 * 100))
-	print('mistakes rate:')
-	for description in mistakes:
-		print('\t%s:  %.2f%%' % (description, mistakes[description] * 100))
-	print()
 
 evaluate('train', train)
 evaluate('dev', val)

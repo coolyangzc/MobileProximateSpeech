@@ -20,7 +20,7 @@ def normalize(y, axis=-1):
 
 ## 定义返回并可视化MFCC的函数
 
-def get_mfcc(filename, sr=16000):  # todo sr = 16000
+def get_mfcc(filename, sr=16000):
 	y, sr = librosa.load(filename, sr=sr)
 	y = normalize(y, axis=-1)
 	return normalize(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=24), axis=-1)

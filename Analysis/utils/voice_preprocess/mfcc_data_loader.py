@@ -28,6 +28,21 @@ label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数
 	'手上反面': 0,
 	'裤兜': 0,
 }
+# label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数据
+# 	'竖直对脸，碰触鼻子': -1,
+# 	'竖直对脸，不碰鼻子': -1,
+# 	'竖屏握持，上端遮嘴': -1,
+# 	'水平端起，倒话筒': 1,
+# 	'话筒': -1,
+# 	'横屏': -1,
+#
+# 	'耳旁打电话': -1,
+# 	'桌上正面': -1,
+# 	'手上正面': -1,
+# 	'桌上反面': -1,
+# 	'手上反面': -1,
+# 	'裤兜': 0,
+# }
 
 
 def suffix_filter(files, suffix):
@@ -86,6 +101,20 @@ class DataPack:
 		random.shuffle(self.labels)
 		random.seed(random_seed)
 		random.shuffle(self.names)
+
+	def select_class(self, selected_label: int):
+		'''
+		select all samples with label
+		:param selected_label: 0 or 1
+		:return: a sub DataPack
+		'''
+		samples, labels, gestures = [], [], []
+		for sample, label, gesture in zip(self.data, self.labels, self.names):
+			if label == selected_label:
+				samples.append(sample)
+				labels.append(label)
+				gestures.append(gesture)
+		return DataPack(samples, labels, gestures)
 
 	def __add__(self, other):
 		'''
@@ -206,7 +235,8 @@ class DataPack:
 		os.chdir(old_path)
 		self.data, self.labels, self.names = ftrs, labels, descriptions
 
-	def __load_sequential(self, one_step: callable, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False):
+	def __load_sequential(self, one_step: callable, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False,
+						  reload=False):
 		if type(wkdir) == str:
 			one_step(wkdir, txtdir=txtdir, cache=cache, reload=reload)
 			if shuffle == True: self.shuffle_all(random_seed)
