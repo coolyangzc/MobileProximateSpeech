@@ -19,15 +19,13 @@ def normalize(y, axis):
 	return (z - E) / S
 
 
-## 定义返回并可视化MFCC的函数
-
 def get_mfcc(filename, sr=16000):
 	y, sr = librosa.load(filename, sr=sr)
-	# y = normalize(y, axis=-1)
 	# 这里要对频率归一化处理，因为不同人说话频率不同，归一化后的迁移效果斐然！
 	return normalize(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=24), axis=0)
 
 
+## 定义返回并可视化MFCC的函数
 # def visualize_mfcc(filename, sr=None):
 # 	mfccs = get_mfcc(filename, sr)
 # 	plt.figure(figsize=(10, 4))

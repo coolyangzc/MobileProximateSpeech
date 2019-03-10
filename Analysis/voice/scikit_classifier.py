@@ -137,8 +137,11 @@ wkdirs = [
 	'Data/Study3/subjects/zfs/trimmed',
 	'Data/Study3/subjects/wj/trimmed',
 	'Data/Study3/subjects/wwn/trimmed',
+	'Data/Study3/subjects/yzc/trimmed',
+	'Data/Study3/subjects/0305_1/trimmed',
+	'Data/Study3/subjects/0305_2/trimmed',
 ]
-testdir = 'Data/Study3/subjects/yzc/trimmed'
+testdir = 'Data/Study3/subjects/cjr/trimmed'
 
 DATE_TIME = date_time()
 DualLogger('logs/%sSVM.txt' % DATE_TIME)
@@ -149,10 +152,10 @@ DualLogger('logs/%sSVM.txt' % DATE_TIME)
 # load ######################################################
 # todo can use load from chunks
 dataset = DataPack()
-dataset.from_chunks_dir(wkdirs, cache=True, reload=True)
+dataset.from_chunks_dir(wkdirs, cache=True, reload=False)
 
 test = DataPack()
-test.from_chunks_dir(testdir, cache=True, reload=True)
+test.from_chunks_dir(testdir, cache=True, reload=False)
 print('data loaded.')
 
 print('train shape:')
@@ -196,7 +199,7 @@ train, val = dataset.train_test_split(test_size=0.1)
 # classifier ######################################################
 # todo adjustable
 print('\n\n=== train & dev ===')
-clf = MySVC(kernel='rbf', gamma='scale', C=1., verbose=True)
+clf = MySVC(kernel='rbf', gamma=1e-3, C=1., verbose=True)
 # clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
 # 					activation='relu', solver='adam',
 # 					learning_rate_init=1e-5, verbose=True, shuffle=True)
