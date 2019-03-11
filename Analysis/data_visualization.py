@@ -93,11 +93,9 @@ def visualize_sensor(data_list, sensor_name, kind='value'):
 
 
 def search_files(file_dir):
-	# files = ['../Data/190111 14_40_17.txt', #'../Data/190111 14_40_36.txt',
+	# files = ['../Data/190111 14_40_17.txt', '../Data/190111 14_40_36.txt',
 	#         '../Data/190111 14_40_47.txt', '../Data/190111 14_40_56.txt',
 	#         '../Data/190114 10_36_37.txt']
-	# for file in files:
-	# visualize_file(file)
 	file_list = os.listdir(file_dir)
 	files = []
 	for file_name in file_list:
@@ -115,20 +113,28 @@ def read_data(file_path_list):
 	return data_list
 
 
-file_paths = search_files('../Data/190115/')
+file_paths = ['../Data/Study1/yzc/190305 14_14_56.txt']
+# file_paths = search_files('../Data/190115/')
 data_list = read_data(file_paths)
+d = data_list[0]
+print(d.task_id)
+print(d.user_pos)
+print(d.start_pos)
+print(d.description)
+print(d.hand)
+print(d.phrase)
 # visualize_file(file_paths[0])
 
 # visualize_sensor(data_list, 'ROTATION_VECTOR')
-# visualize_sensor(data_list, 'LINEAR_ACCELERATION')
-# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sqrt')
-# visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
+visualize_sensor(data_list, 'LINEAR_ACCELERATION')
+visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sqrt')
+visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'slope 1000')
 # visualize_sensor(data_list, 'ROTATION_VECTOR')
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sqrt')
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION')
 # visualize_sensor(data_list, 'LINEAR_ACCELERATION', 'sum')
-visualize_sensor(data_list, 'PROXIMITY')
+# visualize_sensor(data_list, 'PROXIMITY')
 
 
 

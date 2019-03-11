@@ -86,7 +86,8 @@ class FrameList:
 class Data:
 
 	start_time_millis, start_up_time_millis, start_elapsed_realtime_nanos = 0, 0, 0
-	description, file_path = '', ''
+	task_id, user_pos, start_pos, description, hand, phrase = '', '', '', '', '', ''
+	file_path = ''
 	min_time, max_time = 0, 0
 	type_to_list = {}
 
@@ -98,15 +99,21 @@ class Data:
 		lines = f.readlines()
 		f.close()
 		self.file_path = file_path
-		self.description = lines[0]
-		self.start_time_millis = int(lines[1])
-		self.start_up_time_millis = int(lines[2])
-		self.start_elapsed_realtime_nanos = int(lines[3])
-		for line in lines[4:]:
+		self.task_id = lines[0].strip()
+		self.user_pos = lines[1].split()[1]
+		self.start_pos = lines[2].split()[1]
+		self.description = lines[3].split()[1]
+		self.hand = lines[4].strip()
+		self.phrase = lines[5].strip()
+		self.start_time_millis = int(lines[6])
+		self.start_up_time_millis = int(lines[7])
+		self.start_elapsed_realtime_nanos = int(lines[8])
+
+		for line in lines[9:]:
 			self.__add_frame(line)
-		for (t, l) in self.type_to_list.items():
-			l.get_sum()
-			l.get_sqrt()
+		#for (t, l) in self.type_to_list.items():
+			#l.get_sum()
+			#l.get_sqrt()
 
 	def clear(self):
 		self.min_time = self.max_time = 0
