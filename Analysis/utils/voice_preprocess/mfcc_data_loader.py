@@ -66,10 +66,11 @@ class DataPack:
 	mfcc data pack class
 	'''
 
-	def __init__(self, data=None, labels=None, names=None):
+	def __init__(self, data=None, labels=None, names=None, state=None):
 		self.data = [] if data is None else data  # list of samples
 		self.labels = [] if labels is None else labels  # list of numbers
 		self.names = [] if names is None else names  # list of str
+		self.state = set() if state is None else state
 
 	def __iter__(self):
 		self.n_var = 0
@@ -103,6 +104,7 @@ class DataPack:
 		random.shuffle(self.labels)
 		random.seed(random_seed)
 		random.shuffle(self.names)
+		self.state.add('shuffled')
 
 	def select_class(self, selected_label: int):
 		'''
@@ -169,8 +171,8 @@ class DataPack:
 				continue
 
 			ftr = io.load_from_file(file_name) if cached and not reload else mfcc.get_mfcc(file_name)
-			if cache == True and cached == False:
-				io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
+			if cache == True:
+				if not cached or reload: io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
 
 			ftrs.append(ftr)
 			labels.append(label)
@@ -233,9 +235,8 @@ class DataPack:
 					chunk_path = path.join(chunk_dir, chunk)
 					ftr = io.load_from_file(chunk_path) if cached and not reload else mfcc.get_mfcc(chunk_path)
 					if cache == True:
-						if cached and not reload == False: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
-						with open(path.join(chunk_dir, '.ftrexist.'), 'w'):
-							pass  # a mark
+						if not cached or reload: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
+						with open(path.join(chunk_dir, '.ftrexist.'), 'w'): pass  # a mark
 					ftrs.append(ftr)
 					labels.append(label)
 					descriptions.append(description)
@@ -265,6 +266,9 @@ class DataPack:
 		else:
 			raise TypeError('type of wkdir which equals %s is neither str nor list.' % type(wkdir))
 
+		self.state.add('loaded')
+		return self
+
 	def from_wav_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False):
 		''' entrance
 		dir or dirs -> ftr DataPack
@@ -275,7 +279,7 @@ class DataPack:
 		:param reload: whether to reload from wav file to update mfcc data
 		:return: DataPack of ftrs, labels, descriptions
 		'''
-		self.__load_sequential(self.__from_wav_dir, wkdir, txtdir, shuffle, random_seed, cache, reload)
+		return self.__load_sequential(self.__from_wav_dir, wkdir, txtdir, shuffle, random_seed, cache, reload)
 
 	def from_chunks_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False):
 		'''
@@ -287,7 +291,7 @@ class DataPack:
 		:param reload: whether to load from wav file to update mfcc data
 		:return: DataPack of ftrs, labels, descriptions
 		'''
-		self.__load_sequential(self.__from_chunks_dir, wkdir, txtdir, shuffle, random_seed, cache, reload)
+		return self.__load_sequential(self.__from_chunks_dir, wkdir, txtdir, shuffle, random_seed, cache, reload)
 
 	# subsampling methods
 
@@ -315,6 +319,8 @@ class DataPack:
 		self.data, self.labels, self.names = new_data, new_labels, new_names
 		if shuffle == True: self.shuffle_all(random_seed)
 		assert len(new_data) > 0
+		self.state.add('subsample')
+		return self
 
 	def apply_subsampling_grouping(self,
 								   offset=subsampling_config['offset'],
@@ -342,6 +348,45 @@ class DataPack:
 		self.data, self.labels, self.names = new_data, new_labels, new_names
 		if shuffle == True: self.shuffle_all(random_seed)
 		assert len(new_data) > 0
+		self.state.add('subsample')
+		self.state.add('group')
+		return self
+	
+	def _ungroup(self, extend_labels=False, extend_names=False):
+		'''
+		temporarily ungroup
+		'''
+		if 'group' in self.state: # else do nothing
+			self.__shape = np.array(self.data).shape
+			self.data = np.reshape(self.data, (self.__shape[0] * self.__shape[1], self.__shape[2]))
+			if extend_labels:
+				new_labels = []
+				for label in self.labels:
+					for i in range(self.__shape[1]):
+						new_labels.append(label)
+				self.__labels = self.labels # cache
+				self.labels = new_labels
+			if extend_names:
+				new_names = []
+				for name in self.names:
+					for i in range(self.__shape[1]):
+						new_names.append(name)
+				self.__names = self.names # cache
+				self.names = new_names
+		return self
+	
+	def _regroup(self, lessen_labels=False, lessen_names=False):
+		'''
+		recover from temporary ungrouping
+		'''
+		if 'group' in self.state: # else do nothing
+			_shape = np.shape(self.data)
+			self.data = np.reshape(self.data, (self.__shape[0], self.__shape[1], _shape[-1]))
+			if lessen_labels:
+				self.labels = self.__labels
+			if lessen_names:
+				self.names = self.__names
+		return self
 
 	def train_test_split(self, test_size=None):
 		'''
@@ -362,8 +407,8 @@ class DataPack:
 		else:
 			assert 0.0 <= test_size <= 1.0
 		cut = int(len(self.data) * test_size)
-		return DataPack(self.data[cut:], self.labels[cut:], self.names[cut:]), \
-			   DataPack(self.data[:cut], self.labels[:cut], self.names[:cut])
+		return DataPack(self.data[cut:], self.labels[cut:], self.names[cut:], self.state), \
+			   DataPack(self.data[:cut], self.labels[:cut], self.names[:cut], self.state)
 
 	def to_flatten(self):
 		'''
@@ -377,6 +422,9 @@ class DataPack:
 		else:
 			raise ValueError('n_dim of data %d is not valid.' % dim)
 
+		self.state.add('flatten')
+		return self
+
 	def roll_f_as_last(self):
 		'''
 		将频率维度后置
@@ -388,6 +436,9 @@ class DataPack:
 			self.data = np.rollaxis(np.array(self.data), 2, 4)
 		else:
 			raise ValueError('n_dim of data %d is not valid.' % dim)
+
+		self.state.add('f-last')
+		return self
 
 
 def _subsampling(ftr, offset, duration, window, stride):

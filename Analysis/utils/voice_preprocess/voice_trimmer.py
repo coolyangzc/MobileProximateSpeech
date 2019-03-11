@@ -49,7 +49,7 @@ def trim_head(file_path, dst_dir, in_format='wav', out_format='wav'):
 		f.readline()
 		description = f.readline().strip()
 
-	audio[(start_sec_dict[description] + response_sec) * 1000:].export(dst_path, out_format)
+	audio[(start_sec_dict[description] + response_sec) * 1000: -500].export(dst_path, out_format)
 	print('trimmed %s \n and saved to %s' % (file_path, dst_path))
 	return dst_path
 
@@ -74,6 +74,7 @@ def trim_in_dir(wk_dir, dst_dir=None, in_format='wav', out_format='wav'):
 		trim_head(file_path, dst_dir, in_format, out_format)
 	print('done.')
 	os.chdir(old_path)
+
 
 if __name__ == '__main__':
 	DualLogger('../../logs/%svoice_trimmer.txt' % date_time())

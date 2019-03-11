@@ -13,7 +13,9 @@ class MySVC(SVC):
 	'''
 
 	def fit(self, dataset: DataPack):
+		dataset._ungroup(extend_labels=True)
 		super().fit(dataset.data, dataset.labels)
+		dataset._regroup(lessen_labels=True)
 
 	def predict_grouply(self, data):
 		'''
@@ -49,17 +51,21 @@ class MySVC(SVC):
 
 		:param dataset: datapack to evaluate
 		:param group: whether the dataset is applied with grouping, if so, the predict function will be treated uniquely
-		:return: tuple, (accuracy, f1, mistake rate dict, counter of each gesture)
+		:return: tuple, (accuracy, f1, mistake count dict, counter of each gesture)
 		'''
 		counter = Counter(dataset.names)  # count each gesture
-		mistakes = {}  # incorrect rates for all gestures
-		for gesture in gestures: mistakes[gesture] = 0
+		mistakes = Counter()  # incorrect count for all gestures
 		tp, tn, fp, fn = 0, 0, 0, 0
+
 		if group == True:
 			predictions = self.predict_grouply(dataset.data)
+			_, labels, names = dataset
 		else:
+			_, labels, names = dataset._ungroup(extend_labels=True, extend_names=True)
 			predictions = self.predict(dataset.data)
-		for prediction, label, gesture in zip(predictions, dataset.labels, dataset.names):
+			dataset._regroup(lessen_labels=True, lessen_names=True)
+
+		for prediction, label, gesture in zip(predictions, labels, names):
 			if prediction == label:
 				if label == 1:
 					tp += 1
@@ -70,17 +76,11 @@ class MySVC(SVC):
 					fn += 1
 				else:
 					fp += 1
-				mistakes[gesture] += 1
+				mistakes.update([gesture])
 		precision = tp / (tp + fp)
 		recall = tp / (tp + fn)
 		acc = (tp + tn) / (tp + tn + fp + fn)
 		f1 = 2 * precision * recall / (precision + recall)
-
-		for gesture in mistakes:
-			if counter[gesture] > 0:
-				mistakes[gesture] /= counter[gesture]
-			else:
-				mistakes[gesture] = float('nan')
 
 		return acc, f1, mistakes, counter
 
@@ -96,11 +96,14 @@ class MySVC(SVC):
 		if group == True:
 			probs = self.predict_proba_grouply(dataset.data)
 			preds = self.predict_grouply(dataset.data)
+			labels = dataset.labels
 		else:
+			labels = dataset._ungroup(extend_labels=True).labels
 			probs = self.predict_proba(dataset.data)
+			dataset._regroup(lessen_labels=True)
 			preds = np.argmax(probs, axis=1)
 
-		for prob, pred, target in zip(probs, preds, dataset.labels):
+		for prob, pred, target in zip(probs, preds, labels):
 			if pred == target:
 				true_prob_list.append(prob[pred])
 			else:

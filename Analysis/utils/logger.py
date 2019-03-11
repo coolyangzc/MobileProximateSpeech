@@ -8,6 +8,10 @@ class DualLogger:
 		sys.stdout = self
 		self.file = open(filename, 'w')
 
+	def close(self):
+		sys.stdout = self.console
+		self.file.close()
+
 	def __del__(self):
 		self.file.close()
 
