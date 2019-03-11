@@ -8,6 +8,7 @@ from utils.tools import date_time
 
 from utils.voice_preprocess.mfcc_data_loader import DataPack
 
+
 def build_model():
 	print('building model...')
 	layer_units = (24, 100, 1)
@@ -34,7 +35,9 @@ def load_train_test(wkdir, test_size=None):
 	print('data loaded.\n')
 	return dataset.train_test_split(test_size=test_size)
 
+
 if __name__ == '__main__':
+	os.environ['KMP_DUPLICATE_LIB_OK'] = 'True' # todo this is important
 	os.chdir('..')
 	os.path.exists('model_state')
 	date_time = date_time()
