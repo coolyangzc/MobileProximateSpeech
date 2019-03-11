@@ -24,18 +24,36 @@ class MySVC(SVC):
 	def fit(self, dataset: DataPack):
 		super().fit(dataset.data, dataset.labels)
 
-	def score(self, dataset: DataPack):
+	def predict_grouply(self, data):
+		'''
+		predict the dataset which is applied grouping
+
+		:param data: ndarray, shape like (n_group, n_sample, n_feature)
+		:return: a list of predicted labels
+		'''
+		assert np.ndim(data) == 3
+		predictions = []
+		for group in data:
+			counter = Counter(self.predict(group))
+			predictions.append(counter.most_common(1)[0][0])
+		return predictions
+
+	def score(self, dataset: DataPack, group=False):
 		'''
 		score dataset with mistake count
 
 		:param dataset: test datapack
+		:param group: whether the dataset is applied with grouping, if so, the predict function will be treated uniquely
 		:return: tuple, (accuracy, f1, mistake rate dict, counter of each gesture)
 		'''
 		counter = Counter(dataset.names)  # count each gesture
 		mistakes = {}  # incorrect rates for all gestures
 		for gesture in gestures: mistakes[gesture] = 0
 		tp, tn, fp, fn = 0, 0, 0, 0
-		predictions = self.predict(dataset.data)
+		if group == True:
+			predictions = self.predict_grouply(dataset.data)
+		else:
+			predictions = self.predict(dataset.data)
 		for prediction, label, gesture in zip(predictions, dataset.labels, dataset.names):
 			if prediction == label:
 				if label == 1:
@@ -78,9 +96,9 @@ def visualize_distribution(dataset: DataPack, dim1: int = 0, dim2: int = 1, titl
 	plt.show()
 
 
-def evaluate(which, dataset: DataPack):
+def evaluate(which, dataset: DataPack, group=False):
 	print('== on %s ==' % which)
-	acc, f1, mistakes, counter = clf.score(dataset)
+	acc, f1, mistakes, counter = clf.score(dataset, group)
 	print('acc = %.4f%%, f1 = %.4f%%' % (acc * 100, f1 * 100))
 	print('\tgesture \tmistakes rate \tgesture count')
 	for gesture in mistakes:
@@ -151,6 +169,7 @@ DualLogger('logs/%sSVM.txt' % DATE_TIME)
 
 # load ######################################################
 # todo can use load from chunks
+print('=== Data ===')
 dataset = DataPack()
 dataset.from_chunks_dir(wkdirs, cache=True, reload=False)
 
@@ -160,12 +179,16 @@ print('data loaded.')
 
 print('train shape:')
 dataset.show_shape()
+print()
 
 print('test  shape:')
 test.show_shape()
+print()
 
 dataset.apply_subsampling()
-test.apply_subsampling()
+
+group_size = 5 # todo
+test.apply_subsampling_grouping(group_size=group_size)
 
 dataset.to_flatten()
 test.to_flatten()
@@ -175,6 +198,9 @@ dataset.show_shape()
 print()
 
 print('test  shape:')
+_shape = np.array(test.data).shape
+test.data = np.reshape(test.data, (_shape[0] * group_size, _shape[2]))
+del _shape
 test.show_shape()
 print()
 
@@ -188,18 +214,21 @@ print('predicted n_components =', pca.n_components_)
 print('variances ratio =', pca.explained_variance_ratio_)
 dataset.data = pca.transform(dataset.data)
 test.data = pca.transform(test.data)
+_shape = test.data.shape
+test.data = test.data.reshape((_shape[0] // group_size, group_size, _shape[1]))
+del _shape
 print('applied transform on train, dev & test.')
 
 # visualize ######################################################
-visualize_distribution(dataset, title='train & dev')
-visualize_distribution(test, title='test')
+# visualize_distribution(dataset, title='train & dev')
+# visualize_distribution(test, title='test')
 
 train, val = dataset.train_test_split(test_size=0.1)
 
 # classifier ######################################################
 # todo adjustable
 print('\n\n=== train & dev ===')
-clf = MySVC(kernel='rbf', gamma=1e-3, C=1., verbose=True)
+clf = MySVC(kernel='rbf', gamma=0.03, C=1., verbose=True)
 # clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
 # 					activation='relu', solver='adam',
 # 					learning_rate_init=1e-5, verbose=True, shuffle=True)
@@ -215,6 +244,6 @@ print('=== evaluating ===\n')
 
 evaluate('train', train)
 evaluate('dev', val)
-evaluate('test', test)
+evaluate('test', test, group=True)
 
 save_to_file(clf, 'voice/model_state/%s%s(chunk).clf' % (DATE_TIME, type(clf)))
