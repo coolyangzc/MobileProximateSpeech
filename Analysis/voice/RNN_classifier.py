@@ -10,7 +10,7 @@ from utils.voice_preprocess.mfcc_data_loader import DataPack
 
 def build_model():
 	print('building model...')
-	layer_units = (40, 100, 1)
+	layer_units = (24, 100, 1)
 	model = Sequential()
 	model.add(layers.GRU(units=layer_units[1], return_sequences=False, input_shape=(None, layer_units[0])))
 	model.add(layers.Dropout(0.2))
