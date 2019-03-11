@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.decomposition import PCA
 
+from configs.subsampling_config import subsampling_config
 from utils.io import *
 from utils.logger import DualLogger
 from utils.tools import date_time
 from utils.voice_preprocess.mfcc_data_loader import DataPack, label_dict
 from voice.SVM.MySVC import MySVC
-from configs.subsampling_config import subsampling_config
 
 # globals
 gestures = label_dict.keys()
@@ -124,7 +124,7 @@ def pca_reduction(dataset, test, n_components):
 
 
 def show_table(mistakes, counter):
-	print('\t[Gesture] 　　　 [Mistakes Rate]  [Gesture count]')
+	print('\t[Gesture] 　　　 [Mistakes Rate]  [Gesture Count]')
 	for gesture in gestures:
 		if counter[gesture] == 0:
 			mistake_rate = float('nan')
@@ -211,7 +211,7 @@ def leave_one_out(wkdirs, testdir, verbose=False):
 
 	# classifier ######################################################
 	# todo adjustable
-	print('\n\n=== train & dev ===')
+	print('=== train & dev ===')
 	clf = MySVC(kernel='rbf', gamma=0.03, C=1., verbose=verbose, probability=True)
 	print('\nclf config:\n%s\n' % clf)
 	print('gamma =', clf.gamma)
@@ -244,8 +244,8 @@ if __name__ == '__main__':
 	os.mkdir('voice/model_state/%s' % FOLDER)
 	os.chdir('Data/Study3/subjects')
 
-	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	subject_dirs = ['cjr', 'gfz', 'zfs']
+	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	# subject_dirs = ['cjr', 'gfz', 'zfs']
 	TOT_VAL = len(subject_dirs)
 
 	for testdir in subject_dirs:
@@ -272,4 +272,3 @@ if __name__ == '__main__':
 	print()
 
 	logger.close()
-

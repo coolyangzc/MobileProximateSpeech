@@ -7,6 +7,7 @@ from utils.voice_preprocess.mfcc_data_loader import DataPack, label_dict
 
 gestures = label_dict.keys()
 
+
 class MySVC(SVC):
 	'''
 	Support Vector Classifier which provide feedback of incorrect classified samples' descriptions
@@ -53,10 +54,6 @@ class MySVC(SVC):
 		:param group: whether the dataset is applied with grouping, if so, the predict function will be treated uniquely
 		:return: tuple, (accuracy, f1, mistake count dict, counter of each gesture)
 		'''
-		counter = Counter(dataset.names)  # count each gesture
-		mistakes = Counter()  # incorrect count for all gestures
-		tp, tn, fp, fn = 0, 0, 0, 0
-
 		if group == True:
 			predictions = self.predict_grouply(dataset.data)
 			_, labels, names = dataset
@@ -64,6 +61,10 @@ class MySVC(SVC):
 			_, labels, names = dataset._ungroup(extend_labels=True, extend_names=True)
 			predictions = self.predict(dataset.data)
 			dataset._regroup(lessen_labels=True, lessen_names=True)
+
+		counter = Counter(names)  # count each gesture
+		mistakes = Counter()  # incorrect count for all gestures
+		tp, tn, fp, fn = 0, 0, 0, 0
 
 		for prediction, label, gesture in zip(predictions, labels, names):
 			if prediction == label:
