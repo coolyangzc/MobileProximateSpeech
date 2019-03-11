@@ -6,7 +6,7 @@ subsampling_config = {
 	'duration': int(10000 * FRAME_MS_RATIO),  # maximun length of subsampling range, in frames 持续时间
 	'window': int(100 * FRAME_MS_RATIO),  # length of a single unit, in frames 单元窗口长度
 	'stride': int(50 * FRAME_MS_RATIO),  # step in frames 移动窗口的步长
-	'group_size': 5,
+	'group_size': 20,
 }
 
 if __name__ == '__main__':

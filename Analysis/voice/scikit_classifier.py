@@ -1,83 +1,16 @@
 import copy
 import os
-from collections import Counter
 
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPClassifier
-from sklearn.svm import SVC
 
 from utils.io import *
 from utils.logger import DualLogger
 from utils.tools import date_time
-from utils.voice_preprocess.mfcc_data_loader import DataPack, label_dict
-
-gestures = label_dict.keys()
-
-
-class MySVC(SVC):
-	'''
-	Support Vector Classifier which provide feedback of incorrect classified samples' descriptions
-	'''
-
-	def fit(self, dataset: DataPack):
-		super().fit(dataset.data, dataset.labels)
-
-	def predict_grouply(self, data):
-		'''
-		predict the dataset which is applied grouping
-
-		:param data: ndarray, shape like (n_group, n_sample, n_feature)
-		:return: a list of predicted labels
-		'''
-		assert np.ndim(data) == 3
-		predictions = []
-		for group in data:
-			counter = Counter(self.predict(group))
-			predictions.append(counter.most_common(1)[0][0])
-		return predictions
-
-	def score(self, dataset: DataPack, group=False):
-		'''
-		score dataset with mistake count
-
-		:param dataset: test datapack
-		:param group: whether the dataset is applied with grouping, if so, the predict function will be treated uniquely
-		:return: tuple, (accuracy, f1, mistake rate dict, counter of each gesture)
-		'''
-		counter = Counter(dataset.names)  # count each gesture
-		mistakes = {}  # incorrect rates for all gestures
-		for gesture in gestures: mistakes[gesture] = 0
-		tp, tn, fp, fn = 0, 0, 0, 0
-		if group == True:
-			predictions = self.predict_grouply(dataset.data)
-		else:
-			predictions = self.predict(dataset.data)
-		for prediction, label, gesture in zip(predictions, dataset.labels, dataset.names):
-			if prediction == label:
-				if label == 1:
-					tp += 1
-				else:
-					tn += 1
-			else:  # classified wrongly
-				if label == 1:
-					fn += 1
-				else:
-					fp += 1
-				mistakes[gesture] += 1
-		precision = tp / (tp + fp)
-		recall = tp / (tp + fn)
-		acc = (tp + tn) / (tp + tn + fp + fn)
-		f1 = 2 * precision * recall / (precision + recall)
-
-		for gesture in mistakes:
-			if counter[gesture] > 0:
-				mistakes[gesture] /= counter[gesture]
-			else:
-				mistakes[gesture] = float('nan')
-
-		return acc, f1, mistakes, counter
+from utils.voice_preprocess.mfcc_data_loader import DataPack
+from voice.MySVC import MySVC
 
 
 def visualize_distribution(dataset: DataPack, dim1: int = 0, dim2: int = 1, title: str = '???'):
@@ -144,6 +77,21 @@ def leave_one_out_val(wkdirs):
 		val_accs.append(val_acc)
 
 
+def visualize_prob_distribution(proba_list, title, color):
+	plt.title(title)
+
+	plt.show()
+
+def analyze_proba(title, dataset: DataPack, group=False):
+	tl, fl = clf.get_predict_proba_distribution(dataset, group=group)
+	plt.hist(tl, bins=30, facecolor='green', edgecolor='black', label='correct')
+	plt.hist(fl, bins=30, facecolor='red', edgecolor='black', label='incorrect')
+	plt.title('%s proba distribution' % title)
+	plt.xlabel('Proba Range')
+	plt.ylabel('Freq')
+	plt.legend()
+	plt.show()
+
 os.chdir('..')
 
 # data config ######################################################
@@ -153,13 +101,13 @@ wkdirs = [
 	'Data/Study3/subjects/xy/trimmed',
 	'Data/Study3/subjects/wty/trimmed',
 	'Data/Study3/subjects/zfs/trimmed',
-	'Data/Study3/subjects/wj/trimmed',
+	'Data/Study3/subjects/0305_2/trimmed',
 	'Data/Study3/subjects/wwn/trimmed',
 	'Data/Study3/subjects/yzc/trimmed',
 	'Data/Study3/subjects/0305_1/trimmed',
-	'Data/Study3/subjects/0305_2/trimmed',
+	'Data/Study3/subjects/cjr/trimmed',
 ]
-testdir = 'Data/Study3/subjects/cjr/trimmed'
+testdir = 'Data/Study3/subjects/wj/trimmed'
 
 DATE_TIME = date_time()
 DualLogger('logs/%sSVM.txt' % DATE_TIME)
@@ -228,7 +176,7 @@ train, val = dataset.train_test_split(test_size=0.1)
 # classifier ######################################################
 # todo adjustable
 print('\n\n=== train & dev ===')
-clf = MySVC(kernel='rbf', gamma=0.03, C=1., verbose=True)
+clf = MySVC(kernel='rbf', gamma=0.03, C=1., verbose=True, probability=True)
 # clf = MLPClassifier(hidden_layer_sizes=(300, 200, 100, 10),
 # 					activation='relu', solver='adam',
 # 					learning_rate_init=1e-5, verbose=True, shuffle=True)
@@ -237,6 +185,7 @@ print('\nclf config:\n%s\n' % clf)
 print('gamma =', clf.gamma)
 
 clf.fit(train)
+
 print('\ntrain over.\n')
 
 # evaluate ######################################################
@@ -245,5 +194,9 @@ print('=== evaluating ===\n')
 evaluate('train', train)
 evaluate('dev', val)
 evaluate('test', test, group=True)
+
+analyze_proba('train', train)
+analyze_proba('dev', val)
+analyze_proba('test', test, group=True)
 
 save_to_file(clf, 'voice/model_state/%s%s(chunk).clf' % (DATE_TIME, type(clf)))
