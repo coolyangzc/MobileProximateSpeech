@@ -1,5 +1,6 @@
 import copy
 import os
+import time
 from collections import Counter
 
 import matplotlib.pyplot as plt
@@ -113,15 +114,6 @@ def pca_reduction(dataset, test, n_components):
 	test.data = pca.transform(test.data)
 	test._regroup()
 
-	print('\napplied transform on train, dev & test.')
-	print('train shape:')
-	dataset.show_shape()
-	print()
-
-	print('test  shape:')
-	test.show_shape()
-	print()
-
 
 def show_table(mistakes, counter):
 	print('\t[Gesture] 　　　 [Mistakes Rate]  [Gesture Count]')
@@ -177,48 +169,58 @@ def leave_one_out(wkdirs, testdir, verbose=False):
 	test.from_chunks_dir(testdir, cache=True, reload=False)
 	print('data loaded.')
 
-	print('train shape:')
-	dataset.show_shape()
-	print()
-
-	print('test  shape:')
-	test.show_shape()
-	print()
+	# print('dataset shape:')
+	# dataset.show_shape()
+	# print()
+	# print('test shape:')
+	# test.show_shape()
+	# print()
 
 	dataset.apply_subsampling_grouping()
 	test.apply_subsampling_grouping()
 	dataset.to_flatten()
 	test.to_flatten()
 
-	print('\nafter flatten:')
-	print('train shape:')
+	print('after flatten:\n')
+	print('dataset shape:')
 	dataset.show_shape()
 	print()
-
 	print('test  shape:')
 	test.show_shape()
 	print()
 
 	# PCA ######################################################
 	# todo adjustable
-	pca_reduction(dataset, test, n_components=20)
+	pca_reduction(dataset, test, n_components=30)
+	print('\napplied transform on train, dev & test.')
+	train, val = dataset.train_test_split(test_size=0.1)
+	print('train shape:')
+	train.show_shape()
+	print()
+	print('dev shape:')
+	val.show_shape()
+	print()
+	print('test  shape:')
+	test.show_shape()
+	print()
 
 	# visualize ######################################################
 	visualize_distribution(dataset, title='train & dev')
 	visualize_distribution(test, title='test')
 
-	train, val = dataset.train_test_split(test_size=0.1)
-
 	# classifier ######################################################
 	# todo adjustable
 	print('=== train & dev ===')
-	clf = MySVC(kernel='rbf', gamma=0.03, C=1., verbose=verbose, probability=True)
+	clf = MySVC(kernel='rbf', gamma='auto', C=1.0, class_weight='balanced', probability=True,
+				verbose=verbose, cache_size=1000)
 	print('\nclf config:\n%s\n' % clf)
 	print('gamma =', clf.gamma)
 
 	clf.fit(train)
 
-	print('\ntrain over.\n')
+	print('\ntrain over.')
+	print('number of support vectors: \n' % clf.n_support_)
+	print()
 
 	# evaluate ######################################################
 	print('=== evaluating ===')
@@ -238,14 +240,17 @@ def leave_one_out(wkdirs, testdir, verbose=False):
 
 
 if __name__ == '__main__':
+	import random
+
+	since = time.time()
 	os.chdir(CWD)
 	os.mkdir('output/%s' % FOLDER)
 	os.mkdir('logs/%s' % FOLDER)
 	os.mkdir('voice/model_state/%s' % FOLDER)
 	os.chdir('Data/Study3/subjects')
 
-	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	subject_dirs = ['cjr', 'gfz', 'zfs']
+	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	subject_dirs = random.choices(subject_dirs, k=4)
 	TOT_VAL = len(subject_dirs)
 
 	for testdir in subject_dirs:
@@ -271,4 +276,8 @@ if __name__ == '__main__':
 		print(item, ':', subsampling_config[item])
 	print()
 
+	elapse = int(time.time() - since)
+	minutes = elapse // 60
+	seconds = elapse % 60
+	print('total run time: %d min %d sec\n' % (minutes, seconds))
 	logger.close()
