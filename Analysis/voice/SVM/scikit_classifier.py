@@ -252,8 +252,10 @@ if __name__ == '__main__':
 	os.mkdir('voice/model_state/%s' % FOLDER)
 	os.chdir('Data/Study3/subjects')
 
-	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	subject_dirs = random.choices(subject_dirs, k=4)
+	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	# subject_dirs = random.choices(subject_dirs, k=4)
+	subject_dirs = ['lgh', 'gfz', 'jwy', 'mq', 'wrl'] # female
+	# subject_dirs = ['wwn', 'wj', 'wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr', 'zfs'] # males
 	TOT_VAL = len(subject_dirs)
 
 	for testdir in subject_dirs:
