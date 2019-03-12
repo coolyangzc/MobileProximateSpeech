@@ -1,11 +1,13 @@
 # 将mp3音频转换成MFCC向量
 ## （频率x时间）
 
-import librosa
 # import librosa.display
 # import matplotlib.pyplot as plt
 import os
-from numpy import array
+
+import librosa
+from tqdm import tqdm
+from numpy import array, shape
 
 
 def normalize(y, axis):
@@ -40,14 +42,17 @@ def get_mfcc(filename, sr=16000):
 def compute_frame_ms_ratio(wkdir):
 	old_path = os.getcwd()
 	os.chdir(wkdir)
-	res = 0.0
+	res = []
 	files = list(filter(lambda x: x.endswith('.wav'), os.listdir('.')))
-	for file in files:
-		y, sr = librosa.load(file)
+	for file in tqdm(files):
+		y, sr = librosa.load(file, sr=16000)
 		duration = len(y) / sr
-		mfcc = librosa.feature.mfcc(y, sr, n_mfcc=40)
-		res += len(mfcc) / duration
-	res /= len(files)
+		# print('duration: %.2fs' % duration)
+		mfcc = librosa.feature.mfcc(y, sr, n_mfcc=24)
+		# print('frames: ', shape(mfcc))
+		ratio = shape(mfcc)[-1] / (duration * 1000)
+		res.append(ratio)
+		# print('ratio: %.5f' % ratio)
 	os.chdir(old_path)
 	return res
 
@@ -62,7 +67,7 @@ if __name__ == '__main__':
 
 	## 预览第一个音频
 	filename = file_list[0]
-	visualize_mfcc(filename)
+	# visualize_mfcc(filename)
 
 	## 开始处理音频
 	print('Positive...')

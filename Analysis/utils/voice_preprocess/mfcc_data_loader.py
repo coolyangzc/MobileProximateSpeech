@@ -21,7 +21,7 @@ label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数
 	'话筒': 1,
 	'横屏': 1,
 
-	'耳旁打电话': -1,
+	'耳旁打电话': 0,
 	'桌上正面': 0,
 	'手上正面': 0,
 	'桌上反面': 0,
@@ -498,20 +498,12 @@ def _extend_labels_names(data, label, name):
 if __name__ == '__main__':
 	from configs.subsampling_config import subsampling_config
 
-	wkdirs = [
-		# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/zfs/trimmed',
-		# '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wj/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wwn/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/yzc/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/0305_1/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/0305_2/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/cjr/trimmed',
-	]
+	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects')
+	# wkdirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	# wkdirs = list(map(lambda x: os.path.join(x, 'trimmed'), wkdirs))
+	wkdirs = ['wzq/trimmed']
 	pack = DataPack()
-	pack.from_wav_dir(wkdirs, shuffle=False, cache=True)
+	pack.from_chunks_dir(wkdirs, shuffle=True, cache=True)
 	pack.show_shape()
 	pack.apply_subsampling(shuffle=True)
 	print('aftrer subsampling')

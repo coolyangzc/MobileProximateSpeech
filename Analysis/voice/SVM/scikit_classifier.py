@@ -244,8 +244,8 @@ if __name__ == '__main__':
 	os.mkdir('voice/model_state/%s' % FOLDER)
 	os.chdir('Data/Study3/subjects')
 
-	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	# subject_dirs = ['cjr', 'gfz', 'zfs']
+	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	subject_dirs = ['cjr', 'gfz', 'zfs']
 	TOT_VAL = len(subject_dirs)
 
 	for testdir in subject_dirs:

@@ -10,7 +10,7 @@ if __name__ == '__main__':
 	DualLogger('../../logs/%svoice file filtering.txt' % date_time())
 
 	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/')
-	for subject_name in ['cjr', 'gfz', 'wty', 'xy']: # todo
+	for subject_name in ['wzq']: # todo
 		if os.path.isdir(subject_name):
 
 			print('\nraw data filtering...')

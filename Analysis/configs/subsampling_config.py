@@ -1,5 +1,4 @@
-# FRAME_MS_RATIO = 5.692187578342543  # 帧 / 毫秒  这是当前 wav 格式对应的数据
-FRAME_MS_RATIO = 0.09380235476687636  # 帧 / 毫秒  这是当前 mp3 格式对应的数据
+FRAME_MS_RATIO = 0.03131841960956445  # 帧 / 毫秒  这是当前对应的数据
 # 和采样相关的参数
 subsampling_config = {
 	'offset': int(0 * FRAME_MS_RATIO),  # offset of subsampling, in frames (2s in this eg.) 偏移量
@@ -10,15 +9,26 @@ subsampling_config = {
 }
 
 if __name__ == '__main__':
-	from utils.voice_preprocess.mfcc import compute_frame_ms_ratio
+	from utils.voice_preprocess.mfcc import compute_frame_ms_ratio, get_mfcc
+	from utils.voice_preprocess.mfcc_data_loader import _subsampling
+	from numpy import shape, mean
+	# from matplotlib import pyplot as plt
 
-	wkdirs = [
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/gfz/trimmed',
-		'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/xy/trimmed'
-	]
-	ratio = 0.0
-	for wkdir in wkdirs:
-		ratio += compute_frame_ms_ratio('/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wty/trimmed')
-	ratio /= len(wkdirs)
-	print(ratio)
+	# wkdirs = [
+	# 	'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/yzc/trimmed',
+	# 	'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wzq/trimmed',
+	# 	'/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/zfs/trimmed',
+	# ]
+	# ratios = []
+	# for wkdir in wkdirs:
+	# 	ratios += compute_frame_ms_ratio(wkdir)
+	# print(mean(ratios))
+	# plt.hist(ratios, bins=30, facecolor='blue', edgecolor='black')
+	# plt.show()
+
+	path = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects/wzq/original/190306 23_13_39.wav'
+	mfccs = get_mfcc(path)
+	print('mfccs:     ', shape(mfccs))
+	del subsampling_config['group_size']
+	print('subsamples:', shape(_subsampling(mfccs, **subsampling_config)))
+
