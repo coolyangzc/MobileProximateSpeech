@@ -8,7 +8,7 @@ class FrameList:
 	def get_data_way(self):
 		return len(self.value)
 
-	def get_data(self, kind):
+	def get_data(self, kind = 'value'):
 		if kind[:5] == 'slope':
 			k = kind.split()
 			if len(k) > 1:
@@ -99,7 +99,7 @@ class Data:
 		lines = f.readlines()
 		f.close()
 		self.file_path = file_path
-		self.task_id = lines[0].strip()
+		self.task_id = lines[0].strip().replace("/", "_").replace(":", "_").replace(" ", "")
 		self.user_pos = lines[1].split()[1]
 		self.start_pos = lines[2].split()[1]
 		self.description = lines[3].split()[1]
