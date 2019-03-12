@@ -21,7 +21,7 @@ DATE_TIME = date_time()
 FOLDER = '%sSVM leave one out' % DATE_TIME
 VAL_ORD = 0
 TOT_VAL = 0
-
+bad_testers = []
 
 class Results:
 	def __init__(self, acc=0., f1=0., mistakes=None, counter=None, tl=None, fl=None, name=None):
@@ -140,14 +140,14 @@ def evaluate(clf, which, dataset: DataPack, group=False):
 	return Results(acc, f1, mistakes, counter, tl, fl)
 
 
-def leave_one_out(wkdirs, testdir, verbose=False):
+def leave_one_out(wkdirs, testdir):
 	'''
 	train and validate on wkdirs, transfer testing on testdir
 
 	:param wkdirs: str or list of str, directory of a subject or some subjects, for train and dev
 	:param testdir: str, directory of a subject, for test
 	'''
-	global VAL_ORD, TOT_VAL, TRAIN_RES, VAL_RES, TEST_RES, TRAIN_RES_G, VAL_RES_G, TEST_RES_G
+	global VAL_ORD, TOT_VAL, TRAIN_RES, VAL_RES, TEST_RES, TRAIN_RES_G, VAL_RES_G, TEST_RES_G, bad_testers
 	VAL_ORD += 1
 	logger = DualLogger(os.path.join(CWD, 'logs/%s/val-%d.txt' % (FOLDER, VAL_ORD)))
 	os.mkdir(os.path.join(CWD, 'output/%s/val-%d' % (FOLDER, VAL_ORD)))
@@ -157,6 +157,7 @@ def leave_one_out(wkdirs, testdir, verbose=False):
 	print('Testing on %s' % testdir)
 	print()
 	wkdirs = [os.path.join(wkdir, 'trimmed') for wkdir in wkdirs]
+	tester_name = testdir
 	testdir = os.path.join(testdir, 'trimmed')
 
 	# load ######################################################
@@ -191,7 +192,7 @@ def leave_one_out(wkdirs, testdir, verbose=False):
 
 	# PCA ######################################################
 	# todo adjustable
-	pca_reduction(dataset, test, n_components=30)
+	pca_reduction(dataset, test, n_components=20)
 	print('\napplied transform on train, dev & test.')
 	train, val = dataset.train_test_split(test_size=0.1)
 	print('train shape:')
@@ -211,15 +212,15 @@ def leave_one_out(wkdirs, testdir, verbose=False):
 	# classifier ######################################################
 	# todo adjustable
 	print('=== train & dev ===')
-	clf = MySVC(kernel='rbf', gamma='auto', C=1.0, class_weight='balanced', probability=True,
-				verbose=verbose, cache_size=1000)
+	clf = MySVC(kernel='rbf', gamma=0.03, C=1.0, class_weight='balanced', probability=True,
+				verbose=False, cache_size=1000)
 	print('\nclf config:\n%s\n' % clf)
 	print('gamma =', clf.gamma)
 
 	clf.fit(train)
 
 	print('\ntrain over.')
-	print('number of support vectors: \n' % clf.n_support_)
+	print('number of support vectors: ', clf.n_support_)
 	print()
 
 	# evaluate ######################################################
@@ -228,7 +229,9 @@ def leave_one_out(wkdirs, testdir, verbose=False):
 	print('\n== without group voting ==')
 	TRAIN_RES += evaluate(clf, 'train', train)
 	VAL_RES += evaluate(clf, 'dev', val)
-	TEST_RES += evaluate(clf, 'test', test)
+	res = evaluate(clf, 'test', test)
+	if res.acc < 0.80: bad_testers.append((tester_name, res.acc))
+	TEST_RES += res
 
 	print('\n== with group voting ==')
 	TRAIN_RES_G += evaluate(clf, 'train', train, group=True)
@@ -265,6 +268,12 @@ if __name__ == '__main__':
 	for res in TRAIN_RES, VAL_RES, TEST_RES, TRAIN_RES_G, VAL_RES_G, TEST_RES_G:
 		res /= TOT_VAL
 		res.summary()
+	print()
+
+	print('bad testers:')
+	for tester in bad_testers:
+		print(tester[0], ':', tester[1])
+	print()
 
 	print('label_dict:')
 	for gesture in label_dict:
