@@ -133,8 +133,12 @@ class MyKNN(KNeighborsClassifier):
 		'''
 		assert np.ndim(data) == 3
 		preds = []
-		for group in tqdm(data):
-			prob_sum = np.sum(self.predict_proba(group), axis=0)
+		_shape = np.shape(data)
+		data = np.reshape(data, (_shape[0] * _shape[1], _shape[-1]))
+		probs = self.predict_proba(data)
+		probs = np.reshape(probs, (_shape[0], _shape[1], 2))
+		for group in probs:
+			prob_sum = np.sum(group, axis=0)
 			preds.append(0 if prob_sum[0] > prob_sum[1] else 1)
 		return preds
 

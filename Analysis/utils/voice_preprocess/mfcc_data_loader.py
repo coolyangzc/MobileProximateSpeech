@@ -1,15 +1,18 @@
 # load voice mfcc data from .ftr files
 
-from utils import io
-from utils.voice_preprocess import mfcc
-from utils.tools import suffix_conv
 import os
 import os.path as path
 import random
 import time
+
 import numpy as np
+from matplotlib import pyplot as plt
 from tqdm import tqdm
+
 from configs.subsampling_config import subsampling_config
+from utils import io
+from utils.tools import suffix_conv
+from utils.voice_preprocess import mfcc
 
 # DataPack = namedtuple('DataPack', 'data labels names')
 
@@ -29,6 +32,7 @@ label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数
 	'裤兜': 0,
 }
 
+
 # label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数据
 # 	'竖直对脸，碰触鼻子': -1,
 # 	'竖直对脸，不碰鼻子': 1,
@@ -44,7 +48,6 @@ label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数
 # 	'手上反面': 0,
 # 	'裤兜': 0,
 # }
-
 
 
 def suffix_filter(files, suffix):
@@ -236,7 +239,8 @@ class DataPack:
 					ftr = io.load_from_file(chunk_path) if cached and not reload else mfcc.get_mfcc(chunk_path)
 					if cache == True:
 						if not cached or reload: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
-						with open(path.join(chunk_dir, '.ftrexist.'), 'w'): pass  # a mark
+						with open(path.join(chunk_dir, '.ftrexist.'), 'w'):
+							pass  # a mark
 					ftrs.append(ftr)
 					labels.append(label)
 					descriptions.append(description)
@@ -351,12 +355,12 @@ class DataPack:
 		self.state.add('subsample')
 		self.state.add('group')
 		return self
-	
+
 	def _ungroup(self, extend_labels=False, extend_names=False):
 		'''
 		temporarily ungroup
 		'''
-		if 'group' in self.state: # else do nothing
+		if 'group' in self.state:  # else do nothing
 			self.__shape = np.array(self.data).shape
 			self.data = np.reshape(self.data, (self.__shape[0] * self.__shape[1], self.__shape[2]))
 			if extend_labels:
@@ -364,22 +368,22 @@ class DataPack:
 				for label in self.labels:
 					for i in range(self.__shape[1]):
 						new_labels.append(label)
-				self.__labels = self.labels # cache
+				self.__labels = self.labels  # cache
 				self.labels = new_labels
 			if extend_names:
 				new_names = []
 				for name in self.names:
 					for i in range(self.__shape[1]):
 						new_names.append(name)
-				self.__names = self.names # cache
+				self.__names = self.names  # cache
 				self.names = new_names
 		return self
-	
+
 	def _regroup(self, lessen_labels=False, lessen_names=False):
 		'''
 		recover from temporary ungrouping
 		'''
-		if 'group' in self.state: # else do nothing
+		if 'group' in self.state:  # else do nothing
 			_shape = np.shape(self.data)
 			self.data = np.reshape(self.data, (self.__shape[0], self.__shape[1], _shape[-1]))
 			if lessen_labels:
@@ -439,6 +443,23 @@ class DataPack:
 
 		self.state.add('f-last')
 		return self
+
+	def visualize_distribution(self, dim1: int = 0, dim2: int = 1, title: str = '???', out_path=None):
+		'''
+		scatter the distribution of dataset projected on dim1 and dim2, with color of each class
+		'''
+		X0 = np.array(self.select_class(0).data)
+		n, p = None, None
+		if X0.ndim > 1: n = plt.scatter(X0[:, dim1], X0[:, dim2], s=1, c='blue')
+		X1 = np.array(self.select_class(1).data)
+		if X1.ndim > 1: p = plt.scatter(X1[:, dim1], X1[:, dim2], s=1, c='red')
+		name = 'Distribution of %s' % title
+		plt.title(name)
+		plt.xlabel('Dim %d' % dim1)
+		plt.ylabel('Dim %d' % dim2)
+		plt.legend([n, p], ['-', '+'])
+		if out_path: plt.savefig(out_path)
+		plt.show()
 
 
 def _subsampling(ftr, offset, duration, window, stride):

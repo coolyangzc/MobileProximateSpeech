@@ -4,7 +4,6 @@ import time
 from collections import Counter
 
 import matplotlib.pyplot as plt
-import numpy as np
 from sklearn.decomposition import PCA
 
 from configs.subsampling_config import subsampling_config
@@ -12,7 +11,7 @@ from utils.io import *
 from utils.logger import DualLogger
 from utils.tools import date_time
 from utils.voice_preprocess.mfcc_data_loader import DataPack, label_dict
-from voice.SVM.MySVC import MySVC
+from voice.SVM.MyCLF import MySVC
 
 # globals
 gestures = label_dict.keys()
@@ -22,6 +21,7 @@ FOLDER = '%sSVM leave one out' % DATE_TIME
 VAL_ORD = 0
 TOT_VAL = 0
 bad_testers = []
+
 
 class Results:
 	def __init__(self, acc=0., f1=0., mistakes=None, counter=None, tl=None, fl=None, name=None):
@@ -59,26 +59,6 @@ TEST_RES = Results(name='Test')
 TRAIN_RES_G = Results(name='Train (group voting)')
 VAL_RES_G = Results(name='Dev (group voting)')
 TEST_RES_G = Results(name='Test (group voting)')
-
-
-def visualize_distribution(dataset: DataPack, dim1: int = 0, dim2: int = 1, title: str = '???', out_path=None):
-	'''
-	scatter the distribution of dataset projected on dim1 and dim2, with color of each class
-	'''
-	X0 = np.array(dataset.select_class(0).data)
-	n, p = None, None
-	if X0.ndim > 1: n = plt.scatter(X0[:, dim1], X0[:, dim2], s=1, c='blue')
-	X1 = np.array(dataset.select_class(1).data)
-	if X1.ndim > 1: p = plt.scatter(X1[:, dim1], X1[:, dim2], s=1, c='red')
-	name = 'Distribution of %s' % title
-	plt.title(name)
-	plt.xlabel('Dim %d' % dim1)
-	plt.ylabel('Dim %d' % dim2)
-	plt.legend([n, p], ['-', '+'])
-	if out_path is None:
-		out_path = os.path.join(CWD, 'output/%s/val-%d/%s.png' % (FOLDER, VAL_ORD, name))
-	plt.savefig(out_path)
-	plt.show()
 
 
 def visualize_proba(tl, fl, title, out_path=None):
@@ -131,7 +111,7 @@ def evaluate(clf, which, dataset: DataPack, group=False):
 	:return: Results
 	'''
 	print('== on %s ==' % which)
-	acc, f1, mistakes, counter = clf.score(dataset, group)
+	acc, f1, mistakes, counter = clf.evaluate(dataset, group)
 	print('acc = %.4f%%, f1 = %.4f%%\n' % (acc * 100, f1 * 100))
 	show_table(mistakes, counter)
 	tl, fl = clf.get_predict_proba_distribution(dataset, group=group)
@@ -179,6 +159,8 @@ def leave_one_out(wkdirs, testdir):
 
 	dataset.apply_subsampling_grouping()
 	test.apply_subsampling_grouping()
+	# dataset.apply_subsampling()
+	# test.apply_subsampling()
 	dataset.to_flatten()
 	test.to_flatten()
 
@@ -192,8 +174,8 @@ def leave_one_out(wkdirs, testdir):
 
 	# PCA ######################################################
 	# todo adjustable
-	pca_reduction(dataset, test, n_components=20)
-	print('\napplied transform on train, dev & test.')
+	# pca_reduction(dataset, test, n_components=20)
+	# print('\napplied transform on train, dev & test.')
 	train, val = dataset.train_test_split(test_size=0.1)
 	print('train shape:')
 	train.show_shape()
@@ -206,18 +188,21 @@ def leave_one_out(wkdirs, testdir):
 	print()
 
 	# visualize ######################################################
-	visualize_distribution(dataset, title='train & dev')
-	visualize_distribution(test, title='test')
+	output_path1 = os.path.join(CWD, 'output/%s/val-%d/Distribution of train & dev.png' % (FOLDER, VAL_ORD))
+	output_path2 = os.path.join(CWD, 'output/%s/val-%d/Distribution of test.png' % (FOLDER, VAL_ORD))
+	dataset.visualize_distribution(title='train & dev', out_path=output_path1)
+	test.visualize_distribution(title='test', out_path=output_path2)
 
 	# classifier ######################################################
 	# todo adjustable
 	print('=== train & dev ===')
-	clf = MySVC(kernel='rbf', gamma=0.03, C=1.0, class_weight='balanced', probability=True,
+	clf = MySVC(kernel='rbf', gamma=0.003, C=1.0, class_weight='balanced', probability=True,
 				verbose=False, cache_size=1000)
+	# clf = MyKNN(n_neighbors=8, weights='distance', algorithm='auto', leaf_size=30, n_jobs=-1)
 	print('\nclf config:\n%s\n' % clf)
 	print('gamma =', clf.gamma)
 
-	clf.fit(train)
+	clf.learn(train)
 
 	print('\ntrain over.')
 	print('number of support vectors: ', clf.n_support_)
@@ -243,7 +228,6 @@ def leave_one_out(wkdirs, testdir):
 
 
 if __name__ == '__main__':
-	import random
 
 	since = time.time()
 	os.chdir(CWD)
@@ -252,10 +236,13 @@ if __name__ == '__main__':
 	os.mkdir('voice/model_state/%s' % FOLDER)
 	os.chdir('Data/Study3/subjects')
 
-	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	# subject_dirs = random.choices(subject_dirs, k=4)
-	subject_dirs = ['lgh', 'gfz', 'jwy', 'mq', 'wrl'] # female
-	# subject_dirs = ['wwn', 'wj', 'wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr', 'zfs'] # males
+	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
+	females = ['lgh', 'gfz', 'jwy', 'mq', 'wrl']
+	males = ['wwn', 'wj', 'wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr', 'zfs']
+	# subject_dirs = random.sample(females, k=2)
+	# subject_dirs += random.sample(males, k=4)
+	print('subjects: ', subject_dirs)
+	# subject_dirs = ['xy', 'gyz', 'cjr', 'zfs']
 	TOT_VAL = len(subject_dirs)
 
 	for testdir in subject_dirs:
