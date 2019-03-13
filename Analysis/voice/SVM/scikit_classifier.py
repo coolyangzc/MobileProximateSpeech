@@ -188,10 +188,10 @@ def leave_one_out(wkdirs, testdir):
 	print()
 
 	# visualize ######################################################
-	output_path1 = os.path.join(CWD, 'output/%s/val-%d/Distribution of train & dev.png' % (FOLDER, VAL_ORD))
-	output_path2 = os.path.join(CWD, 'output/%s/val-%d/Distribution of test.png' % (FOLDER, VAL_ORD))
-	dataset.visualize_distribution(title='train & dev', out_path=output_path1)
-	test.visualize_distribution(title='test', out_path=output_path2)
+	# output_path1 = os.path.join(CWD, 'output/%s/val-%d/Distribution of train & dev.png' % (FOLDER, VAL_ORD))
+	# output_path2 = os.path.join(CWD, 'output/%s/val-%d/Distribution of test.png' % (FOLDER, VAL_ORD))
+	# dataset.visualize_distribution(title='train & dev', out_path=output_path1)
+	# test.visualize_distribution(title='test', out_path=output_path2)
 
 	# classifier ######################################################
 	# todo adjustable
