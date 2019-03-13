@@ -3,11 +3,12 @@
 
 import librosa.display
 import matplotlib.pyplot as plt
+# from speechpy import feature, processing
 import os
 
 import librosa
 from tqdm import tqdm
-from numpy import array, shape
+from numpy import array, shape, rollaxis
 
 SAMPLE_RATE = 16000
 
@@ -27,7 +28,8 @@ def get_mfcc(filename, sr=SAMPLE_RATE):
 	y, sr = librosa.load(filename, sr=sr)
 	# 这里要对频率归一化处理，因为不同人说话频率不同，归一化后的迁移效果斐然！
 	return normalize(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=24), axis=0)
-	# return librosa.feature.mfcc(y=y, sr=sr, n_mfcc=24)
+	# mfcc = feature.mfcc(y, sr, frame_length=0.020, frame_stride=0.010)
+	# return rollaxis(processing.cmvnw(mfcc, win_size=301, variance_normalization=True), 0, 2)
 
 
 # 定义返回并可视化MFCC的函数
@@ -51,7 +53,8 @@ def compute_frame_ms_ratio(wkdir):
 		y, sr = librosa.load(file, sr=SAMPLE_RATE)
 		duration = len(y) / sr
 		# print('duration: %.2fs' % duration)
-		mfcc = librosa.feature.mfcc(y, sr, n_mfcc=24)
+		mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=24)
+		# mfcc = rollaxis(feature.mfcc(y, sr), 0, 2)
 		# print('frames: ', shape(mfcc))
 		ratio = shape(mfcc)[-1] / (duration * 1000)
 		res.append(ratio)

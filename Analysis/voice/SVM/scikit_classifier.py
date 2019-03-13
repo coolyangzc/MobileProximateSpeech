@@ -1,5 +1,6 @@
 import copy
 import os
+import random
 import time
 from collections import Counter
 
@@ -236,11 +237,11 @@ if __name__ == '__main__':
 	os.mkdir('voice/model_state/%s' % FOLDER)
 	os.chdir('Data/Study3/subjects')
 
-	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
+	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
 	females = ['lgh', 'gfz', 'jwy', 'mq', 'wrl']
 	males = ['wwn', 'wj', 'wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr', 'zfs']
-	# subject_dirs = random.sample(females, k=2)
-	# subject_dirs += random.sample(males, k=4)
+	subject_dirs = random.sample(females[:3], k=1)
+	subject_dirs += random.sample(males, k=3)
 	print('subjects: ', subject_dirs)
 	# subject_dirs = ['xy', 'gyz', 'cjr', 'zfs']
 	TOT_VAL = len(subject_dirs)

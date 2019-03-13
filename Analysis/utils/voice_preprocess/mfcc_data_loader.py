@@ -518,14 +518,24 @@ def _extend_labels_names(data, label, name):
 
 if __name__ == '__main__':
 	from configs.subsampling_config import subsampling_config
+	import random
 
 	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects')
-	# wkdirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	# wkdirs = list(map(lambda x: os.path.join(x, 'trimmed'), wkdirs))
-	wkdirs = ['wzq/trimmed']
+	wkdirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	# wkdirs = random.sample(wkdirs, k=4)
+	wkdirs.remove('mq')
+	# wkdirs = ['mq']#, 'gfz', 'zfs']
+	print(wkdirs)
+	wkdirs = list(map(lambda x: os.path.join(x, 'trimmed'), wkdirs))
+	# wkdirs = ['wzq/trimmed']
 	pack = DataPack()
-	pack.from_chunks_dir(wkdirs, shuffle=True, cache=True)
+	pack.from_chunks_dir(wkdirs, shuffle=True, cache=True, reload=False)
 	pack.show_shape()
+
+	print()
+	print(np.shape(pack.data[0]))
+	print()
+
 	pack.apply_subsampling(shuffle=True)
 	print('aftrer subsampling')
 	print(pack.labels[:5], pack.names[:5])
