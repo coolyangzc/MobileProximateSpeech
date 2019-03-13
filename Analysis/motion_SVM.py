@@ -3,10 +3,11 @@ import sklearn as sk
 import numpy as np
 from sklearn import tree
 from sklearn import svm
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 
-feature_path = '../Data/feature_2s/'
+feature_path = '../Data/feature/'
 # feature_path = '../Data/feature - 副本/'
 user_list = os.listdir(feature_path)
 X = []
@@ -14,7 +15,10 @@ y = []
 task = []
 id = -1
 for u in user_list:
+	print(u)
 	if u[-4:] == '.txt':
+		continue
+	if u == 'tqy':
 		continue
 	p = os.path.join(feature_path, u)
 	out_dir = os.path.join(feature_path, u)
@@ -30,7 +34,9 @@ for u in user_list:
 			file = open(os.path.join(p, f), "r", encoding='utf-8')
 			lines = file.readlines()
 			file.close()
-			feature_num = 63
+			#feature_num = 78
+			#feature_num = 63
+			feature_num = 144
 			task_id = int(f.split('_')[0])
 			if 19 <= task_id <= 22:
 				continue
@@ -59,6 +65,14 @@ for u in user_list:
 					task[id].append(lines[2])
 					sp += feature_num + 2
 
+X_all = []
+for i in range(len(X)):
+	X_all.extend(X[i])
+scaler = StandardScaler()
+scaler.fit(X_all)
+for i in range(len(X)):
+	X[i] = scaler.transform(X[i])
+
 mean_train_acc, mean_test_acc = 0, 0
 
 total, correct = {}, {}
@@ -77,8 +91,8 @@ for loo in range(len(X)):
 	X_test = np.array(X_test)
 	y_train = np.array(y_train)
 	y_test = np.array(y_test)
-	clf = svm.SVC(kernel='rbf', gamma='scale')
-	# clf = tree.DecisionTreeClassifier()
+	clf = svm.SVC(kernel='rbf', gamma=1e-3, class_weight={0:1, 1:1})
+	# clf = tree.DecisionTreeClassifier(max_depth=10)
 	clf.fit(X_train, y_train)
 	print(X_train.shape)
 	print(y_train.shape)
@@ -86,9 +100,6 @@ for loo in range(len(X)):
 	test_acc = clf.score(X_test, y_test)
 	mean_train_acc += train_acc
 	mean_test_acc += test_acc
-	print(train_acc)
-	print(test_acc)
-
 	res = clf.predict(X[loo])
 	print(res)
 	same = []
@@ -105,6 +116,8 @@ for loo in range(len(X)):
 		else:
 			same.append(0)
 	print(same)
+	print(train_acc)
+	print(test_acc)
 
 
 print('Mean')

@@ -5,10 +5,10 @@ import data_reader
 import webrtcvad_utils
 
 
-def skewness_kurtosis(data):
+def skewness_kurtosis_energy(data):
 	n = len(data)
 	if n <= 1:
-		return [0, 3]
+		return [0, 3, 0]
 	EX, EX2, EX3 = 0, 0, 0
 	for a in data:
 		EX += a
@@ -17,17 +17,18 @@ def skewness_kurtosis(data):
 	EX /= n
 	EX2 /= n
 	EX3 /= n
+	energy = EX2
 	miu = EX
 	sigma = math.sqrt(EX2 - EX * EX)
 	if sigma == 0:
-		return [0, 3]
+		return [0, 3, energy]
 	skew = (EX3 - 3*miu*sigma**2 - miu**3) / sigma**3
 	EX_minus_miu4 = 0
 	for a in data:
 		EX_minus_miu4 += (a - miu) ** 4
 	EX_minus_miu4 /= n
 	kurt = EX_minus_miu4 / sigma ** 4
-	return [skew, kurt]
+	return [skew, kurt, energy]
 
 
 def output_sensor_feature(data, output, sensor_name, start_time, end_time):
@@ -42,24 +43,41 @@ def output_sensor_feature(data, output, sensor_name, start_time, end_time):
 			break
 		for v in range(len(values)):
 			arr[v].append(values[v][i])
-	for v in range(len(values)):
-		if len(arr[v]) > 0:
+	n = len(arr[0])
+	if n > 0:
+		for v in range(len(values)):
 			output.write(str(np.mean(arr[v])) + '\n')
-			output.write(str(np.std(arr[v])) + '\n')
+			output.write(str(np.std(arr[v], ddof=0)) + '\n')
 			output.write(str(np.max(arr[v])) + '\n')
 			output.write(str(np.min(arr[v])) + '\n')
 			output.write(str(np.median(arr[v])) + '\n')
-			[skew, kurt] = skewness_kurtosis(arr[v])
+			[skew, kurt, energy] = skewness_kurtosis_energy(arr[v])
+			output.write(str(energy) + '\n')
 			output.write(str(skew) + '\n')
 			output.write(str(kurt) + '\n')
-		else:
-			output.write('0\n')
-			output.write('0\n')
-			output.write('0\n')
-			output.write('0\n')
-			output.write('0\n')
-			output.write('0\n')
+	else:
+		for v in range(len(values)):
+			for i in range(7):
+				output.write('0\n')
 			output.write('3\n')
+	'''
+	if sensor_name == 'PROXIMITY':
+		return
+	if n > 0:
+		for i in range(len(values)):
+			for j in range(i+1, len(values)):
+				EXY = 0
+				for k in range(n):
+					EXY += arr[i][k] * arr[j][k]
+				EXY /= n
+				CovXY = EXY - np.mean(arr[i]) * np.mean(arr[j])
+				CorrXY = CovXY / (np.std(arr[i], ddof=1) * np.std(arr[j], ddof=1))
+				output.write(str(CorrXY) + '\n')
+	else:
+		for i in range(len(values)):
+			for j in range(len(values)):
+				output.write('0\n')
+	'''
 
 
 def extract_feature(start_time, end_time, data, output):
@@ -67,9 +85,19 @@ def extract_feature(start_time, end_time, data, output):
 	end_time *= 1000
 	output.write(str(start_time) + "\n")
 	output.write(str(end_time) + "\n")
+	s, e = start_time, end_time
+	m = (s + e) / 2
+	output_sensor_feature(data, output, "LINEAR_ACCELERATION", s, m)
+	output_sensor_feature(data, output, "LINEAR_ACCELERATION", m, e)
+	output_sensor_feature(data, output, "GYROSCOPE", s, m)
+	output_sensor_feature(data, output, "GYROSCOPE", m, e)
+	output_sensor_feature(data, output, "PROXIMITY", s, m)
+	output_sensor_feature(data, output, "PROXIMITY", m, e)
+	'''
 	output_sensor_feature(data, output, "LINEAR_ACCELERATION", start_time, end_time)
 	output_sensor_feature(data, output, "GYROSCOPE", start_time, end_time)
 	output_sensor_feature(data, output, "PROXIMITY", start_time, end_time)
+	'''
 
 
 def calc_data(file_name, file_dir, out_dir):
@@ -90,18 +118,18 @@ def calc_data(file_name, file_dir, out_dir):
 	if task < 32 or d.description == '接听':
 		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + ".wav"))
 		print(t)
-		if len(t) == 0 or t[0] < 3.0 or t[0] > 4.0:
-			if len(t) > 2 and 3.0 < t[2] < 4.0:
-				extract_feature(t[2] - 3.0, t[2], d, output)
+		if len(t) == 0 or t[0] < 2.0 or t[0] > 3.0:
+			if len(t) > 2 and 2.0 < t[2] < 3.0:
+				extract_feature(t[2] - 2.0, t[2], d, output)
 			else:
-				extract_feature(0, 3.0, d, output)
+				extract_feature(0, 2.0, d, output)
 		else:
-			extract_feature(t[0] - 3.0, t[0], d, output)
+			extract_feature(t[0] - 2.0, t[0], d, output)
 	else:
 		max_time = d.get_max_time() / 1000
 		start = 1.0
-		while start + 3.0 < max_time:
-			extract_feature(start, start + 3.0, d, output)
+		while start + 2.5 < max_time:
+			extract_feature(start, start + 2.0, d, output)
 			start += 2.0
 	'''
 	if task < 32:
@@ -121,6 +149,7 @@ def calc_data(file_name, file_dir, out_dir):
 		for i in range(5):
 			extract_feature(i * sp + 0.5, (i + 1) * sp + 0.5, d, output)
 	'''
+
 
 data_path = '../Data/Study1/'
 feature_path = '../Data/feature/'
