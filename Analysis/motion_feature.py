@@ -87,6 +87,23 @@ def calc_data(file_name, file_dir, out_dir):
 	output.write(d.hand + '\n')
 
 	task = int(d.task_id.split("_")[0])
+	if task < 32 or d.description == '接听':
+		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + ".wav"))
+		print(t)
+		if len(t) == 0 or t[0] < 3.0 or t[0] > 4.0:
+			if len(t) > 2 and 3.0 < t[2] < 4.0:
+				extract_feature(t[2] - 3.0, t[2], d, output)
+			else:
+				extract_feature(0, 3.0, d, output)
+		else:
+			extract_feature(t[0] - 3.0, t[0], d, output)
+	else:
+		max_time = d.get_max_time() / 1000
+		start = 1.0
+		while start + 3.0 < max_time:
+			extract_feature(start, start + 3.0, d, output)
+			start += 2.0
+	'''
 	if task < 32:
 		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + ".wav"))
 		print(t)
@@ -103,7 +120,7 @@ def calc_data(file_name, file_dir, out_dir):
 		sp = (max_time / 1000 - 1) / 5
 		for i in range(5):
 			extract_feature(i * sp + 0.5, (i + 1) * sp + 0.5, d, output)
-
+	'''
 
 data_path = '../Data/Study1/'
 feature_path = '../Data/feature/'
