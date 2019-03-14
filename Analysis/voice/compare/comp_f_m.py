@@ -21,13 +21,16 @@ def load_data(subjects):
 	# dataset.data = list(dataset.data)
 	return dataset
 
+
 def draw_which(dataset: DataPack, dim1, dim2, color, label=None):
 	plt.scatter(dataset.data[:, dim1], dataset.data[:, dim2], c=color, s=1, alpha=0.2, label=label)
 	plt.xlabel(dim1)
 	plt.ylabel(dim2)
 
+
 def compute_separability(X, Y):
 	return np.mean(pairwise_distances(X, Y, n_jobs=2))
+
 
 if __name__ == '__main__':
 	CWD = '/Users/james/MobileProximateSpeech/Analysis'
@@ -51,6 +54,7 @@ if __name__ == '__main__':
 	# m.show_shape()
 
 	# print()
+	# todo below codes calculate the distance between females and males
 	# print('dist between f and f: ', compute_separability(f.data, f.data), '\n')
 	# print('dist between f and m: ', compute_separability(f.data, m.data), '\n')
 	# print('dist between m and m: ', compute_separability(m.data, m.data), '\n')

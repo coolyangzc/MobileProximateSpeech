@@ -22,7 +22,7 @@
 
 ------
 
-以下均为Python操作，若要图方便，可以直接打开`utils.voice_preprocess.lazy`，修改受试者名字后，一键运行。
+以下均为Python操作，若要图方便，可以直接打开`utils.voice_preprocess.pipeline`，修改受试者名字后，一键运行。
 
 ![image-20190305152730157](/Users/james/MobileProximateSpeech/Analysis/utils/voice_preprocess/assets/image-20190305152730157.png)
 

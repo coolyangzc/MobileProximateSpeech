@@ -24,7 +24,7 @@ label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数
 	'话筒': 1,
 	'横屏': 1,
 
-	'耳旁打电话': 1,
+	'耳旁打电话': 0,
 	'桌上正面': 0,
 	'手上正面': 0,
 	'桌上反面': 0,
@@ -121,7 +121,7 @@ class DataPack:
 				samples.append(sample)
 				labels.append(label)
 				gestures.append(gesture)
-		return DataPack(samples, labels, gestures)
+		return DataPack(samples, labels, gestures, self.state)
 
 	def crop(self, size: int):
 		'''
@@ -523,7 +523,7 @@ if __name__ == '__main__':
 	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects')
 	wkdirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
 	# wkdirs = random.sample(wkdirs, k=4)
-	wkdirs.remove('mq')
+	# wkdirs.remove('mq')
 	# wkdirs = ['mq']#, 'gfz', 'zfs']
 	print(wkdirs)
 	wkdirs = list(map(lambda x: os.path.join(x, 'trimmed'), wkdirs))

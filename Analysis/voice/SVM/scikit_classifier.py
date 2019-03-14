@@ -18,7 +18,7 @@ from voice.SVM.MyCLF import MySVC
 gestures = label_dict.keys()
 CWD = '/Users/james/MobileProximateSpeech/Analysis'
 DATE_TIME = date_time()
-FOLDER = '%sSVM leave one out' % DATE_TIME
+FOLDER = '%sSVM ear0 whole' % DATE_TIME # todo
 VAL_ORD = 0
 TOT_VAL = 0
 bad_testers = []
@@ -52,6 +52,9 @@ class Results:
 		print('acc = %.4f%%, f1 = %.4f%%\n' % (self.acc * 100, self.f1 * 100))
 		show_table(self.mistakes, self.counter)
 		visualize_proba(self.tl, self.fl, self.name, out_path='output/%s/%s summary.png' % (FOLDER, self.name))
+
+	def as_csv(self):
+		return self.name + ' ACC, ' + str(self.acc) + '\n' + self.name + ' F1, ' + str(self.f1) + '\n'
 
 
 TRAIN_RES = Results(name='Train')
@@ -189,6 +192,7 @@ def leave_one_out(wkdirs, testdir):
 	print()
 
 	# visualize ######################################################
+	# todo whether to enable distribution visualization
 	# output_path1 = os.path.join(CWD, 'output/%s/val-%d/Distribution of train & dev.png' % (FOLDER, VAL_ORD))
 	# output_path2 = os.path.join(CWD, 'output/%s/val-%d/Distribution of test.png' % (FOLDER, VAL_ORD))
 	# dataset.visualize_distribution(title='train & dev', out_path=output_path1)
@@ -237,13 +241,14 @@ if __name__ == '__main__':
 	os.mkdir('voice/model_state/%s' % FOLDER)
 	os.chdir('Data/Study3/subjects')
 
-	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
+	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
 	females = ['lgh', 'gfz', 'jwy', 'mq', 'wrl']
 	males = ['wwn', 'wj', 'wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr', 'zfs']
-	subject_dirs = random.sample(females[:3], k=1)
-	subject_dirs += random.sample(males, k=3)
-	print('subjects: ', subject_dirs)
+	# subject_dirs = random.sample(females, k=1)
+	# subject_dirs += random.sample(males, k=3)
 	# subject_dirs = ['xy', 'gyz', 'cjr', 'zfs']
+	# subject_dirs = males
+	print('subjects: ', subject_dirs)
 	TOT_VAL = len(subject_dirs)
 
 	for testdir in subject_dirs:
@@ -280,3 +285,8 @@ if __name__ == '__main__':
 	seconds = elapse % 60
 	print('total run time: %d min %d sec\n' % (minutes, seconds))
 	logger.close()
+
+	# save to .csv
+	with open('logs/%s/summary.csv' % FOLDER, 'w') as f:
+		for res in TRAIN_RES, VAL_RES, TEST_RES, TRAIN_RES_G, VAL_RES_G, TEST_RES_G:
+			f.write(res.as_csv())
