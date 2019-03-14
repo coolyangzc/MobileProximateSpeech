@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
 
     <application
@@ -45,6 +47,10 @@
         <activity
             android:name="com.yzc.proximatespeechrecorder.VoiceActivity"
             android:label="VoiceActivity"  >
+        </activity>
+        <activity
+            android:name="com.yzc.proximatespeechrecorder.ClientActivity"
+            android:label="ClientActivity"  >
         </activity>
     </application>
 

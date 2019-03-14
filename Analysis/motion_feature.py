@@ -92,11 +92,6 @@ def extract_feature(start_time, end_time, data, output):
 	output_sensor_feature(data, output, "GYROSCOPE", m, e)
 	output_sensor_feature(data, output, "PROXIMITY", s, m)
 	output_sensor_feature(data, output, "PROXIMITY", m, e)
-	'''
-	output_sensor_feature(data, output, "LINEAR_ACCELERATION", start_time, end_time)
-	output_sensor_feature(data, output, "GYROSCOPE", start_time, end_time)
-	output_sensor_feature(data, output, "PROXIMITY", start_time, end_time)
-	'''
 
 
 def find_suitable_end(t, l, r):

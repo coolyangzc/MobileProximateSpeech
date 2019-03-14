@@ -1,14 +1,14 @@
 import os
-import sklearn as sk
 import numpy as np
 from sklearn import tree
 from sklearn import svm
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
 
 
-feature_path = '../Data/feature/'
+feature_path = '../Data/feature_2s_1s1s/'
 # feature_path = '../Data/feature - 副本/'
 user_list = os.listdir(feature_path)
 X = []
@@ -19,8 +19,8 @@ for u in user_list:
 	print(u)
 	if u[-4:] == '.txt':
 		continue
-	# if u == 'tqy':
-		# continue
+	if u == 'tqy':
+		continue
 	p = os.path.join(feature_path, u)
 	out_dir = os.path.join(feature_path, u)
 	if not os.path.exists(out_dir):
@@ -66,7 +66,6 @@ for u in user_list:
 					task[id].append(lines[2])
 					sp += feature_num + 2
 
-
 X_all = []
 for i in range(len(X)):
 	X_all.extend(X[i])
@@ -75,7 +74,6 @@ scaler = StandardScaler()
 scaler.fit(X_all)
 for i in range(len(X)):
 	X[i] = scaler.transform(X[i])
-
 
 mean_train_acc, mean_test_acc = 0, 0
 
@@ -95,6 +93,7 @@ for loo in range(len(X)):
 	X_test = np.array(X_test)
 	y_train = np.array(y_train)
 	y_test = np.array(y_test)
+	# clf = AdaBoostClassifier()
 	clf = svm.SVC(kernel='rbf', gamma=1e-3, class_weight={0:1, 1:1})
 	# clf = tree.DecisionTreeClassifier(max_depth=10)
 	clf.fit(X_train, y_train)

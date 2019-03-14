@@ -90,7 +90,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
     }
 
     private void initViews() {
-        textView_sensor = findViewById(R.id.textView_description);
+        textView_sensor = findViewById(R.id.textView_recv);
         textView_touch = findViewById(R.id.textView_touch);
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(clickListener);

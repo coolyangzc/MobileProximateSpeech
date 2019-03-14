@@ -17,7 +17,7 @@
         app:layout_constraintTop_toBottomOf="@+id/button_goto" />
 
     <TextView
-        android:id="@+id/textView_description"
+        android:id="@+id/textView_recv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

@@ -98,7 +98,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
     }
 
     private void initViews() {
-        textView_description = findViewById(R.id.textView_description);
+        textView_description = findViewById(R.id.textView_recv);
         textView_description.setText(tasks.getTaskDescription());
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(clickListener);
@@ -197,6 +197,8 @@ public class Study1Activity extends Activity implements SensorEventListener {
                 break;
             }
         }
+        // if (sensorEvent.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION)
+            // Log.d(TAG, Long.toString(sensorEvent.timestamp / 1000000L));
         if (!isRecording)
             return;
         s += " " + Long.toString((sensorEvent.timestamp - startTimestamp) / 1000000L);

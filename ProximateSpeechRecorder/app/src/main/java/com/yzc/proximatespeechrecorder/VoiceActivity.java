@@ -58,7 +58,7 @@ public class VoiceActivity extends Activity {
     }
 
     private void initViews() {
-        textView_description = findViewById(R.id.textView_description);
+        textView_description = findViewById(R.id.textView_recv);
         textView_sentence = findViewById(R.id.textView_sentence);
         textView_description.setText(tasks.getTaskDescription());
         textView_sentence.setText(tasks.getSpeechSentence());

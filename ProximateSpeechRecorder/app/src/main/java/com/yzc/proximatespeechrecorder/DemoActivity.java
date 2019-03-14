@@ -43,7 +43,7 @@ public class DemoActivity extends Activity implements SensorEventListener {
     }
 
     private void initView() {
-        textView_sensor = findViewById(R.id.textView_description);
+        textView_sensor = findViewById(R.id.textView_recv);
         Button button_calibrate = findViewById(R.id.button_calibrate);
         button_calibrate.setOnClickListener(clickListener);
 
