@@ -60,7 +60,7 @@ def output_sensor_feature(data, output, sensor_name, start_time, end_time):
 			for i in range(7):
 				output.write('0\n')
 			output.write('3\n')
-	'''
+
 	if sensor_name == 'PROXIMITY':
 		return
 	if n > 0:
@@ -77,7 +77,6 @@ def output_sensor_feature(data, output, sensor_name, start_time, end_time):
 		for i in range(len(values)):
 			for j in range(len(values)):
 				output.write('0\n')
-	'''
 
 
 def extract_feature(start_time, end_time, data, output):
@@ -100,6 +99,13 @@ def extract_feature(start_time, end_time, data, output):
 	'''
 
 
+def find_suitable_end(t, l, r):
+	for i in range(0, len(t), 2):
+		if l <= t[i] <= r:
+			return t[i]
+	return l
+
+
 def calc_data(file_name, file_dir, out_dir):
 	print(file_name)
 	d = data_reader.Data()
@@ -118,13 +124,12 @@ def calc_data(file_name, file_dir, out_dir):
 	if task < 32 or d.description == '接听':
 		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + ".wav"))
 		print(t)
-		if len(t) == 0 or t[0] < 2.0 or t[0] > 3.0:
-			if len(t) > 2 and 2.0 < t[2] < 3.0:
-				extract_feature(t[2] - 2.0, t[2], d, output)
-			else:
-				extract_feature(0, 2.0, d, output)
+		if d.start_pos == '裤兜':
+			end = find_suitable_end(t, 5.0, 10.0)
 		else:
-			extract_feature(t[0] - 2.0, t[0], d, output)
+			end = find_suitable_end(t, 2.0, 4.0)
+		extract_feature(end - 2.0, end, d, output)
+
 	else:
 		max_time = d.get_max_time() / 1000
 		start = 1.0

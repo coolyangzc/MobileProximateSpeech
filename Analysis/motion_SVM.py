@@ -4,6 +4,7 @@ import numpy as np
 from sklearn import tree
 from sklearn import svm
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
 
 
@@ -18,8 +19,8 @@ for u in user_list:
 	print(u)
 	if u[-4:] == '.txt':
 		continue
-	if u == 'tqy':
-		continue
+	# if u == 'tqy':
+		# continue
 	p = os.path.join(feature_path, u)
 	out_dir = os.path.join(feature_path, u)
 	if not os.path.exists(out_dir):
@@ -36,7 +37,7 @@ for u in user_list:
 			file.close()
 			#feature_num = 78
 			#feature_num = 63
-			feature_num = 144
+			feature_num = 156
 			task_id = int(f.split('_')[0])
 			if 19 <= task_id <= 22:
 				continue
@@ -65,13 +66,16 @@ for u in user_list:
 					task[id].append(lines[2])
 					sp += feature_num + 2
 
+
 X_all = []
 for i in range(len(X)):
 	X_all.extend(X[i])
+# scaler = RobustScaler()
 scaler = StandardScaler()
 scaler.fit(X_all)
 for i in range(len(X)):
 	X[i] = scaler.transform(X[i])
+
 
 mean_train_acc, mean_test_acc = 0, 0
 
