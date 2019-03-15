@@ -34,7 +34,6 @@ public class ClientActivity extends Activity implements SensorEventListener {
     Socket socketClient;
 
     private TextView textView_recv;
-    private String msg;
     private Button button_connect, button_send;
     private BufferedReader in;
     private BufferedWriter out;
@@ -45,10 +44,29 @@ public class ClientActivity extends Activity implements SensorEventListener {
             Sensor.TYPE_PROXIMITY
     };
 
-    //Camera2
+    private String sent = "";
+
+    //Camera2, for same SENSOR_DELAY_GAME
     private String mCameraIdFront;
     private CameraDevice mCameraDevice;
     private MediaRecorder mMediaRecorder;
+
+
+    private synchronized void send() {
+        if (sent.length() > 0)
+            try {
+                Log.i("ClientSend", sent);
+                out.write(sent);
+                out.flush();
+                sent = "";
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+
+    private synchronized void add(String msg) {
+        sent += msg;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +74,13 @@ public class ClientActivity extends Activity implements SensorEventListener {
         setContentView(R.layout.activity_client);
         initView();
         loadSensor();
-        //For same SENSOR_DELAY_GAME
         setupCamera();
         openCamera(mCameraIdFront);
+        Thread thread = new Thread() {
+            @Override
+            public void run() {sendClient();}
+        };
+        thread.start();
     }
 
     private void loadSensor() {
@@ -98,30 +120,16 @@ public class ClientActivity extends Activity implements SensorEventListener {
                         public void run() { tcpClient();}
                     };
                     thread.start();
-                    textView_recv.setText(msg);
                     break;
                 case R.id.button_send:
-                    thread = new Thread() {
-                        @Override
-                        public void run() {sendClient("1234");}
-                    };
-                    thread.start();
                     break;
             }
         }
     };
 
-    private void sendClient(String msg) {
-        try {
-            Log.i(TAG, msg);
-            out.write(msg);
-            out.flush();
-            // Log.i("TcpClient", "receiving");
-            // String inMsg = in.readLine() + System.getProperty("line.separator");//服务器返回的数据
-            // Log.i("TcpClient", "received: " + inMsg);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void sendClient() {
+        while (true)
+            send();
     }
 
     private void tcpClient(){
@@ -152,6 +160,7 @@ public class ClientActivity extends Activity implements SensorEventListener {
             Log.d(TAG, String.valueOf(sensorEvent.timestamp / 1000000L));
         if (out == null)
             return;
+        String msg = "";
         switch (type) {
             case Sensor.TYPE_LINEAR_ACCELERATION:
                 msg = "LINEAR_ACCELERATION";
@@ -168,11 +177,9 @@ public class ClientActivity extends Activity implements SensorEventListener {
             msg += " " + values[i];
         msg += "#";
         Log.i("ClientTrue", msg);
-        Thread thread = new Thread() {
-            @Override
-            public void run() {sendClient(msg);}
-        };
-        thread.start();
+        add(msg);
+
+
     }
 
     @Override
