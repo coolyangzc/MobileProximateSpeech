@@ -31,6 +31,44 @@ def skewness_kurtosis_energy(data):
 	return [skew, kurt, energy]
 
 
+def extract_sensor_feature(arr, sensor_name):
+	feature = []
+	n = len(arr[0])
+	if n > 0:
+		for v in range(len(arr)):
+			feature.append(np.mean(arr[v]))
+			feature.append(np.std(arr[v], ddof=0))
+			feature.append(np.max(arr[v]))
+			feature.append(np.min(arr[v]))
+			feature.append(np.median(arr[v]))
+			[skew, kurt, energy] = skewness_kurtosis_energy(arr[v])
+			feature.append(energy)
+			feature.append(skew)
+			feature.append(kurt)
+	else:
+		for v in range(len(arr)):
+			for i in range(7):
+				feature.append(0)
+			feature.append(3)
+	if sensor_name == 'PROXIMITY':
+		return feature
+	for i in range(len(arr)):
+		for j in range(i+1, len(arr)):
+			if n > 0:
+				EXY = 0
+				for k in range(n):
+					EXY += arr[i][k] * arr[j][k]
+				EXY /= n
+				CovXY = EXY - np.mean(arr[i]) * np.mean(arr[j])
+				CorrXY = CovXY / (np.std(arr[i], ddof=1) * np.std(arr[j], ddof=1))
+				if math.isnan(CorrXY) or math.isinf(CorrXY):
+					CorrXY = 0
+				feature.append(CorrXY)
+			else:
+				feature.append(0)
+	return feature
+
+
 def output_sensor_feature(data, output, sensor_name, start_time, end_time):
 	frame_list = data.get_list(sensor_name)
 	values = frame_list.get_data()
@@ -43,40 +81,9 @@ def output_sensor_feature(data, output, sensor_name, start_time, end_time):
 			break
 		for v in range(len(values)):
 			arr[v].append(values[v][i])
-	n = len(arr[0])
-	if n > 0:
-		for v in range(len(values)):
-			output.write(str(np.mean(arr[v])) + '\n')
-			output.write(str(np.std(arr[v], ddof=0)) + '\n')
-			output.write(str(np.max(arr[v])) + '\n')
-			output.write(str(np.min(arr[v])) + '\n')
-			output.write(str(np.median(arr[v])) + '\n')
-			[skew, kurt, energy] = skewness_kurtosis_energy(arr[v])
-			output.write(str(energy) + '\n')
-			output.write(str(skew) + '\n')
-			output.write(str(kurt) + '\n')
-	else:
-		for v in range(len(values)):
-			for i in range(7):
-				output.write('0\n')
-			output.write('3\n')
-
-	if sensor_name == 'PROXIMITY':
-		return
-	if n > 0:
-		for i in range(len(values)):
-			for j in range(i+1, len(values)):
-				EXY = 0
-				for k in range(n):
-					EXY += arr[i][k] * arr[j][k]
-				EXY /= n
-				CovXY = EXY - np.mean(arr[i]) * np.mean(arr[j])
-				CorrXY = CovXY / (np.std(arr[i], ddof=1) * np.std(arr[j], ddof=1))
-				output.write(str(CorrXY) + '\n')
-	else:
-		for i in range(len(values)):
-			for j in range(len(values)):
-				output.write('0\n')
+	feature = extract_sensor_feature(arr, sensor_name)
+	for f in feature:
+		output.write(str(f) + '\n')
 
 
 def extract_feature(start_time, end_time, data, output):
@@ -151,17 +158,18 @@ def calc_data(file_name, file_dir, out_dir):
 	'''
 
 
-data_path = '../Data/Study1/'
-feature_path = '../Data/feature/'
-user_list = os.listdir(data_path)
-for u in user_list:
-	# if u != "plh":
-		# continue
-	p = os.path.join(data_path, u)
-	out_dir = os.path.join(feature_path, u)
-	if not os.path.exists(out_dir):
-		os.makedirs(out_dir)
-	files = os.listdir(p)
-	for f in files:
-		if f[-4:] == ".txt":
-			calc_data(f[:-4], p, out_dir)
+if __name__ == "__main__":
+	data_path = '../Data/Study1/'
+	feature_path = '../Data/feature/'
+	user_list = os.listdir(data_path)
+	for u in user_list:
+		# if u != "plh":
+			# continue
+		p = os.path.join(data_path, u)
+		out_dir = os.path.join(feature_path, u)
+		if not os.path.exists(out_dir):
+			os.makedirs(out_dir)
+		files = os.listdir(p)
+		for f in files:
+			if f[-4:] == ".txt":
+				calc_data(f[:-4], p, out_dir)

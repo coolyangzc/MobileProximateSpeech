@@ -197,8 +197,8 @@ public class Study1Activity extends Activity implements SensorEventListener {
                 break;
             }
         }
-        // if (sensorEvent.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION)
-            // Log.d(TAG, Long.toString(sensorEvent.timestamp / 1000000L));
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION)
+            Log.d(TAG, Long.toString(sensorEvent.timestamp / 1000000L));
         if (!isRecording)
             return;
         s += " " + Long.toString((sensorEvent.timestamp - startTimestamp) / 1000000L);

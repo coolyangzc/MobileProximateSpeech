@@ -2,13 +2,14 @@ import os
 import numpy as np
 from sklearn import tree
 from sklearn import svm
+from sklearn.externals import joblib
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
 
 
-feature_path = '../Data/feature_2s_1s1s/'
+feature_path = '../Data/feature/'
 # feature_path = '../Data/feature - 副本/'
 user_list = os.listdir(feature_path)
 X = []
@@ -66,6 +67,7 @@ for u in user_list:
 					task[id].append(lines[2])
 					sp += feature_num + 2
 
+'''
 X_all = []
 for i in range(len(X)):
 	X_all.extend(X[i])
@@ -74,10 +76,20 @@ scaler = StandardScaler()
 scaler.fit(X_all)
 for i in range(len(X)):
 	X[i] = scaler.transform(X[i])
+'''
 
 mean_train_acc, mean_test_acc = 0, 0
 
 total, correct = {}, {}
+
+X_all, y_all = [], []
+for i in range(len(X)):
+	X_all.extend(X[i])
+	y_all.extend(y[i])
+clf = svm.SVC(kernel='rbf', gamma=1e-4, class_weight={0:1, 1:1})
+clf.fit(X_all, y_all)
+joblib.dump(clf, "my_model.m")
+print(clf.score(X_all, y_all))
 
 for loo in range(len(X)):
 	print(loo)
@@ -94,7 +106,7 @@ for loo in range(len(X)):
 	y_train = np.array(y_train)
 	y_test = np.array(y_test)
 	# clf = AdaBoostClassifier()
-	clf = svm.SVC(kernel='rbf', gamma=1e-3, class_weight={0:1, 1:1})
+	clf = svm.SVC(kernel='rbf', gamma=1e-4, class_weight={0:1, 1:1})
 	# clf = tree.DecisionTreeClassifier(max_depth=10)
 	clf.fit(X_train, y_train)
 	print(X_train.shape)
@@ -121,7 +133,6 @@ for loo in range(len(X)):
 	print(same)
 	print(train_acc)
 	print(test_acc)
-
 
 print('Mean')
 print(mean_train_acc / len(X))
