@@ -8,14 +8,16 @@ from PIL import Image
 from tqdm import tqdm
 
 from utils.tools import suffix_filter
+from utils import io
 
-label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数据
-	'竖直对脸，碰触鼻子': 1,
+# todo
+label_dict = {  # 分类字典, -1 表示舍弃这个特征的所有数据
+	'竖直对脸，碰触鼻子': 0,
 	'竖直对脸，不碰鼻子': 1,
-	'竖屏握持，上端遮嘴': 1,
-	'水平端起，倒话筒': 1,
-	'话筒': 1,
-	'横屏': 1,
+	'竖屏握持，上端遮嘴': 2,
+	'水平端起，倒话筒': -1,
+	'话筒': 3,
+	'横屏': 4,
 }
 
 description_pattern = re.compile('(\w+，?\w+) Study2', re.U)
@@ -26,6 +28,25 @@ def show_shape(iterable):
 		print(np.array(iterable).shape)
 	except ValueError:
 		print('the shape is not standard, len = %d.' % len(iterable))
+
+
+def get_description(folder):
+	'''
+	get the description
+	cwd: .../xxx/trimmed/
+
+	:param folder: xxx/trimmed
+	:return: description str
+	'''
+	txt_path = os.path.join('../original', folder) + '.txt'
+	with open(txt_path, 'r') as f:
+		line = f.readline()
+	mt = description_pattern.match(line)
+	try:
+		name = mt.group(1)
+		return name
+	except AttributeError:
+		raise AttributeError('Unidentified description in: %s\n%s' % (os.path.abspath(txt_path), line))
 
 
 class ImagePack:
@@ -101,7 +122,7 @@ class ImagePack:
 		'''
 		return ImagePack(self.images + other.images, self.labels + other.labels, self.names + other.names)
 
-	def from_subject(self, subject_dir, shuffle=True, random_seed=None, progressbar=False):
+	def __from_subject(self, subject_dir, shuffle=True, random_seed=None, progressbar=False, cache=False, reload=False):
 		'''
 		load from a subject's folder
 
@@ -109,11 +130,14 @@ class ImagePack:
 		:param shuffle: whether to shuffle
 		:param random_seed: random seed for shuffling, if none, use time.time()
 		:param progressbar: whether to display a progressbar
+		:param cache: whether to cache images into static numpy arrays
+		:param reload: whether to reload images regardless of if cache folder exists
 		:return: self
 		'''
 		old_path = os.getcwd()
 		os.chdir(subject_dir)
-		assert os.path.exists('original') and os.path.exists('trimmed')
+		if not (os.path.exists('original') and os.path.exists('trimmed')):
+			raise FileNotFoundError('Error in', subject_dir)
 
 		# list all image folders
 		os.chdir('trimmed')
@@ -122,28 +146,29 @@ class ImagePack:
 		for folder in tqdm(folders) if progressbar else folders:
 			# get the description and label
 			# cwd: .../xxx/trimmed/
-			txt_path = os.path.join('../original', folder) + '.txt'
-			with open(txt_path, 'r') as f:
-				line = f.readline()
-			mt = description_pattern.match(line)
-			try:
-				name = mt.group(1)
-			except AttributeError:
-				print('Unidentified description in:')
-				print(os.path.abspath(txt_path))
-				print(line)
-				name = None
-				exit(1)
+			name = get_description(folder)
 			label = label_dict[name]
+			if label == -1: continue
 
 			# load .jpg images
 			os.chdir(folder)
-			for img_name in suffix_filter(os.listdir('.'), suffix='.jpg'):
-				img = Image.open(img_name)
-				npimg = np.array(img)
-				self.images.append(npimg)
+
+			if reload == True or not os.path.exists('cache.npimgs'):  # never cached numpy arrays before
+				images = []
+				for img_name in suffix_filter(os.listdir('.'), suffix='.jpg'):
+					img = Image.open(img_name)
+					npimg = np.array(img)
+					images.append(npimg)
+				if cache == True:
+					io.save_to_file(images, 'cache.npimgs')
+			else:  # cached before
+				images = io.load_from_file('cache.npimgs')
+
+			self.images += images
+			for _ in images:
 				self.labels.append(label)
 				self.names.append(name)
+
 			os.chdir('..')
 
 		if shuffle == True: self.shuffle_all(random_seed)
@@ -151,12 +176,34 @@ class ImagePack:
 		os.chdir(old_path)
 		return self
 
+	def from_subject(self, subject_dirs, shuffle=True, random_seed=None, progressbar=False, cache=False, reload=False):
+		'''
+		load from subjects' folder
+
+		:param subject_dirs: subjects' directories or subject's directory,
+			should include a 'trimmed' subdirectory and a 'original' directory
+		:param shuffle: whether to shuffle
+		:param random_seed: random seed for shuffling, if none, use time.time()
+		:param progressbar: whether to display a progressbar
+		:param cache: whether to cache images into static numpy arrays
+		:param reload: whether to reload images regardless of if cache folder exists
+		:return: self
+		'''
+		if not isinstance(subject_dirs, list): subject_dirs = [subject_dirs]
+		for i, subject_dir in enumerate(subject_dirs):
+			if progressbar: print('%d / %d, loading from %s...' % (i + 1, len(subject_dirs), subject_dir))
+			self.__from_subject(subject_dir, shuffle=False, progressbar=progressbar, cache=cache, reload=reload)
+			if progressbar: print()
+		if shuffle: self.shuffle_all(random_seed)
+		return self
+
 
 if __name__ == '__main__':
-	subject_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study2/subjects/zfs'
+	CWD = '/Users/james/MobileProximateSpeech/Analysis/Data/Study2/subjects/'
+	os.chdir(CWD)
+	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))[:3]
 	imgset = ImagePack()
-	imgset.from_subject(subject_dir, progressbar=True)
+	imgset.from_subject(subject_dirs, progressbar=True)
 	print(imgset.labels[:3])
 	print(imgset.names[:3])
-	for img in imgset.images[:3]:
-		show_shape(img)
+	imgset.show_shape()
