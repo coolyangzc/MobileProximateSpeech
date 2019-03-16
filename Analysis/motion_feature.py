@@ -5,56 +5,73 @@ import data_reader
 import webrtcvad_utils
 
 
-def skewness_kurtosis_energy(data):
+def sgn(x):
+	if x > 0:
+		return 1
+	elif x < 0:
+		return -1
+	else:
+		return 0
+
+
+def statical_signal_feature(data):
+	# mean, min, max, median, standard deviation, IQR: interquartile range
+	# ZCR: Zero-Crossing Rate, energy, skew: skewness, kurt: kurtosis
+	# 6 + 4 = 10 features
 	n = len(data)
-	if n <= 1:
-		return [0, 3, 0]
-	EX, EX2, EX3 = 0, 0, 0
-	for a in data:
-		EX += a
-		EX2 += a*a
-		EX3 += a**3
-	EX /= n
+	feature = []
+	if n == 0:
+		for i in range(9):
+			feature.append(0)
+		feature.append(3)
+		return feature
+	EX = np.mean(data)
+	if n > 1:
+		std = np.std(data, ddof=1)
+	else:
+		std = 0
+	q75, q25 = np.percentile(data, [75, 25])
+	IQR = q75 - q25
+
+	feature.append(EX)
+	feature.append(np.min(data))
+	feature.append(np.max(data))
+	feature.append(np.median(data))
+	feature.append(std)
+	feature.append(IQR)
+
+	EX2, EX3, EX_minus_miu4, ZCR = 0, 0, 0, 0
+
+	for i in range(len(data)):
+		EX2 += data[i] ** 2
+		EX3 += data[i] ** 3
+		EX_minus_miu4 += (data[i] - EX) ** 4
+		if i > 0 & sgn(data[i-1]) * sgn(data[i]) == -1:
+			ZCR += 1
 	EX2 /= n
 	EX3 /= n
-	energy = EX2
-	miu = EX
-	sigma = math.sqrt(EX2 - EX * EX)
-	if sigma == 0:
-		return [0, 3, energy]
-	skew = (EX3 - 3*miu*sigma**2 - miu**3) / sigma**3
-	EX_minus_miu4 = 0
-	for a in data:
-		EX_minus_miu4 += (a - miu) ** 4
 	EX_minus_miu4 /= n
-	kurt = EX_minus_miu4 / sigma ** 4
-	return [skew, kurt, energy]
+	if n > 1:
+		ZCR /= n - 1
+	energy = EX2
+	skew, kurt = 0, 3
+	if std > 0:
+		skew = (EX3 - 3 * EX * std ** 2 - EX ** 3) / std ** 3
+		kurt = EX_minus_miu4 / std ** 4
+
+	feature.append(ZCR)
+	feature.append(energy)
+	feature.append(skew)
+	feature.append(kurt)
+	return feature
 
 
-def extract_sensor_feature(arr, sensor_name):
-	feature = []
+def heuristic_feature(arr):
 	n = len(arr[0])
-	if n > 0:
-		for v in range(len(arr)):
-			feature.append(np.mean(arr[v]))
-			feature.append(np.std(arr[v], ddof=0))
-			feature.append(np.max(arr[v]))
-			feature.append(np.min(arr[v]))
-			feature.append(np.median(arr[v]))
-			[skew, kurt, energy] = skewness_kurtosis_energy(arr[v])
-			feature.append(energy)
-			feature.append(skew)
-			feature.append(kurt)
-	else:
-		for v in range(len(arr)):
-			for i in range(7):
-				feature.append(0)
-			feature.append(3)
-	if sensor_name == 'PROXIMITY':
-		return feature
+	feature = []
 	for i in range(len(arr)):
 		for j in range(i+1, len(arr)):
-			if n > 0:
+			if n > 1:
 				EXY = 0
 				for k in range(n):
 					EXY += arr[i][k] * arr[j][k]
@@ -69,7 +86,18 @@ def extract_sensor_feature(arr, sensor_name):
 	return feature
 
 
-def output_sensor_feature(data, output, sensor_name, start_time, end_time):
+def extract_sensor_feature(arr, sensor_name):
+	feature = []
+	for v in range(len(arr)):
+		feature.extend(statical_signal_feature(arr[v]))
+	heuristic_sensors = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE']
+	if sensor_name not in heuristic_sensors:
+		return feature
+	feature.extend(heuristic_feature(arr))
+	return feature
+
+
+def extract_time_feature(data, sensor_name, start_time, end_time):
 	frame_list = data.get_list(sensor_name)
 	values = frame_list.get_data()
 	arr = [[] for i in range(len(values))]
@@ -81,9 +109,7 @@ def output_sensor_feature(data, output, sensor_name, start_time, end_time):
 			break
 		for v in range(len(values)):
 			arr[v].append(values[v][i])
-	feature = extract_sensor_feature(arr, sensor_name)
-	for f in feature:
-		output.write(str(f) + '\n')
+	return extract_sensor_feature(arr, sensor_name)
 
 
 def extract_feature(start_time, end_time, data, output):
@@ -93,12 +119,16 @@ def extract_feature(start_time, end_time, data, output):
 	output.write(str(end_time) + "\n")
 	s, e = start_time, end_time
 	m = (s + e) / 2
-	output_sensor_feature(data, output, "LINEAR_ACCELERATION", s, m)
-	output_sensor_feature(data, output, "LINEAR_ACCELERATION", m, e)
-	output_sensor_feature(data, output, "GYROSCOPE", s, m)
-	output_sensor_feature(data, output, "GYROSCOPE", m, e)
-	output_sensor_feature(data, output, "PROXIMITY", s, m)
-	output_sensor_feature(data, output, "PROXIMITY", m, e)
+	sensor_list = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE', 'PROXIMITY']
+	feature = []
+	for sensor in sensor_list:
+		f = extract_time_feature(data, sensor, s, m)
+		f.extend(extract_time_feature(data, sensor, m, e))
+		output.write(sensor + ' ' + str(len(f)) + ' ')
+		feature.extend(f)
+	output.write('\n')
+	for f in feature:
+		output.write(str(f) + '\n')
 
 
 def find_suitable_end(t, l, r):
@@ -138,24 +168,6 @@ def calc_data(file_name, file_dir, out_dir):
 		while start + 2.5 < max_time:
 			extract_feature(start, start + 2.0, d, output)
 			start += 2.0
-	'''
-	if task < 32:
-		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + ".wav"))
-		print(t)
-		if len(t) == 0 or t[0] < 0.40:
-			if len(t) > 2 and t[2] > 0.40:
-				extract_feature(0, t[2], d, output)
-			else:
-				extract_feature(0, 0.8, d, output)
-		else:
-			extract_feature(0, t[0], d, output)
-	else:
-		max_time = d.get_max_time()
-
-		sp = (max_time / 1000 - 1) / 5
-		for i in range(5):
-			extract_feature(i * sp + 0.5, (i + 1) * sp + 0.5, d, output)
-	'''
 
 
 if __name__ == "__main__":

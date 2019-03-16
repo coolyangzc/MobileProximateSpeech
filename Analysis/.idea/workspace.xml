@@ -3,6 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="de7ba81e-35ff-462d-bbea-3ee31447ea18" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/motion_SVM.py" beforeDir="false" afterPath="$PROJECT_DIR$/motion_SVM.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/motion_feature.py" beforeDir="false" afterPath="$PROJECT_DIR$/motion_feature.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/my_model.m" beforeDir="false" afterPath="$PROJECT_DIR$/my_model.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/ClientActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/ClientActivity.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -13,11 +18,11 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Analysis$motion_analyzer.coverage" NAME="motion_analyzer Coverage Results" MODIFIED="1552447765186" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Analysis$server.coverage" NAME="server Coverage Results" MODIFIED="1552634210552" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$server.coverage" NAME="server Coverage Results" MODIFIED="1552641701215" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$ana.coverage" NAME="ana Coverage Results" MODIFIED="1552271133614" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Analysis$motion_SVM.coverage" NAME="motion_SVM Coverage Results" MODIFIED="1552629074029" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$motion_SVM.coverage" NAME="motion_SVM Coverage Results" MODIFIED="1552637144363" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$data_visualization.coverage" NAME="data_visualization Coverage Results" MODIFIED="1552270942813" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Analysis$motion_feature.coverage" NAME="motion_feature Coverage Results" MODIFIED="1552627970274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$motion_feature.coverage" NAME="motion_feature Coverage Results" MODIFIED="1552705226487" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -35,11 +40,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data_reader.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/motion_feature.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="740">
-              <caret line="45" column="26" selection-start-line="45" selection-start-column="26" selection-end-line="45" selection-end-column="26" />
+            <state relative-caret-position="200">
+              <caret line="126" column="52" selection-start-line="126" selection-start-column="52" selection-end-line="126" selection-end-column="52" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -47,8 +55,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/motion_SVM.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="466">
-              <caret line="90" column="30" selection-start-line="90" selection-start-column="30" selection-end-line="90" selection-end-column="30" />
+            <state relative-caret-position="320">
+              <caret line="48" column="18" selection-start-line="48" selection-start-column="18" selection-end-line="48" selection-end-column="18" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -57,22 +65,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/motion_feature.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1879">
-              <caret line="21" selection-start-line="21" selection-end-line="21" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="605">
-              <caret line="94" column="28" lean-forward="true" selection-start-line="94" selection-start-column="28" selection-end-line="94" selection-end-column="28" />
+            <state relative-caret-position="600">
+              <caret line="62" column="39" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -81,13 +77,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/webrtcvad_utils.py">
+        <entry file="file://$PROJECT_DIR$/data_reader.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2640">
-              <caret line="137" column="51" selection-start-line="137" selection-start-column="51" selection-end-line="137" selection-end-column="51" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="2660">
+              <caret line="133" column="29" selection-start-line="133" selection-start-column="19" selection-end-line="133" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -112,6 +105,7 @@
       <find>what</find>
       <find>print</find>
       <find>88402269PROXIMITY</find>
+      <find>EX</find>
     </findStrings>
     <replaceStrings>
       <replace>file_id</replace>
@@ -131,16 +125,16 @@
         <option value="$PROJECT_DIR$/motion_analyzer.py" />
         <option value="$PROJECT_DIR$/webrtcvad_utils.py" />
         <option value="$PROJECT_DIR$/motion_SVM.py" />
-        <option value="$PROJECT_DIR$/motion_feature.py" />
         <option value="$PROJECT_DIR$/server.py" />
+        <option value="$PROJECT_DIR$/motion_feature.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-105" />
-    <option name="y" value="71" />
+    <option name="x" value="80" />
+    <option name="y" value="172" />
     <option name="width" value="1940" />
-    <option name="height" value="1105" />
+    <option name="height" value="1103" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -200,7 +194,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.server">
+  <component name="RunManager" selected="Python.motion_feature">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -342,9 +336,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.motion_feature" />
         <item itemvalue="Python.server" />
         <item itemvalue="Python.motion_SVM" />
-        <item itemvalue="Python.motion_feature" />
         <item itemvalue="Python.motion_analyzer" />
         <item itemvalue="Python.ana" />
       </list>
@@ -386,12 +380,13 @@
       <workItem from="1552268749720" duration="50865000" />
       <workItem from="1552528445028" duration="13096000" />
       <workItem from="1552551048470" duration="1245000" />
-      <workItem from="1552616577112" duration="11069000" />
+      <workItem from="1552616577112" duration="16566000" />
+      <workItem from="1552698976976" duration="6233000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="157021000" />
+    <option name="totallyTimeSpent" value="168751000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -404,13 +399,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20107238" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20375335" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.25779036" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.2776204" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -564,7 +560,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/webrtcvad_utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2640">
+        <state relative-caret-position="850">
           <caret line="137" column="51" selection-start-line="137" selection-start-column="51" selection-end-line="137" selection-end-column="51" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -574,15 +570,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_reader.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="740">
-          <caret line="45" column="26" selection-start-line="45" selection-start-column="26" selection-end-line="45" selection-end-column="26" />
+        <state relative-caret-position="2660">
+          <caret line="133" column="29" selection-start-line="133" selection-start-column="19" selection-end-line="133" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="600">
+          <caret line="62" column="39" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/motion_SVM.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="90" column="30" selection-start-line="90" selection-start-column="30" selection-end-line="90" selection-end-column="30" />
+        <state relative-caret-position="320">
+          <caret line="48" column="18" selection-start-line="48" selection-start-column="18" selection-end-line="48" selection-end-column="18" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -591,20 +597,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/motion_feature.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1879">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
+        <state relative-caret-position="200">
+          <caret line="126" column="52" selection-start-line="126" selection-start-column="52" selection-end-line="126" selection-end-column="52" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="605">
-          <caret line="94" column="28" lean-forward="true" selection-start-line="94" selection-start-column="28" selection-end-line="94" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>

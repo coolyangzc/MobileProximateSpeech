@@ -12,14 +12,14 @@ last_time = 0
 
 def work_sensor(sensor_name, queue, start_time, end_time):
 	arr = [[] for i in range(len(queue[0]) - 1)]
-	for q in queue:
+	for frame in queue:
 		# print(q, start_time, end_time)
-		if q[0] < start_time:
+		if frame[0] < start_time:
 			continue
-		if q[0] > end_time:
+		if frame[0] > end_time:
 			break
-		for i in range(len(q) - 1):
-			arr[i].append(q[i+1])
+		for i in range(len(frame) - 1):
+			arr[i].append(frame[i+1])
 	# print('arr: ', arr)
 	# print(sensor_name, extract_sensor_feature(arr, sensor_name))
 	return extract_sensor_feature(arr, sensor_name)
@@ -31,7 +31,7 @@ def work(data):
 		return
 	item = data.split(' ')
 	c = 0
-	if item[0] == 'LINEAR_ACCELERATION':
+	if item[0] == 'ACCELEROMETER':
 		c = 0
 	elif item[0] == 'GYROSCOPE':
 		c = 1
@@ -56,8 +56,8 @@ def work(data):
 	last_time = t
 	feature = []
 	m = (s + t) / 2
-	feature.extend(work_sensor('LINEAR_ACCELERATION', q[0], s, m))
-	feature.extend(work_sensor('LINEAR_ACCELERATION', q[0], m, t))
+	feature.extend(work_sensor('ACCELEROMETER', q[0], s, m))
+	feature.extend(work_sensor('ACCELEROMETER', q[0], m, t))
 	feature.extend(work_sensor('GYROSCOPE', q[1], s, m))
 	feature.extend(work_sensor('GYROSCOPE', q[1], m, t))
 	feature.extend(work_sensor('PROXIMITY', q[2], s, m))

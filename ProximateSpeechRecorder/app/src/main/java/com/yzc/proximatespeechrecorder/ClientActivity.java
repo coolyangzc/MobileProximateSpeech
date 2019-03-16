@@ -39,7 +39,7 @@ public class ClientActivity extends Activity implements SensorEventListener {
     private BufferedWriter out;
     private String TAG = "ClientActivity";
     private int sensorType[] = {
-            Sensor.TYPE_LINEAR_ACCELERATION,
+            Sensor.TYPE_ACCELEROMETER,
             Sensor.TYPE_GYROSCOPE,
             Sensor.TYPE_PROXIMITY
     };
@@ -156,14 +156,12 @@ public class ClientActivity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         float[] values = sensorEvent.values;
         int type = sensorEvent.sensor.getType();
-        if (type == Sensor.TYPE_LINEAR_ACCELERATION)
-            Log.d(TAG, String.valueOf(sensorEvent.timestamp / 1000000L));
         if (out == null)
             return;
         String msg = "";
         switch (type) {
-            case Sensor.TYPE_LINEAR_ACCELERATION:
-                msg = "LINEAR_ACCELERATION";
+            case Sensor.TYPE_ACCELEROMETER:
+                msg = "ACCELEROMETER";
                 break;
             case Sensor.TYPE_GYROSCOPE:
                 msg = "GYROSCOPE";

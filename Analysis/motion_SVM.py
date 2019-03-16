@@ -46,7 +46,7 @@ for u in user_list:
 				feature = []
 				for i in range(6, 6 + feature_num):
 					feature.append(float(lines[i]))
-				# feature = feature[:42]
+				# feature = feature[:108]
 				X[id].append(feature)
 				y[id].append(1)
 				task[id].append(lines[2])
@@ -58,7 +58,7 @@ for u in user_list:
 					feature = []
 					for i in range(feature_num):
 						feature.append(float(lines[sp + i]))
-					# feature = feature[:42]
+					# feature = feature[:108]
 					X[id].append(feature)
 					# if lines[2] == '接听\n':
 					#	y[id].append(2)
@@ -82,6 +82,7 @@ mean_train_acc, mean_test_acc = 0, 0
 
 total, correct = {}, {}
 
+
 X_all, y_all = [], []
 for i in range(len(X)):
 	X_all.extend(X[i])
@@ -90,6 +91,7 @@ clf = svm.SVC(kernel='rbf', gamma=1e-4, class_weight={0:1, 1:1})
 clf.fit(X_all, y_all)
 joblib.dump(clf, "my_model.m")
 print(clf.score(X_all, y_all))
+
 
 for loo in range(len(X)):
 	print(loo)
