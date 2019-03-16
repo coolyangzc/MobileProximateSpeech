@@ -143,6 +143,7 @@ def calc_data(file_name, file_dir, out_dir):
 	d = data_reader.Data()
 	d.read(os.path.join(file_dir, file_name + ".txt"))
 	out_file = os.path.join(out_dir, d.task_id + ".txt")
+
 	print(out_file)
 
 	output = open(out_file, 'w', encoding='utf-8')
@@ -161,7 +162,6 @@ def calc_data(file_name, file_dir, out_dir):
 		else:
 			end = find_suitable_end(t, 2.0, 4.0)
 		extract_feature(end - 2.0, end, d, output)
-
 	else:
 		max_time = d.get_max_time() / 1000
 		start = 1.0
@@ -175,8 +175,8 @@ if __name__ == "__main__":
 	feature_path = '../Data/feature/'
 	user_list = os.listdir(data_path)
 	for u in user_list:
-		# if u != "plh":
-			# continue
+		if u != "plh":
+			continue
 		p = os.path.join(data_path, u)
 		out_dir = os.path.join(feature_path, u)
 		if not os.path.exists(out_dir):

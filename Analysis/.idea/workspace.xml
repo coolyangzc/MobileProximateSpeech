@@ -6,9 +6,6 @@
       <change beforePath="$PROJECT_DIR$/motion_SVM.py" beforeDir="false" afterPath="$PROJECT_DIR$/motion_SVM.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/motion_feature.py" beforeDir="false" afterPath="$PROJECT_DIR$/motion_feature.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/my_model.m" beforeDir="false" afterPath="$PROJECT_DIR$/my_model.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/ClientActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/ClientActivity.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,9 +17,9 @@
     <SUITE FILE_PATH="coverage/Analysis$motion_analyzer.coverage" NAME="motion_analyzer Coverage Results" MODIFIED="1552447765186" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$server.coverage" NAME="server Coverage Results" MODIFIED="1552641701215" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$ana.coverage" NAME="ana Coverage Results" MODIFIED="1552271133614" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Analysis$motion_SVM.coverage" NAME="motion_SVM Coverage Results" MODIFIED="1552637144363" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$motion_SVM.coverage" NAME="motion_SVM Coverage Results" MODIFIED="1552708212722" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$data_visualization.coverage" NAME="data_visualization Coverage Results" MODIFIED="1552270942813" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Analysis$motion_feature.coverage" NAME="motion_feature Coverage Results" MODIFIED="1552705226487" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$motion_feature.coverage" NAME="motion_feature Coverage Results" MODIFIED="1552707147204" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -40,11 +37,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/motion_feature.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="126" column="52" selection-start-line="126" selection-start-column="52" selection-end-line="126" selection-end-column="52" />
+            <state relative-caret-position="-597">
+              <caret line="142" column="14" selection-start-line="142" selection-start-column="14" selection-end-line="142" selection-end-column="14" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -52,11 +49,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/motion_SVM.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="48" column="18" selection-start-line="48" selection-start-column="18" selection-end-line="48" selection-end-column="18" />
+            <state relative-caret-position="180">
+              <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -79,7 +76,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_reader.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2660">
+            <state relative-caret-position="12">
               <caret line="133" column="29" selection-start-line="133" selection-start-column="19" selection-end-line="133" selection-end-column="29" />
             </state>
           </provider>
@@ -124,15 +121,15 @@
         <option value="$PROJECT_DIR$/data_reader.py" />
         <option value="$PROJECT_DIR$/motion_analyzer.py" />
         <option value="$PROJECT_DIR$/webrtcvad_utils.py" />
-        <option value="$PROJECT_DIR$/motion_SVM.py" />
         <option value="$PROJECT_DIR$/server.py" />
         <option value="$PROJECT_DIR$/motion_feature.py" />
+        <option value="$PROJECT_DIR$/motion_SVM.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="80" />
-    <option name="y" value="172" />
+    <option name="x" value="643" />
+    <option name="y" value="295" />
     <option name="width" value="1940" />
     <option name="height" value="1103" />
   </component>
@@ -194,7 +191,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.motion_feature">
+  <component name="RunManager" selected="Python.motion_SVM">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -336,9 +333,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.motion_SVM" />
         <item itemvalue="Python.motion_feature" />
         <item itemvalue="Python.server" />
-        <item itemvalue="Python.motion_SVM" />
         <item itemvalue="Python.motion_analyzer" />
         <item itemvalue="Python.ana" />
       </list>
@@ -381,12 +378,12 @@
       <workItem from="1552528445028" duration="13096000" />
       <workItem from="1552551048470" duration="1245000" />
       <workItem from="1552616577112" duration="16566000" />
-      <workItem from="1552698976976" duration="6233000" />
+      <workItem from="1552698976976" duration="9386000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="168751000" />
+    <option name="totallyTimeSpent" value="171904000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -406,7 +403,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.2776204" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.26062322" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -568,13 +565,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_reader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2660">
-          <caret line="133" column="29" selection-start-line="133" selection-start-column="19" selection-end-line="133" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
@@ -585,20 +575,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/motion_SVM.py">
+    <entry file="file://$PROJECT_DIR$/data_reader.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="48" column="18" selection-start-line="48" selection-start-column="18" selection-end-line="48" selection-end-column="18" />
+        <state relative-caret-position="12">
+          <caret line="133" column="29" selection-start-line="133" selection-start-column="19" selection-end-line="133" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motion_feature.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-597">
+          <caret line="142" column="14" selection-start-line="142" selection-start-column="14" selection-end-line="142" selection-end-column="14" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/motion_feature.py">
+    <entry file="file://$PROJECT_DIR$/motion_SVM.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="126" column="52" selection-start-line="126" selection-start-column="52" selection-end-line="126" selection-end-column="52" />
+        <state relative-caret-position="180">
+          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
