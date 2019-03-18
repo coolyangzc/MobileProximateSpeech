@@ -14,9 +14,9 @@ def read_file(path, file_name, id):
 		return
 	file = open(os.path.join(path, file_name), "r", encoding='utf-8')
 	lines = file.readlines()
+	file.close()
 	if len(lines) <= 7:
 		return
-	file.close()
 	task_id = int(file_name.strip().split('_')[0])
 	if 19 <= task_id <= 22:
 		return
@@ -110,8 +110,8 @@ def leave_one_out_validation():
 		X_train, X_test = np.array(X_train), np.array(X_test)
 		y_train, y_test = np.array(y_train), np.array(y_test)
 		print(X_train.shape, y_train.shape)
-		clf = AdaBoostClassifier()
-		# clf = svm.SVC(kernel='rbf', gamma=1e-3, class_weight={0: 1, 1: 1})
+		# clf = AdaBoostClassifier()
+		clf = svm.SVC(kernel='rbf', gamma=1e-3, class_weight={0: 1, 1: 1})
 		# clf = tree.DecisionTreeClassifier(max_depth=5)
 		clf.fit(X_train, y_train)
 
@@ -146,9 +146,10 @@ def leave_one_out_validation():
 		print(t.ljust(24 - len(t)), correct[t], '/', total[t], correct[t] / total[t])
 
 
-X, y, task = [], [], []
-read_features('../Data/feature/')
-data_normalization()
-# generate_model()
-leave_one_out_validation()
+if __name__ == "__main__":
+	X, y, task = [], [], []
+	read_features('../Data/feature/')
+	data_normalization()
+	# generate_model()
+	leave_one_out_validation()
 

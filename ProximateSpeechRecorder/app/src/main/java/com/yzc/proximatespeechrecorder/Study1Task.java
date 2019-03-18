@@ -74,6 +74,9 @@ public class Study1Task {
         tasks.addAll(negativeTasks);
         tasks.add("走\n裤兜\n裤兜");
         tasks.add("走\n手中\n手中");
+        tasks.add("坐\n手中\n摇晃（左右）");
+        tasks.add("坐\n手中\n摇晃（前后）");
+
         for (String t: tasks)
             Log.e("tasks", t);
 
@@ -106,6 +109,8 @@ public class Study1Task {
             "握持（走）",
             "桌上",
             "接听",
+            "摇晃（左右）",
+            "摇晃（前后）"
     };
 
     public String getTaskDescription() {
@@ -191,13 +196,19 @@ public class Study1Task {
 
     };
 
-    //SensorActivity
+    //For SensorActivity Usage (Study 2, CV)
     public String triggerPosition[] = new String[] {
             "竖直对脸，碰触鼻子",
             "竖直对脸，不碰鼻子",
             "竖屏握持，上端遮嘴",
             "水平端起，倒话筒",
             "话筒",
-            "横屏"
+            "横屏",
+            "左耳打电话（不碰）",
+            "右耳打电话（不碰）",
+            "左耳打电话（碰触）",
+            "右耳打电话（碰触）",
+            "倒着拿手机",
+            "自拍"
     };
 }
