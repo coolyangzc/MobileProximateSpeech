@@ -363,6 +363,10 @@ def train_val_test_sorter(src_dir, dst_dir=None):
 	print('\ntest:')
 	test.show_shape()
 
+	os.chdir(dst_dir)
+	for which in 'train', 'val', 'test':
+		if not os.path.exists(which):
+			os.mkdir(which)
 	train.save_to_dir('train', overwrite=True)
 	val.save_to_dir('val', overwrite=True)
 	test.save_to_dir('test', overwrite=True)
@@ -373,10 +377,9 @@ def train_val_test_sorter(src_dir, dst_dir=None):
 if __name__ == '__main__':
 	# 以下将对 Study2 的所有图片进行归类，分为训练、开发、测试三堆，分别储存在 train, val, test 目录，注意测试集的正例是被 leave one out 得到的
 	CWD = '/Volumes/TOSHIBA EXT/Analysis/Data/Study2'
-	os.chdir(CWD)
-	# train_val_test_sorter('.')
-	pack = ImagePack()
-	os.chdir('negatives')
-	subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	pack.from_subject(subjects, shuffle=True, cache=False)
-	pack.show_shape()
+	train_val_test_sorter(CWD)
+	# pack = ImagePack()
+	# os.chdir('subjects')
+	# subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	# pack.from_subject(subjects, progressbar=True, shuffle=True, cache=True, reload=False)
+	# pack.show_shape()
