@@ -10,7 +10,7 @@ from utils.tools import suffix_filter
 def extract_frames(video_path, start_time=0., minus_time=0., stride_time=None, stride_frame=10,
 				   threshold=None, progress_bar=False):
 	'''
-	从视频中提取帧，输出到子目录
+	从单个视频中提取帧，输出到子目录
 	extract picture frames from mp4 video, starting from `start_time`, ending at `time duration of the video - end_time`
 	this function will output all the picture frames to a sub folder which shares the same name as the basename of `video_path`
 
@@ -25,7 +25,7 @@ def extract_frames(video_path, start_time=0., minus_time=0., stride_time=None, s
 	old_path = os.getcwd()
 	try:
 		os.chdir(os.path.dirname(video_path))
-	except FileNotFoundError:
+	except OSError:
 		pass
 	video_name = os.path.basename(video_path)
 
@@ -111,9 +111,11 @@ def extract_frames_in_dir(wkdir, start_time=0., minus_time=0., stride_time=None,
 
 
 if __name__ == '__main__':
-	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study2/subjects')
-	subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	print(subjects)
-	for subject in subjects:
-		wkdir = os.path.join(subject, 'trimmed')
-		extract_frames_in_dir(wkdir, stride_frame=10)
+	CWD = 'E:\ZFS_TEST\Analysis\Data\Study2\\negatives'
+	os.chdir(CWD)
+	# negatives = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	negatives = ['world']
+	print(negatives)
+	for kind in negatives:
+		wkdir = os.path.join(kind, 'original')
+		extract_frames_in_dir(wkdir, stride_frame=30, start_time=2., minus_time=2.)
