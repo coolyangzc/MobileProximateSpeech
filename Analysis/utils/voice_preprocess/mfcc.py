@@ -27,7 +27,7 @@ def normalize(y, axis):
 def get_mfcc(filename, sr=SAMPLE_RATE):
 	y, sr = librosa.load(filename, sr=sr)
 	# 这里要对频率归一化处理，因为不同人说话频率不同，归一化后的迁移效果斐然！
-	return normalize(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=24), axis=0)
+	return librosa.core.stft(y)
 	# mfcc = feature.mfcc(y, sr, frame_length=0.020, frame_stride=0.010)
 	# return rollaxis(processing.cmvnw(mfcc, win_size=301, variance_normalization=True), 0, 2)
 
