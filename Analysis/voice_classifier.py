@@ -22,7 +22,7 @@ def read_file(path, file_name, id):
 	if len(lines) <= 3:
 		return
 	task_id = int(file_name.strip().split('_')[0])
-	global X, y, task
+	global X, y, task, task_from
 	feature_num = int(lines[2])
 	task_description = lines[0].strip()
 	y_type = 0
@@ -38,12 +38,13 @@ def read_file(path, file_name, id):
 		X[id].append(feature)
 		y[id].append(y_type)
 		task[id].append(task_description)
+		task_from[id].append(file_name)
 		sp += feature_num
 
 
 def read_features(feature_path):
 	user_list = os.listdir(feature_path)
-	global X, y, task
+	global X, y, task, task_from
 	id = -1
 	for u in user_list:
 		if u[-4:] == '.txt':
@@ -54,6 +55,7 @@ def read_features(feature_path):
 		X.append([])
 		y.append([])
 		task.append([])
+		task_from.append([])
 		id += 1
 		for f in files:
 			read_file(p, f, id)
@@ -87,7 +89,7 @@ def generate_model():
 def leave_one_out_validation():
 	mean_train_acc, mean_test_acc = 0, 0
 
-	total, correct = {}, {}
+	total, correct, total_vote, correct_vote = {}, {}, {}, {}
 
 	for loo in range(len(X)):
 		print(loo)
@@ -106,7 +108,6 @@ def leave_one_out_validation():
 		# clf = neighbors.KNeighborsClassifier()
 		# clf = tree.DecisionTreeClassifier(max_depth=5)
 		clf.fit(X_train, y_train)
-
 		train_acc = clf.score(X_train, y_train)
 		test_acc = clf.score(X_test, y_test)
 		mean_train_acc += train_acc
@@ -118,10 +119,11 @@ def leave_one_out_validation():
 			t = task[loo][i]
 			if t not in total:
 				total[t] = 0
+				total_vote[t] = 0
+				correct[t] = 0
+				correct_vote[t] = 0
 			total[t] += 1
 			if res[i] == y[loo][i]:
-				if t not in correct:
-					correct[t] = 0
 				same.append(1)
 				correct[t] += 1
 			else:
@@ -130,16 +132,42 @@ def leave_one_out_validation():
 		print(train_acc)
 		print(test_acc)
 
+		vote = 0
+		task_from[loo].append('#')
+		for i in range(len(res)):
+			t = task[loo][i]
+			if res[i] == 1:
+				vote += 1
+			else:
+				vote -= 1
+			if task_from[loo][i] != task_from[loo][i+1]:
+				if vote > 0:
+					vote_res = 1
+				else:
+					vote_res = 0
+				total_vote[t] += 1
+				if vote_res == y[loo][i]:
+					correct_vote[t] += 1
+				vote = 0
+
 	print('Mean')
 	print(mean_train_acc / len(X))
 	print(mean_test_acc / len(X))
 
 	for t in correct:
 		print(t.ljust(24 - len(t)), correct[t], '/', total[t], correct[t] / total[t])
+	print('Vote')
+	mean_vote_acc = 0
+	for t in correct_vote:
+		print(t.ljust(24 - len(t)), correct_vote[t], '/', total_vote[t], correct_vote[t] / total_vote[t])
+		mean_vote_acc += correct_vote[t] / total_vote[t]
+	mean_vote_acc /= len(correct_vote)
+	print(mean_vote_acc)
+
 
 
 if __name__ == "__main__":
-	X, y, task = [], [], []
+	X, y, task, task_from = [], [], [], []
 	read_features('../Data/voice feature/')
 	# data_normalization()
 	# generate_model()

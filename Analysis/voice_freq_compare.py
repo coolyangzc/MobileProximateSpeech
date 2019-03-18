@@ -61,6 +61,99 @@ def calc_wav(file_path, type, output):
 			count[type] += 1
 
 
+def calc_wav_mono(file_path, type, output):
+	try:
+		wavefile = wave.open(file_path, 'r')
+	except wave.Error:
+		return
+	nchannels = wavefile.getnchannels()
+	sample_width = wavefile.getsampwidth()
+	framerate = wavefile.getframerate()
+	numframes = wavefile.getnframes()
+	time = numframes / framerate
+
+	print(nchannels, sample_width, framerate, numframes, time)
+
+	y, z = np.zeros(numframes), np.zeros(numframes)
+
+	for i in range(numframes):
+		val = wavefile.readframes(1)
+		left = val[0:2]
+		right = val[2:4]
+		y[i] = struct.unpack('h', left)[0]
+		z[i] = struct.unpack('h', right)[0]
+	s = 0
+	sum = np.zeros(len(freqs))
+	cnt = 0
+	while s + fft_size < len(y):
+		data = y[s:s + fft_size]
+		xf = np.fft.rfft(data) / fft_size
+		xfp = 20 * np.log10(np.clip(np.abs(xf), 1e-20, 1e100))
+
+
+		if output != 0:
+			cnt += 1
+			sum += xfp
+			if cnt == 20:
+				for f in sum:
+					output.write(str(f / cnt) + '\n')
+				cnt = 0
+				sum = np.zeros(len(freqs))
+		else:
+			for i in range(len(freqs)):
+				freq_tot[type][i] += xfp[i]
+			count[type] += 1
+
+		data = z[s:s + fft_size]
+		xf = np.fft.rfft(data) / fft_size
+		xfp = 20 * np.log10(np.clip(np.abs(xf), 1e-20, 1e100))
+
+		if output != 0:
+			cnt += 1
+			sum += xfp
+			if cnt == 20:
+				for f in sum:
+					output.write(str(f / cnt) + '\n')
+				cnt = 0
+				sum = np.zeros(len(freqs))
+		else:
+			for i in range(len(freqs)):
+				freq_tot[type+1][i] += xfp[i]
+			count[type+1] += 1
+		s += fft_size
+
+
+def visualization_mono():
+	global freq_tot, count
+	path = '../Data/Voice Study Mono 32000Hz/'
+	for u in user_list:
+		user_path = os.path.join(path, u)
+		file_list = os.listdir(user_path)
+		for f in file_list:
+			if f[-4:] != '.txt':
+				continue
+			file = open(os.path.join(user_path, f), "r", encoding='utf-8')
+			lines = file.readlines()
+			type = 0
+			if lines[1].strip() in positive:
+				type = 2
+			wav_file = os.path.join(user_path, f[:-4] + '.wav')
+			calc_wav_mono(wav_file, type, 0)
+		for t in range(4):
+			for i in range(len(freqs)):
+				freq_tot[t][i] /= count[t]
+		print(freq_tot)
+		plt.plot(freqs, freq_tot[0], label='distant left')
+		plt.plot(freqs, freq_tot[1], label='distant right')
+		plt.plot(freqs, freq_tot[2], label='close left')
+		plt.plot(freqs, freq_tot[3], label='close right')
+		plt.title(u)
+		plt.legend()
+		plt.show()
+		freq_tot = np.zeros((4, len(freqs)))
+		count = np.zeros(4)
+
+
 def visualization():
 	global freq_tot, count
 	for u in user_list:
@@ -138,9 +231,23 @@ def output_freqs():
 
 
 if __name__ == "__main__":
+	file_path = '../Data/voice/yzc/filtered/190305 10_26_49.wav'
+	try:
+		wavefile = wave.open(file_path, 'r')
+	except wave.Error:
+		print('Error')
+	nchannels = wavefile.getnchannels()
+	sample_width = wavefile.getsampwidth()
+	framerate = wavefile.getframerate()
+	numframes = wavefile.getnframes()
+	time = numframes / framerate
+	while True:
+		print(nchannels, sample_width, framerate, numframes, time)
+
 	path = '../Data/voice/'
 	user_list = os.listdir(path)
 	# visualization()
-	output_freqs()
+	# output_freqs()
+	visualization_mono()
 
 
