@@ -3,8 +3,8 @@
 
 import collections
 import contextlib
-import sys
 import os
+import sys
 import wave
 
 import webrtcvad
@@ -12,6 +12,7 @@ import webrtcvad
 from utils.logger import DualLogger
 from utils.tools import date_time
 
+import numpy as np
 
 def read_wave(path):
 	"""Reads a .wav file.
@@ -32,6 +33,7 @@ def read_wave(path):
 			raise TypeError('sample_rate = %d, not in (8000, 16000, 32000, 48000)' % sample_rate)
 
 		pcm_data = wf.readframes(wf.getnframes())
+		print('pca data:', pcm_data)
 		return pcm_data, sample_rate
 
 
