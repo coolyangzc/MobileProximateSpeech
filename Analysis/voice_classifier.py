@@ -104,7 +104,7 @@ def leave_one_out_validation():
 		y_train, y_test = np.array(y_train), np.array(y_test)
 		print(X_train.shape, y_train.shape)
 		# clf = AdaBoostClassifier()
-		clf = svm.SVC(kernel='rbf', gamma=1e-4, class_weight={0: 1, 1: 1})
+		clf = svm.SVC(kernel='rbf', gamma=1e-4, class_weight={0: 1, 1: 1}, probability=True)
 		# clf = neighbors.KNeighborsClassifier()
 		# clf = tree.DecisionTreeClassifier(max_depth=5)
 		clf.fit(X_train, y_train)
@@ -134,6 +134,8 @@ def leave_one_out_validation():
 
 		vote = 0
 		task_from[loo].append('#')
+		# Simple Vote
+		'''
 		for i in range(len(res)):
 			t = task[loo][i]
 			if res[i] == 1:
@@ -141,6 +143,23 @@ def leave_one_out_validation():
 			else:
 				vote -= 1
 			if task_from[loo][i] != task_from[loo][i+1]:
+				if vote > 0:
+					vote_res = 1
+				else:
+					vote_res = 0
+				total_vote[t] += 1
+				if vote_res == y[loo][i]:
+					correct_vote[t] += 1
+				vote = 0
+		'''
+		# Proba Vote
+		res = clf.predict_proba(X[loo])
+		print(res)
+		for i in range(len(res)):
+			t = task[loo][i]
+			vote -= res[i][0]
+			vote += res[i][1]
+			if task_from[loo][i] != task_from[loo][i + 1]:
 				if vote > 0:
 					vote_res = 1
 				else:
@@ -163,7 +182,6 @@ def leave_one_out_validation():
 		mean_vote_acc += correct_vote[t] / total_vote[t]
 	mean_vote_acc /= len(correct_vote)
 	print(mean_vote_acc)
-
 
 
 if __name__ == "__main__":

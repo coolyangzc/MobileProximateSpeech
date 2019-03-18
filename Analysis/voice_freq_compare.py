@@ -231,23 +231,10 @@ def output_freqs():
 
 
 if __name__ == "__main__":
-	file_path = '../Data/voice/yzc/filtered/190305 10_26_49.wav'
-	try:
-		wavefile = wave.open(file_path, 'r')
-	except wave.Error:
-		print('Error')
-	nchannels = wavefile.getnchannels()
-	sample_width = wavefile.getsampwidth()
-	framerate = wavefile.getframerate()
-	numframes = wavefile.getnframes()
-	time = numframes / framerate
-	while True:
-		print(nchannels, sample_width, framerate, numframes, time)
-
 	path = '../Data/voice/'
 	user_list = os.listdir(path)
 	# visualization()
-	# output_freqs()
-	visualization_mono()
+	output_freqs()
+	# visualization_mono()
 
 
