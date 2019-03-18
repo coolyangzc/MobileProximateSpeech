@@ -15,6 +15,12 @@ label_dict = {  # todo 分类字典, -1 表示舍弃这个特征的所有数据�
 	'大千世界': 0,
 	'易混淆': 0,
 	'耳旁打电话': 0,
+	'右耳打电话（不碰）': 0,
+	'右耳打电话（碰触）': 0,
+	'左耳打电话（不碰）': 0,
+	'左耳打电话（碰触）': 0,
+	'倒着拿手机': 0,
+	'自拍': 0,
 	'竖直对脸，碰触鼻子': 1,
 	'竖直对脸，不碰鼻子': 2,
 	'竖屏握持，上端遮嘴': 3,
@@ -33,7 +39,7 @@ doc_dict = [  # todo 每一类对应的描述
 ]
 N_CLASS = len(doc_dict)
 
-description_pattern = re.compile('(\w+，?\w+) Study2', re.U)
+description_pattern = re.compile('(.*) Study2', re.U)
 
 
 def show_shape(iterable):
@@ -176,8 +182,19 @@ class ImagePack:
 		for folder in tqdm(folders) if progressbar else folders:
 			# get the description and label
 			# cwd: .../xxx/resized/
-			name = get_description(folder)
-			label = label_dict[name]
+			try:
+				name = get_description(folder)
+			except FileNotFoundError as e:
+				mp4files = suffix_filter(os.listdir(folder), '.mp4')
+				if len(mp4files) > 0:
+					raise e
+				else:
+					continue
+
+			try:
+				label = label_dict[name]
+			except KeyError:
+				raise KeyError('Unidentified description %s in %s, %s' % (name, folder, subject_dir))
 			if label == -1: continue
 
 			# load .jpg images
@@ -186,7 +203,11 @@ class ImagePack:
 			if reload == True or not os.path.exists('cache.npimgs'):  # never cached numpy arrays before
 				images = []
 				for img_name in suffix_filter(os.listdir('.'), suffix='.jpg'):
-					img = Image.open(img_name)
+					try:
+						img = Image.open(img_name)
+					except OSError:
+						print('cannot open %s in %s, %s' % (img_name, folder, subject_dir))
+						continue
 					npimg = np.array(img)
 					images.append(npimg)
 				if cache == True:
@@ -302,20 +323,26 @@ class ImagePack:
 		os.chdir(old_path)
 
 
-if __name__ == '__main__':
-	# 以下将对 Study2 的所有图片进行归类，分为训练、开发、测试三堆，分别储存在 train, val, test 目录，注意测试集的正例是被 leave one out 得到的
-	CWD = 'E:\ZFS_TEST\Analysis\Data\\Study2'
-	os.chdir(CWD)
+def train_val_test_sorter(src_dir, dst_dir=None):
+	'''
+	以下将对 Study2 的所有图片进行归类，分为训练、开发、测试三堆，分别储存在 train, val, test 目录，注意测试集的正例是被 leave one out 得到的
+
+	:param src_dir: 包含 subjects 和 negatives 两个子目录的文件夹
+	:param dst_dir: 输出目标目录，内含 train, val, test 三个文件夹
+	'''
+	old_path = os.getcwd()
+	os.chdir(src_dir)
+	if dst_dir is None: dst_dir = src_dir
 	train_val = ImagePack()
 	test = ImagePack()
 
-	# positives
+	# from subjects
 	os.chdir('subjects')
 	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
 	train_val.from_subject(subject_dirs[:-1], progressbar=True, shuffle=False, reload=False)  # leave one out
 	test.from_subject(subject_dirs[-1], progressbar=True, shuffle=True, reload=False)
 
-	# negatives
+	# from negatives
 	os.chdir('../negatives')
 	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
 	neg = ImagePack()
@@ -339,3 +366,17 @@ if __name__ == '__main__':
 	train.save_to_dir('train', overwrite=True)
 	val.save_to_dir('val', overwrite=True)
 	test.save_to_dir('test', overwrite=True)
+
+	os.chdir(old_path)
+
+
+if __name__ == '__main__':
+	# 以下将对 Study2 的所有图片进行归类，分为训练、开发、测试三堆，分别储存在 train, val, test 目录，注意测试集的正例是被 leave one out 得到的
+	CWD = '/Volumes/TOSHIBA EXT/Analysis/Data/Study2'
+	os.chdir(CWD)
+	# train_val_test_sorter('.')
+	pack = ImagePack()
+	os.chdir('negatives')
+	subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	pack.from_subject(subjects, shuffle=True, cache=False)
+	pack.show_shape()
