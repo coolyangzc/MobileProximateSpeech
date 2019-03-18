@@ -25,3 +25,10 @@ def suffix_conv(file_name: str, suffix):
 	if len(segments) <= 1:
 		raise ValueError('file_name `%s` got no suffix' % file_name)
 	return '.'.join(segments[:-1]) + suffix
+
+
+def suffix_filter(files, suffix):
+	'''
+	return list of files with given suffix
+	'''
+	return list(filter(lambda x: x.endswith(suffix), files))

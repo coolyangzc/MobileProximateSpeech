@@ -39,7 +39,7 @@ def trim_head(file_path, dst_dir, in_format='wav', out_format='wav'):
 	:return dst_path
 	'''
 	assert os.path.exists(file_path)
-	txt_path = suffix_conv(file_path, '.txt')
+	txt_path = os.path.join('../original', suffix_conv(file_path, '.txt'))
 	assert os.path.exists(txt_path)
 	dst_path = os.path.join(dst_dir, os.path.basename(file_path))
 	dst_path = suffix_conv(dst_path, out_format)

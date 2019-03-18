@@ -1,11 +1,14 @@
 # 对 wav 文件重新编码，得到不同的采样率、通道数
 import os
+import threading
 
 import librosa
 import numpy as np
 from scipy.io import wavfile
+from tqdm import tqdm
+import shutil
 
-from utils.tools import suffix_conv
+from utils.tools import suffix_conv, suffix_filter
 
 
 def re_encode(src_path, dst_path=None, sample_rate=32000, mono=False, suffix=True):
@@ -28,7 +31,7 @@ def re_encode(src_path, dst_path=None, sample_rate=32000, mono=False, suffix=Tru
 		n_channel = np.shape(y)[0]
 		y = np.rollaxis(y, 0, 2)
 	else:
-		raise AttributeError
+		raise AttributeError('ndim error in %s' % src_path)
 
 	if dst_path is None:
 		dir = os.path.dirname(os.path.abspath(src_path))
@@ -47,9 +50,33 @@ def re_encode(src_path, dst_path=None, sample_rate=32000, mono=False, suffix=Tru
 	return dst_path
 
 
+def re_encode_in_dir(wk_dir, out_dir=None, audio_format='mp4', sample_rate=32000, mono=False, suffix=True):
+	'''
+	batch re-encode
+	:param wk_dir: a directory, should include many wav files.
+	:param out_dir: if none, == wk_dir
+	:param audio_format:
+	:param sample_rate:
+	:param mono: True - 1 channel, False - n channels
+	:param suffix: whether to have -1 or -2 as suffix to imply the n_channel
+	'''
+	owd = os.getcwd()
+	os.chdir(wk_dir)
+	files = suffix_filter(os.listdir('.'), suffix=audio_format)
+	for file in tqdm(files):
+		name = os.path.basename(re_encode(file, sample_rate=sample_rate, mono=mono, suffix=suffix))
+		if out_dir is not None:
+			shutil.move(name, os.path.join(owd, out_dir, name))
+
+	os.chdir(owd)
+
+
 if __name__ == '__main__':
 	from utils.voice_preprocess.VAD import get_voice_chunks
 
-	path = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/test/downsampling/190304 20_10_35.mp4'
-	dst = re_encode(path, sample_rate=32000, mono=True, suffix=False)
-	get_voice_chunks(dst, aggressiveness=3)
+	cwd = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/test/downsampling/'
+	os.chdir(cwd)
+	re_encode_in_dir('original/', out_dir='wav2channel/', sample_rate=32000, mono=False, suffix=False)
+	re_encode_in_dir('original/', sample_rate=16000, mono=True, suffix=False)
+# dst = re_encode(path, sample_rate=32000, mono=True, suffix=False)
+# get_voice_chunks(dst, aggressiveness=3)
