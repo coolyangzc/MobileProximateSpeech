@@ -138,6 +138,6 @@ if __name__ == '__main__':
 	CWD = '/Users/james/MobileProximateSpeech/Analysis/Data/Study2/subjects'
 	os.chdir(CWD)
 	# subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	subjects = ['cjr']
+	subjects = ['hsd']
 	for subject in subjects:
 		batch_resize(subject, src_folder='trimmed', overwrite=False)

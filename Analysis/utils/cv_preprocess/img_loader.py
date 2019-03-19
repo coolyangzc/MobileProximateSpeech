@@ -25,7 +25,7 @@ label_dict = {  # todo 分类字典, 0 表示舍弃这个特征的所有数据�
 	'竖直对脸，碰触鼻子': +1,
 	'竖直对脸，不碰鼻子': +2,
 	'竖屏握持，上端遮嘴': +3,
-	'水平端起，倒话筒': +4,
+	'水平端起，倒话筒': 0,
 	'话筒': +5,
 	'横屏': +6,
 }
@@ -171,7 +171,7 @@ class ImagePack:
 		old_path = os.getcwd()
 		os.chdir(subject_dir)
 		if not (os.path.exists('original') and os.path.exists('resized')):
-			raise FileNotFoundError('Error in %s', subject_dir)
+			raise FileNotFoundError('folder original/ or resized/ not found in %s', subject_dir)
 
 		# list all image folders
 		os.chdir('resized')
@@ -217,7 +217,7 @@ class ImagePack:
 			cnt = 0
 			for _ in images:
 				self.labels.append(label)
-				name = folder + str(cnt)
+				name = folder + '-' + str(cnt)
 				self.names.append(name)  # keep track of image name
 				cnt += 1
 
@@ -306,6 +306,7 @@ class ImagePack:
 		old_path = os.getcwd()
 		os.chdir(dst_dir)
 		for c in CLASSES:
+			if c == 0: continue
 			c = str(c)
 			if os.path.exists(c):
 				if overwrite == True:
@@ -348,7 +349,7 @@ def train_val_test_sorter(src_dir, dst_dir=None):
 	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
 	neg = ImagePack()
 	neg.from_subject(subject_dirs, progressbar=True, shuffle=False, reload=False)
-	os.chdir(CWD)
+	os.chdir('..')
 	neg_train_val, neg_test = neg.train_test_split(test_size=0.1)
 
 	train_val += neg_train_val
@@ -382,7 +383,7 @@ if __name__ == '__main__':
 	cwd = '/Users/james/MobileProximateSpeech/Analysis/Data/Study2/subjects'
 	os.chdir(cwd)
 	imgpack = ImagePack()
-	imgpack.from_subject('cjr')
+	imgpack.from_subject(['hsd', 'cjr'], cache=True)
 	imgpack.save_to_dir('../classes', overwrite=True)
 # pack = ImagePack()
 # os.chdir('subjects')
