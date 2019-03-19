@@ -305,9 +305,36 @@ class ImagePack:
 		return ImagePack(list(self.images)[cut:], list(self.labels)[cut:], self.names[cut:], self.subjects[cut:]), \
 			   ImagePack(list(self.images)[:cut], list(self.labels)[:cut], self.names[:cut], self.subjects[:cut])
 
-	def save_to_dir(self, src_dir, dst_dir):
+	def __sort_to_class_dirs(self, dst_dir):
 		'''
 		sort images with different labels and store them in dst_dir's subdirectories
+		todo, dir tree like: dst_dir / class_number / jpg
+
+		:param dst_dir: target directory
+		'''
+		if not os.path.exists(dst_dir):
+			os.mkdir(dst_dir)
+		old_path = os.getcwd()
+		os.chdir(dst_dir)
+		for c in CLASSES:
+			if c == 0: continue
+			c = str(c)
+			if not os.path.exists(c):
+				os.mkdir(c)
+
+		name_counter = Counter()
+		progress = tqdm(total=len(self.names))
+		for image, label, name in zip(self.images, self.labels, self.names):
+			progress.update()
+			img = Image.fromarray(image)
+			img.save(os.path.join(str(label), name + ' - %d.jpg' % name_counter[name]))
+			name_counter.update([name])
+
+		os.chdir(old_path)
+
+	def __sort_to_class_subject_dirs(self, src_dir, dst_dir):
+		'''
+		sort images with different labels, subjects and store them in dst_dir's sub-sub-directories
 		it will supplement the dst_dir unless files with the same name exist, that way, will be overwritten.
 		todo, dir tree like: dst_dir / class_number / subject / jpg, mp4, txt
 
@@ -324,8 +351,10 @@ class ImagePack:
 				os.mkdir(class_dir)
 
 		# sort all pack data to class directories
-		subject_counter = Counter()
-		for image, label, name, subject in tqdm(zip(self.images, self.labels, self.names, self.subjects)):
+		name_counter = Counter()
+		progress = tqdm(total=len(self.names))
+		for image, label, name, subject in zip(self.images, self.labels, self.names, self.subjects):
+			progress.update()
 			img = Image.fromarray(image)
 			trg_dir = os.path.join(dst_dir, str(label), subject)
 			if not os.path.exists(trg_dir):
@@ -333,21 +362,43 @@ class ImagePack:
 
 			# save img
 			trg_path = os.path.join(trg_dir, name)
-			img_path = trg_path + ' - %d.jpg' % subject_counter[subject]
-			subject_counter.update([subject])
+			img_path = trg_path + ' - %d.jpg' % name_counter[name]
+			name_counter.update([name])
 			img.save(img_path)
 
 			# copy mp4 and txt from src_dir to dst_dir
 			src_path = os.path.join(src_dir, subject, 'original', name)
 
 			mp4_path = trg_path + '.mp4'
-			if not os.path.exists(mp4_path): # only copy once
+			if not os.path.exists(mp4_path):  # only copy once
 				shutil.copyfile(src_path + '.mp4', mp4_path)  # possible to raise FileNotFoundError
 
 			txt_path = trg_path + '.txt'
-			if not os.path.exists(txt_path): # only copy once
+			if not os.path.exists(txt_path):  # only copy once
 				shutil.copyfile(src_path + '.txt', trg_path + '.txt')  # possible to raise FileNotFoundError
 
+	def sort_to_dir(self, dst_dir, mode: str = 'class', src_dir=None):
+		'''
+		sort images with different labels, subjects and store them in dst_dir's sub-sub-directories
+		it will supplement the dst_dir unless files with the same name exist, that way, will be overwritten.
+		todo, dir tree like:   dst_dir / class_number / subject / jpg, mp4, txt (mode == 'class subject')
+		todo,       or like:   dst_dir / class_number / jpg (mode == 'class')
+
+		:param dst_dir: target directory
+		:param mode: either 'class' or 'class subject'
+		:param src_dir: source directory to look for stores subjects' original files, should include 'cjr', 'hsd' ...
+			(only needed when mode == 'class subject')
+		'''
+		if mode == 'class':
+			self.__sort_to_class_dirs(dst_dir=dst_dir)
+		elif mode == 'class subject':
+			if src_dir is None:
+				raise AttributeError('You must specify `src_dst` if mode == \'class subject\'.')
+			elif not os.path.exists(src_dir):
+				raise FileNotFoundError('`src_dir` %s not found.' % os.path.abspath(src_dir))
+			self.__sort_to_class_subject_dirs(src_dir=src_dir, dst_dir=dst_dir)
+		else:
+			raise ValueError('Got unidentified `mode` value: %s' % mode)
 
 	def clear(self):
 		del self.images, self.labels, self.names
@@ -397,9 +448,9 @@ def train_val_test_sorter(src_dir, dst_dir=None):
 	for which in 'train', 'val', 'test':
 		if not os.path.exists(which):
 			os.mkdir(which)
-	# train.save_to_dir('train', overwrite=True)
-	# val.save_to_dir('val', overwrite=True)
-	# test.save_to_dir('test', overwrite=True)
+	train.sort_to_dir('train', mode='class')
+	val.sort_to_dir('val', mode='class')
+	test.sort_to_dir('test', mode='class')
 
 	os.chdir(old_path)
 
@@ -412,7 +463,7 @@ if __name__ == '__main__':
 	os.chdir(cwd)
 	imgpack = ImagePack()
 	imgpack.from_subject(['hsd', 'cjr'], cache=True)
-	imgpack.save_to_dir(src_dir='.', dst_dir='../classes')
+	imgpack.sort_to_dir(dst_dir='../classes', src_dir='.', mode='class subject')
 # pack = ImagePack()
 # os.chdir('subjects')
 # subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
