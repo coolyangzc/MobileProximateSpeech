@@ -322,6 +322,9 @@ class ImagePack:
 
 		os.chdir(old_path)
 
+	def clear(self):
+		del self.images, self.labels, self.names
+
 
 def train_val_test_sorter(src_dir, dst_dir=None):
 	'''
@@ -378,8 +381,8 @@ if __name__ == '__main__':
 	# 以下将对 Study2 的所有图片进行归类，分为训练、开发、测试三堆，分别储存在 train, val, test 目录，注意测试集的正例是被 leave one out 得到的
 	CWD = '/Volumes/TOSHIBA EXT/Analysis/Data/Study2'
 	train_val_test_sorter(CWD)
-	# pack = ImagePack()
-	# os.chdir('subjects')
-	# subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	# pack.from_subject(subjects, progressbar=True, shuffle=True, cache=True, reload=False)
-	# pack.show_shape()
+# pack = ImagePack()
+# os.chdir('subjects')
+# subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+# pack.from_subject(subjects, progressbar=True, shuffle=True, cache=True, reload=False)
+# pack.show_shape()
