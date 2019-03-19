@@ -72,7 +72,7 @@ if __name__ == '__main__':
 	imgset.show_shape()
 	print()
 
-	train, val = imgset.train_test_split()
+	train, val = imgset.train_val_split()
 	print('train set:')
 	train.show_shape()
 	print()
