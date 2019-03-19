@@ -31,6 +31,7 @@ response_sec = 0.3  # human response time
 def trim_head(file_path, dst_dir, in_format='wav', out_format='wav'):
 	'''
 	trim head of audio file_path and output to dst_dir
+	original/ should exists as an uncle directory of file_path
 
 	:param file_path: audio file to trim
 	:param dst_dir: output directory
@@ -54,30 +55,33 @@ def trim_head(file_path, dst_dir, in_format='wav', out_format='wav'):
 	return dst_path
 
 
-def trim_in_dir(wk_dir, dst_dir=None, in_format='wav', out_format='wav'):
+def trim_in_dir(wk_dir, dst_dir, in_format='wav', out_format='wav'):
 	'''
 	trim head of audios in wk_dir and output to dst_dir
+	by default, this will overwrite the files in `dst_dir`
 
 	:param wk_dir: audio file directory
 	:param dst_dir: output directory
 	:param in_format: input format
 	:param out_format: output format
 	'''
-	old_path = os.getcwd()
+	dst_dir = os.path.abspath(dst_dir)
+	if not os.path.exists(dst_dir):
+		os.mkdir(dst_dir)
+	owd = os.getcwd()
 	os.chdir(wk_dir)
-	if dst_dir is None: dst_dir = '../trimmed'
-	if not os.path.exists(dst_dir): os.mkdir(dst_dir)
 
 	print('trimming in %s ...' % wk_dir)
 	files = filter(lambda x: x.endswith('.%s' % in_format), os.listdir('.'))
 	for file_path in tqdm(files):
 		trim_head(file_path, dst_dir, in_format, out_format)
 	print('done.')
-	os.chdir(old_path)
+	os.chdir(owd)
 
 
 if __name__ == '__main__':
-	DualLogger('../../logs/%svoice_trimmer.txt' % date_time())
-	wk_dir = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/temp/wwn_pls/original'
-	trim_in_dir(wk_dir)
+	cwd = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/test/downsampling/'
+	os.chdir(cwd)
+	trim_in_dir(wk_dir='wav1channel', dst_dir='trimmed1channel')
+	trim_in_dir(wk_dir='wav2channel', dst_dir='trimmed2channel')
 	pass

@@ -29,9 +29,10 @@ if __name__ == '__main__':
 										audio_format='mp4', sample_rate=32000, mono=False, suffix=False)
 
 			print('\ntrimming...')
-			voice_trimmer.trim_in_dir('wav1channel', in_format='wav', out_format='wav')
+			voice_trimmer.trim_in_dir('wav1channel', dst_dir='trimmed1channel', in_format='wav', out_format='wav')
+			voice_trimmer.trim_in_dir('wav2channel', dst_dir='trimmed2channel', in_format='wav', out_format='wav')
 
 			print('\nvad...')
-			VAD.get_voice_chunks_in_dir('trimmed', aggressiveness=3)
+			VAD.get_voice_chunks_in_dir('wav1channel', aggressiveness=3)
 
 			os.chdir('..')
