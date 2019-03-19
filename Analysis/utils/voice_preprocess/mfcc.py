@@ -35,7 +35,9 @@ def __get_mfcc_1_channel(filename, sr=None):
 	y, sr = librosa.load(filename, sr=sr, mono=True)
 	# <del>这里要对频率归一化处理，因为不同人说话频率不同，归一化后的迁移效果斐然！</del>
 	# return librosa.core.stft(y)
-	return librosa.feature.mfcc(y, sr=sr, n_mfcc=N_MFCC)
+	mfcc = librosa.feature.mfcc(y, sr=sr, n_mfcc=N_MFCC)
+	# mfcc = normalize(mfcc, axis=0)
+	return mfcc
 
 
 # mfcc = feature.mfcc(y, sr, frame_length=0.020, frame_stride=0.010)
@@ -51,7 +53,10 @@ def __get_mfcc_2_channel(filename, sr=None):
 	if ndim(y) != 2 or shape(y)[0] != 2:
 		raise AttributeError('the audio file %s is not 2 channel.' % filename)
 	# return librosa.core.stft(y)
-	return librosa.feature.mfcc(y[0], sr=sr, n_mfcc=N_MFCC), librosa.feature.mfcc(y[1], sr=sr, n_mfcc=N_MFCC)
+	mfcc0, mfcc1 = librosa.feature.mfcc(y[0], sr=sr, n_mfcc=N_MFCC), librosa.feature.mfcc(y[1], sr=sr, n_mfcc=N_MFCC)
+	# mfcc0 = normalize(mfcc0, axis=0)
+	# mfcc1 = normalize(mfcc1, axis=0)
+	return mfcc0, mfcc1
 
 
 # 定义返回并可视化MFCC的函数

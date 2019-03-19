@@ -13,10 +13,10 @@ subsampling_config_2_channel = {
 
 FRAME_TO_MS_1 = 0.03131841960956445  # 帧 / 毫秒  这是当前 librosa 16000Hz 对应的数据
 subsampling_config_1_channel = {
-	'offset': int(0 * FRAME_TO_MS_1),  # offset of subsampling, in frames 偏移量
-	'duration': int(10000 * FRAME_TO_MS_1),  # maximun length of subsampling range, in frames 持续时间
-	'window': int(500 * FRAME_TO_MS_1),  # length of a single unit, in frames 单元窗口长度
-	'stride': int(250 * FRAME_TO_MS_1),  # step in frames 移动窗口的步长
+	'offset': int(1000 * FRAME_TO_MS_1),  # offset of subsampling, in frames 偏移量
+	'duration': int(6000 * FRAME_TO_MS_1),  # maximun length of subsampling range, in frames 持续时间
+	'window': int(100 * FRAME_TO_MS_1),  # length of a single unit, in frames 单元窗口长度
+	'stride': int(50 * FRAME_TO_MS_1),  # step in frames 移动窗口的步长
 	'group_size': 5,
 }
 

@@ -18,7 +18,7 @@ from voice.SVM.MyCLF import MySVC
 gestures = label_dict.keys()
 CWD = '/Users/james/MobileProximateSpeech/Analysis'
 DATE_TIME = date_time()
-FOLDER = '%sSVM ear0 whole' % DATE_TIME # todo
+FOLDER = '%s1 channel from wav males SVM' % DATE_TIME # todo
 VAL_ORD = 0
 TOT_VAL = 0
 bad_testers = []
@@ -140,18 +140,18 @@ def leave_one_out(wkdirs, testdir):
 	print('Training and validating on %s' % wkdirs)
 	print('Testing on %s' % testdir)
 	print()
-	wkdirs = [os.path.join(wkdir, 'trimmed') for wkdir in wkdirs]
+	wkdirs = [os.path.join(wkdir, 'trimmed2channel') for wkdir in wkdirs]
 	tester_name = testdir
-	testdir = os.path.join(testdir, 'trimmed')
+	testdir = os.path.join(testdir, 'trimmed2channel')
 
 	# load ######################################################
 	# todo can use load from chunks
 	print('=== Data ===')
 	dataset = DataPack()
-	dataset.from_wav_dir(wkdirs, cache=True, reload=False)
+	dataset.from_wav_dir(wkdirs, cache=True, reload=False, mono=True)
 
 	test = DataPack()
-	test.from_wav_dir(testdir, cache=True, reload=False)
+	test.from_wav_dir(testdir, cache=True, reload=False, mono=True)
 	print('data loaded.')
 
 	# print('dataset shape:')
@@ -169,39 +169,35 @@ def leave_one_out(wkdirs, testdir):
 	test.to_flatten()
 
 	print('after flatten:\n')
-	print('dataset shape:')
-	dataset.show_shape()
-	print()
-	print('test  shape:')
-	test.show_shape()
-	print()
+	print('dataset info:')
+	dataset.show_info()
+	print('test info:')
+	test.show_info()
 
 	# PCA ######################################################
 	# todo adjustable
-	# pca_reduction(dataset, test, n_components=20)
-	# print('\napplied transform on train, dev & test.')
+	pca_reduction(dataset, test, n_components=20)
+	print('\napplied transform on train, dev & test.')
 	train, val = dataset.train_test_split(test_size=0.1)
 	print('train shape:')
 	train.show_shape()
-	print()
-	print('dev shape:')
+	print('\ndev shape:')
 	val.show_shape()
-	print()
-	print('test  shape:')
+	print('\ntest  shape:')
 	test.show_shape()
 	print()
 
 	# visualize ######################################################
 	# todo whether to enable distribution visualization
-	# output_path1 = os.path.join(CWD, 'output/%s/val-%d/Distribution of train & dev.png' % (FOLDER, VAL_ORD))
-	# output_path2 = os.path.join(CWD, 'output/%s/val-%d/Distribution of test.png' % (FOLDER, VAL_ORD))
-	# dataset.visualize_distribution(title='train & dev', out_path=output_path1)
-	# test.visualize_distribution(title='test', out_path=output_path2)
+	output_path1 = os.path.join(CWD, 'output/%s/val-%d/Distribution of train & dev.png' % (FOLDER, VAL_ORD))
+	output_path2 = os.path.join(CWD, 'output/%s/val-%d/Distribution of test.png' % (FOLDER, VAL_ORD))
+	dataset.visualize_distribution(title='train & dev', out_path=output_path1)
+	test.visualize_distribution(title='test', out_path=output_path2)
 
 	# classifier ######################################################
 	# todo adjustable
 	print('=== train & dev ===')
-	clf = MySVC(kernel='rbf', gamma=0.003, C=1.0, class_weight='balanced', probability=True,
+	clf = MySVC(kernel='rbf', gamma=1e-5, C=1.0, class_weight='balanced', probability=True,
 				verbose=False, cache_size=1000)
 	# clf = MyKNN(n_neighbors=8, weights='distance', algorithm='auto', leaf_size=30, n_jobs=-1)
 	print('\nclf config:\n%s\n' % clf)
@@ -239,11 +235,11 @@ if __name__ == '__main__':
 	os.mkdir('output/%s' % FOLDER)
 	os.mkdir('logs/%s' % FOLDER)
 	os.mkdir('voice/model_state/%s' % FOLDER)
-	os.chdir('Data/Study3/subjects')
+	os.chdir('Data/Study3/subjects copy')
 
 	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
-	# females = ['gfz', 'jwy', 'mq', 'wrl']
-	males = ['wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr'][:3]
+	females = ['gfz', 'jwy', 'mq', 'wrl']
+	males = ['wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr']
 	# subject_dirs = random.sample(females, k=1)
 	# subject_dirs += random.sample(males, k=3)
 	subject_dirs = males

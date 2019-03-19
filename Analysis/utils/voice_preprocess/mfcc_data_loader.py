@@ -3,6 +3,7 @@
 import os
 import os.path as path
 import time
+import random
 
 import numpy as np
 from tqdm import tqdm
@@ -91,20 +92,21 @@ class DataPack:
 			raise StopIteration
 
 	def show_shape(self):
-		print('  data: ', end='')
+		print('\t\tdata: ', end='')
 		show_shape(self.data)
-		print('  labels: ', end='')
+		print('\t\tlabels: ', end='')
 		show_shape(self.labels)
-		print('  names: ', end='')
+		print('\t\tnames: ', end='')
 		show_shape(self.names)
 
 	def show_info(self):
-		print('state:')
+		print('\tstate:')
 		for key in self.state:
 			print('  ', key)
-		print('n_channel =', self.n_channel)
-		print('shape:')
+		print('\tn_channel =', self.n_channel)
+		print('\tshape:')
 		self.show_shape()
+		print()
 
 	def shuffle_all(self, random_seed=None):
 		if random_seed is None: random_seed = time.time()
@@ -488,10 +490,12 @@ class DataPack:
 		self.state: has `subsample`, but no `group`
 		'''
 		from matplotlib import pyplot as plt
+		self._ungroup(extend_labels=True)
 		X0 = np.array(self.select_class(0).data)
 		n, p = None, None
 		if X0.ndim > 1: n = plt.scatter(X0[:, dim1], X0[:, dim2], s=1, c='blue')
 		X1 = np.array(self.select_class(1).data)
+		self._regroup(lessen_labels=True)
 		if X1.ndim > 1: p = plt.scatter(X1[:, dim1], X1[:, dim2], s=1, c='red')
 		name = 'Distribution of %s' % title
 		plt.title(name)
@@ -515,8 +519,6 @@ def _subsampling(ftr, offset, duration, window, stride):
 	:param stride: 每次采样的步长
 	:return: list of windows, shape like (n_window, n_mfcc, n_frame)
 	'''
-	if offset >= ftr.shape[-1]:
-		raise ValueError('subsampling offset %d is greater than length of ftr %d.' % (offset, len(ftr)))
 	units = []
 	high = min(offset + duration, ftr.shape[-1])
 	left = offset
@@ -561,27 +563,23 @@ if __name__ == '__main__':
 	import random
 
 	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects copy/')
-	# wkdirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	subjects.remove('zfs')
+	subjects.remove('wj')
+	subjects.remove('wwn')
 	# wkdirs = random.sample(wkdirs, k=4)
 	# wkdirs.remove('mq')
 	# wkdirs = ['mq', 'gfz', 'zfs']
-	# print(wkdirs)
-	# wkdirs = list(map(lambda x: os.path.join(x, 'trimmed'), wkdirs))
-	wkdirs = ['cjr/trimmed2channel/']
+	print(subjects)
+	subjects = list(map(lambda x: os.path.join(x, 'trimmed2channel'), subjects))
+
 	pack = DataPack()
-	pack.from_wav_dir(wkdirs, shuffle=False, cache=True, reload=False, mono=False)
+	pack.from_wav_dir(subjects, shuffle=False, cache=True, reload=False, mono=True)
 	pack.show_info()
 
-	print()
-
-	pack.apply_subsampling_grouping(shuffle=True)
+	pack.apply_subsampling_grouping()
 	pack.show_info()
-	print()
-	print(pack.labels[:5], '\n', pack.names[:5])
 
 	pack.to_flatten()
 	pack.show_info()
-	print()
-	print(pack.labels[:5], '\n', pack.names[:5])
 
-	pass
