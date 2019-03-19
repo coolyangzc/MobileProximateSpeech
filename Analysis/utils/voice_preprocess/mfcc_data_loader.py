@@ -2,7 +2,6 @@
 
 import os
 import os.path as path
-import random
 import time
 
 import numpy as np
@@ -526,8 +525,8 @@ if __name__ == '__main__':
 	# wkdirs.remove('mq')
 	# wkdirs = ['mq']#, 'gfz', 'zfs']
 	print(wkdirs)
-	wkdirs = list(map(lambda x: os.path.join(x, 'trimmed'), wkdirs))
-	# wkdirs = ['wzq/trimmed']
+	# wkdirs = list(map(lambda x: os.path.join(x, 'trimmed'), wkdirs))
+	wkdirs = ['wzq/trimmed']
 	pack = DataPack()
 	pack.from_chunks_dir(wkdirs, shuffle=True, cache=True, reload=False)
 	pack.show_shape()
