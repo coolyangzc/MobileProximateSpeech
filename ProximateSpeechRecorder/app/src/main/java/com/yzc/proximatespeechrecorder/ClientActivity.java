@@ -40,6 +40,8 @@ public class ClientActivity extends Activity implements SensorEventListener {
     private String TAG = "ClientActivity";
     private int sensorType[] = {
             Sensor.TYPE_ACCELEROMETER,
+            Sensor.TYPE_LINEAR_ACCELERATION,
+            Sensor.TYPE_GRAVITY,
             Sensor.TYPE_GYROSCOPE,
             Sensor.TYPE_PROXIMITY
     };
@@ -163,6 +165,12 @@ public class ClientActivity extends Activity implements SensorEventListener {
             case Sensor.TYPE_ACCELEROMETER:
                 msg = "ACCELEROMETER";
                 break;
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                msg = "LINEAR_ACCELERATION";
+                break;
+            case Sensor.TYPE_GRAVITY:
+                msg = "GRAVITY";
+                break;
             case Sensor.TYPE_GYROSCOPE:
                 msg = "GYROSCOPE";
                 break;
@@ -176,8 +184,6 @@ public class ClientActivity extends Activity implements SensorEventListener {
         msg += "#";
         Log.i("ClientTrue", msg);
         add(msg);
-
-
     }
 
     @Override

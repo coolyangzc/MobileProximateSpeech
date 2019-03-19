@@ -172,7 +172,7 @@ def calc_data(file_name, file_dir, out_dir):
 
 if __name__ == "__main__":
 	data_path = '../Data/Study1/'
-	feature_path = '../Data/feature/'
+	feature_path = '../Data/motion feature/'
 	user_list = os.listdir(data_path)
 	for u in user_list:
 		if u != "plh":

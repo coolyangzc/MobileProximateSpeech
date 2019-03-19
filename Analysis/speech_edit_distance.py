@@ -27,8 +27,6 @@ if __name__ == "__main__":
 	recog_path = '../Data/Voice Study Mono 16000Hz/recognition'
 	user_list = os.listdir(recog_path)
 	for u in user_list:
-		if u =='wzq' or u =='yzc':
-			continue
 		user_path = os.path.join(recog_path, u)
 		file_list = os.listdir(user_path)
 		for f in file_list:

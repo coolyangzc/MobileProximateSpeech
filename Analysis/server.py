@@ -4,10 +4,12 @@ from collections import deque
 from sklearn.externals import joblib
 from motion_feature import extract_sensor_feature
 from time import ctime
+
 HOST = '192.168.1.57'
 PORT = 8888
-res = 0
-last_time = 0
+res, last_time = 0, 0
+
+sensor_list = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE', 'PROXIMITY']
 
 
 def work_sensor(sensor_name, queue, start_time, end_time):
@@ -30,15 +32,11 @@ def work(data):
 	if len(data) == 0:
 		return
 	item = data.split(' ')
-	c = 0
-	if item[0] == 'ACCELEROMETER':
-		c = 0
-	elif item[0] == 'GYROSCOPE':
-		c = 1
-	elif item[0] == 'PROXIMITY':
-		c = 2
-	else:
-		return
+	c = -1
+	for i in range(len(sensor_list)):
+		if (sensor_list[i] == item[0]):
+			c = i
+			break
 	val = []
 	try:
 		for i in range(len(item) - 1):
@@ -56,18 +54,14 @@ def work(data):
 	last_time = t
 	feature = []
 	m = (s + t) / 2
-	feature.extend(work_sensor('ACCELEROMETER', q[0], s, m))
-	feature.extend(work_sensor('ACCELEROMETER', q[0], m, t))
-	feature.extend(work_sensor('GYROSCOPE', q[1], s, m))
-	feature.extend(work_sensor('GYROSCOPE', q[1], m, t))
-	feature.extend(work_sensor('PROXIMITY', q[2], s, m))
-	feature.extend(work_sensor('PROXIMITY', q[2], m, t))
-	# print('feature', feature)
+	for i in range(len(sensor_list)):
+		feature.extend(work_sensor(sensor_list[i], q[i], s, m))
+		feature.extend(work_sensor(sensor_list[i], q[i], m, t))
 	for f in feature:
 		if math.isnan(f) or math.isinf(f):
 			return
 	new_res = clf.predict([feature])[0]
-	print(feature)
+	print('feature', feature)
 	print(new_res)
 	global res
 	if new_res != res:
@@ -88,13 +82,11 @@ if __name__ == "__main__":
 	print('Socket is now listening')
 
 	q = []
-	for i in range(3):
+	for i in range(len(sensor_list)):
 		q.append(deque())
-	q[0].append([0 for i in range(3+1)])
-	q[1].append([0 for i in range(3+1)])
-	q[2].append([0 for i in range(3+1)])
+		q[i].append([0 for i in range(3+1)])
 
-	clf = joblib.load("my_model.m")
+	clf = joblib.load("motion_model.m")
 	buffer = ''
 	while True:
 		conn, addr = s.accept()
