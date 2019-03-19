@@ -9,34 +9,32 @@ from PIL import Image
 from tqdm import tqdm
 
 from utils import io
-from utils.tools import suffix_filter
+from utils.tools import suffix_filter, inverse_dict
 
-label_dict = {  # todo 分类字典, -1 表示舍弃这个特征的所有数据，0 表示负例
-	'大千世界': 0,
-	'易混淆': 0,
-	'耳旁打电话': 0,
-	'右耳打电话（不碰）': 0,
-	'右耳打电话（碰触）': 0,
-	'左耳打电话（不碰）': 0,
-	'左耳打电话（碰触）': 0,
-	'倒着拿手机': 0,
-	'自拍': 0,
-	'竖直对脸，碰触鼻子': 1,
-	'竖直对脸，不碰鼻子': 2,
-	'竖屏握持，上端遮嘴': 3,
-	'水平端起，倒话筒': -1,
-	'话筒': 4,
-	'横屏': 5,
+label_dict = {  # todo 分类字典, 0 表示舍弃这个特征的所有数据，- 表示负例
+	'大千世界': -1,
+	'易混淆': -2,
+	'耳旁打电话': -3,
+	'右耳打电话（不碰）': -4,
+	'右耳打电话（碰触）': -5,
+	'左耳打电话（不碰）': -6,
+	'左耳打电话（碰触）': -7,
+	'倒着拿手机': -8,
+	'自拍': -9,
+
+	'竖直对脸，碰触鼻子': +1,
+	'竖直对脸，不碰鼻子': +2,
+	'竖屏握持，上端遮嘴': +3,
+	'水平端起，倒话筒': +4,
+	'话筒': +5,
+	'横屏': +6,
 }
-doc_dict = [  # todo 每一类对应的描述
-	'负例',
-	'竖直对脸，碰触鼻子',
-	'竖直对脸，不碰鼻子',
-	'竖屏握持，上端遮嘴',
-	# '水平端起，倒话筒',
-	'话筒',
-	'横屏',
-]
+doc_dict = inverse_dict(label_dict)  # 每一类对应的描述
+try:
+	del doc_dict[0]
+except:
+	pass
+CLASSES = label_dict.values()
 N_CLASS = len(doc_dict)
 
 description_pattern = re.compile('(.*) Study2', re.U)
@@ -62,15 +60,15 @@ def get_description(folder):
 		line = f.readline()
 	mt = description_pattern.match(line)
 	try:
-		name = mt.group(1)
-		return name
+		desc = mt.group(1)
+		return desc
 	except AttributeError:
 		raise AttributeError('Unidentified description in: %s\n%s' % (os.path.abspath(txt_path), line))
 
 
 class ImagePack:
 	'''
-	Data structure for storing images, labels and descriptions
+	Data structure for storing images, labels and names
 	'''
 
 	def __init__(self, images=None, labels=None, names=None):
@@ -114,7 +112,7 @@ class ImagePack:
 	def select_class(self, selected_label):
 		'''
 		select all samples with label
-		:param selected_label: 0 or 1
+		:param selected_label: class label
 		:return: a sub DataPack
 		'''
 		images, labels, names = [], [], []
@@ -183,7 +181,7 @@ class ImagePack:
 			# get the description and label
 			# cwd: .../xxx/resized/
 			try:
-				name = get_description(folder)
+				desc = get_description(folder)
 			except FileNotFoundError as e:
 				mp4files = suffix_filter(os.listdir(folder), '.mp4')
 				if len(mp4files) > 0:
@@ -192,10 +190,10 @@ class ImagePack:
 					continue
 
 			try:
-				label = label_dict[name]
+				label = label_dict[desc]
 			except KeyError:
-				raise KeyError('Unidentified description %s in %s, %s' % (name, folder, subject_dir))
-			if label == -1: continue
+				raise KeyError('Unidentified description %s in %s, %s' % (desc, folder, subject_dir))
+			if label == 0: continue
 
 			# load .jpg images
 			os.chdir(folder)
@@ -216,9 +214,12 @@ class ImagePack:
 				images = io.load_from_file('cache.npimgs')
 
 			self.images += images
+			cnt = 0
 			for _ in images:
 				self.labels.append(label)
-				self.names.append(name)
+				name = folder + str(cnt)
+				self.names.append(name)  # keep track of image name
+				cnt += 1
 
 			os.chdir('..')
 
@@ -258,13 +259,13 @@ class ImagePack:
 		'''
 		old_path = os.getcwd()
 		os.chdir(data_dir)
-		for c in tqdm(range(N_CLASS)):
+		for c in tqdm(CLASSES):
 			os.chdir(str(c))
 			for file in suffix_filter(os.listdir('.'), suffix=format):
 				img = Image.open(file)
 				self.images.append(np.array(img))
 				self.labels.append(c)
-				self.names.append(doc_dict[c])
+				self.names.append(file.split('.')[0])
 			os.chdir('..')
 		if shuffle == True: self.shuffle_all(random_seed)
 		os.chdir(old_path)
@@ -300,10 +301,11 @@ class ImagePack:
 		:param overwrite: whether to cover subdirs which already exist
 		'''
 		print('saving to %s...' % dst_dir)
-		assert os.path.exists(dst_dir)
+		if not os.path.exists(dst_dir):
+			os.mkdir(dst_dir)
 		old_path = os.getcwd()
 		os.chdir(dst_dir)
-		for c in range(N_CLASS):
+		for c in CLASSES:
 			c = str(c)
 			if os.path.exists(c):
 				if overwrite == True:
@@ -312,13 +314,9 @@ class ImagePack:
 					raise FileExistsError('class directory %s already exists.' % c)
 			os.mkdir(c)
 
-		cnt = {}
-		for c in range(N_CLASS): cnt[c] = 0
-
-		for image, label in tqdm(zip(self.images, self.labels)):
+		for image, label, name in tqdm(zip(self.images, self.labels, self.names)):
 			img = Image.fromarray(image)
-			img.save(os.path.join(str(label), str(cnt[label]) + '.jpg'))
-			cnt[label] += 1
+			img.save(os.path.join(str(label), name + '.jpg'))
 
 		os.chdir(old_path)
 
@@ -379,8 +377,13 @@ def train_val_test_sorter(src_dir, dst_dir=None):
 
 if __name__ == '__main__':
 	# 以下将对 Study2 的所有图片进行归类，分为训练、开发、测试三堆，分别储存在 train, val, test 目录，注意测试集的正例是被 leave one out 得到的
-	CWD = '/Volumes/TOSHIBA EXT/Analysis/Data/Study2'
-	train_val_test_sorter(CWD)
+	# CWD = '/Volumes/TOSHIBA EXT/Analysis/Data/Study2'
+	# train_val_test_sorter(CWD)
+	cwd = '/Users/james/MobileProximateSpeech/Analysis/Data/Study2/subjects'
+	os.chdir(cwd)
+	imgpack = ImagePack()
+	imgpack.from_subject('cjr')
+	imgpack.save_to_dir('../classes', overwrite=True)
 # pack = ImagePack()
 # os.chdir('subjects')
 # subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))

@@ -32,3 +32,14 @@ def suffix_filter(files, suffix):
 	return list of files with given suffix
 	'''
 	return list(filter(lambda x: x.endswith(suffix), files))
+
+
+def inverse_dict(d: dict) -> dict:
+	return dict(zip(d.values(), d.keys()))
+
+
+if __name__ == '__main__':
+	a = {'a':-1, 'b':0, 'c':2, 'd':0}
+	b = inverse_dict(a)
+	del b[0]
+	print(b, '\n', len(b))
