@@ -7,7 +7,7 @@ from collections import Counter
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
-from configs.subsampling_config import subsampling_config
+from configs.subsampling_config import subsampling_config_1_channel
 from utils.io import *
 from utils.logger import DualLogger
 from utils.tools import date_time
@@ -148,10 +148,10 @@ def leave_one_out(wkdirs, testdir):
 	# todo can use load from chunks
 	print('=== Data ===')
 	dataset = DataPack()
-	dataset.from_chunks_dir(wkdirs, cache=True, reload=False)
+	dataset.from_wav_dir(wkdirs, cache=True, reload=False)
 
 	test = DataPack()
-	test.from_chunks_dir(testdir, cache=True, reload=False)
+	test.from_wav_dir(testdir, cache=True, reload=False)
 	print('data loaded.')
 
 	# print('dataset shape:')
@@ -241,13 +241,12 @@ if __name__ == '__main__':
 	os.mkdir('voice/model_state/%s' % FOLDER)
 	os.chdir('Data/Study3/subjects')
 
-	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
-	females = ['lgh', 'gfz', 'jwy', 'mq', 'wrl']
-	males = ['wwn', 'wj', 'wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr', 'zfs']
+	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
+	# females = ['gfz', 'jwy', 'mq', 'wrl']
+	males = ['wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr'][:3]
 	# subject_dirs = random.sample(females, k=1)
 	# subject_dirs += random.sample(males, k=3)
-	# subject_dirs = ['xy', 'gyz', 'cjr', 'zfs']
-	# subject_dirs = males
+	subject_dirs = males
 	print('subjects: ', subject_dirs)
 	TOT_VAL = len(subject_dirs)
 
@@ -276,8 +275,8 @@ if __name__ == '__main__':
 	print()
 
 	print('subsampling config:')
-	for item in subsampling_config:
-		print(item, ':', subsampling_config[item])
+	for item in subsampling_config_1_channel:
+		print(item, ':', subsampling_config_1_channel[item])
 	print()
 
 	elapse = int(time.time() - since)

@@ -23,16 +23,6 @@ def re_encode(src_path, dst_path=None, sample_rate=32000, mono=False, suffix=Tru
 	:param suffix: whether to have -1 or -2 as suffix to imply the n_channel
 	:return: `dst_path`
 	'''
-	if dst_path is None:
-		dir = os.path.dirname(os.path.abspath(src_path))
-		name = os.path.basename(src_path)
-		if suffix == True:
-			name = name.split('.')[0]
-			name += '-' + ('1' if mono == True else str(n_channel)) + '.wav'
-		else:
-			name = suffix_conv(name, '.wav')
-		dst_path = os.path.join(dir, name)
-
 	try:
 		y, sr = librosa.load(src_path, sr=sample_rate, mono=mono)
 	except:
@@ -46,6 +36,16 @@ def re_encode(src_path, dst_path=None, sample_rate=32000, mono=False, suffix=Tru
 		y = np.rollaxis(y, 0, 2)
 	else:
 		raise AttributeError('ndim error in %s' % src_path)
+
+	if dst_path is None:
+		dir = os.path.dirname(os.path.abspath(src_path))
+		name = os.path.basename(src_path)
+		if suffix == True:
+			name = name.split('.')[0]
+			name += '-' + ('1' if mono == True else str(n_channel)) + '.wav'
+		else:
+			name = suffix_conv(name, '.wav')
+		dst_path = os.path.join(dir, name)
 
 	librosa.output.write_wav(dst_path, y, sr)
 	y = np.asarray(y * 32768.0, dtype=np.int16)  # convert the wave data to 16-bit PCM format
@@ -110,11 +110,15 @@ class ReEncodeThread(threading.Thread):
 
 
 if __name__ == '__main__':
-	from utils.voice_preprocess.VAD import get_voice_chunks
+	# from utils.voice_preprocess.VAD import get_voice_chunks
 
-	cwd = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/test/downsampling/'
+	cwd = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/problem'
 	os.chdir(cwd)
-	re_encode_in_dir('original/', out_dir='wav2channel/', sample_rate=32000, mono=False, suffix=False, n_jobs=3)
+	for subject in ['wj', 'wwn', 'zfs']:
+		os.chdir(subject)
+		re_encode_in_dir('trimmed1channel/', out_dir='trimmed1channel(16000)/', audio_format='wav', sample_rate=16000, mono=True, suffix=False, n_jobs=3)
+
+		os.chdir('..')
 # re_encode_in_dir('original/', sample_rate=16000, mono=True, suffix=False, n_jobs=4)
 # dst = re_encode(path, sample_rate=32000, mono=True, suffix=False)
 # get_voice_chunks(dst, aggressiveness=3)

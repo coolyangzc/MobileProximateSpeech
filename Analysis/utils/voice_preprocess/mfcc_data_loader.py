@@ -5,10 +5,9 @@ import os.path as path
 import time
 
 import numpy as np
-from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-from configs.subsampling_config import subsampling_config
+from configs.subsampling_config import subsampling_config_1_channel, subsampling_config_2_channel
 from utils import io
 from utils.tools import suffix_conv
 from utils.voice_preprocess import mfcc
@@ -68,11 +67,12 @@ class DataPack:
 	mfcc data pack class
 	'''
 
-	def __init__(self, data=None, labels=None, names=None, state=None):
+	def __init__(self, data=None, labels=None, names=None, state=None, n_channel=None):
 		self.data = [] if data is None else data  # list of samples
 		self.labels = [] if labels is None else labels  # list of numbers
 		self.names = [] if names is None else names  # list of str
 		self.state = set() if state is None else state
+		self.n_channel = n_channel
 
 	def __iter__(self):
 		self.n_var = 0
@@ -91,12 +91,20 @@ class DataPack:
 			raise StopIteration
 
 	def show_shape(self):
-		print('data: ', end='')
+		print('  data: ', end='')
 		show_shape(self.data)
-		print('labels: ', end='')
+		print('  labels: ', end='')
 		show_shape(self.labels)
-		print('names: ', end='')
+		print('  names: ', end='')
 		show_shape(self.names)
+
+	def show_info(self):
+		print('state:')
+		for key in self.state:
+			print('  ', key)
+		print('n_channel =', self.n_channel)
+		print('shape:')
+		self.show_shape()
 
 	def shuffle_all(self, random_seed=None):
 		if random_seed is None: random_seed = time.time()
@@ -120,7 +128,7 @@ class DataPack:
 				samples.append(sample)
 				labels.append(label)
 				gestures.append(gesture)
-		return DataPack(samples, labels, gestures, self.state)
+		return DataPack(samples, labels, gestures, self.state, self.n_channel)
 
 	def crop(self, size: int):
 		'''
@@ -136,11 +144,11 @@ class DataPack:
 		concatenate another DataPack
 		:param other:  DataPack
 		'''
-		return DataPack(self.data + other.data, self.labels + other.labels, self.names + other.names)
+		return DataPack(list(self.data) + list(other.data), self.labels + other.labels, self.names + other.names,
+						self.state, self.n_channel)
 
 	# loading method
-
-	def __from_wav_dir(self, wkdir, txtdir=None, cache=False, reload=False):
+	def __from_wav_dir(self, wkdir, txtdir=None, cache=False, reload=False, mono=True):
 		'''
 		dir -> ftr DataPack
 
@@ -150,6 +158,7 @@ class DataPack:
 		:param random_seed: random seed
 		:param cache: whether to store ftr data as cache to expedite future loading
 		:param reload: whether to reload from wav file to update mfcc data
+		:param mono: whether to load into mono channel
 		'''
 		old_path = os.getcwd()
 		os.chdir(wkdir)
@@ -172,7 +181,7 @@ class DataPack:
 			if label == -1:  # abandon this piece of data if label == -1
 				continue
 
-			ftr = io.load_from_file(file_name) if cached and not reload else mfcc.get_mfcc(file_name)
+			ftr = io.load_from_file(file_name) if cached and not reload else mfcc.get_mfcc(file_name, mono=mono)
 			if cache == True:
 				if not cached or reload: io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
 
@@ -186,7 +195,7 @@ class DataPack:
 		os.chdir(old_path)
 		self.data, self.labels, self.names = ftrs, labels, descriptions
 
-	def __from_chunks_dir(self, wkdir, txtdir=None, cache=False, reload=False):
+	def __from_chunks_dir(self, wkdir, txtdir=None, cache=False, reload=False, mono=True):
 		'''
 		dir -> ftr DataPack
 
@@ -196,6 +205,7 @@ class DataPack:
 		:param random_seed: random seed
 		:param cache: whether to store ftr data as cache to expedite future loading
 		:param reload: whether to reload from wav file to update mfcc data
+		:param mono: whether to load into mono channel
 		:return: DataPack of ftrs, labels, descriptions
 		'''
 		old_path = os.getcwd()
@@ -227,7 +237,7 @@ class DataPack:
 					ftr = io.load_from_file(file_name)
 				else:
 					file_name = chunk_dir + '.wav'
-					ftr = mfcc.get_mfcc(file_name)
+					ftr = mfcc.get_mfcc(file_name, mono=mono)
 					if cache == True: io.save_to_file(ftr, suffix_conv(file_name, '.ftr'))
 				ftrs.append(ftr)
 				labels.append(label)
@@ -235,7 +245,10 @@ class DataPack:
 			else:
 				for chunk in chunks:
 					chunk_path = path.join(chunk_dir, chunk)
-					ftr = io.load_from_file(chunk_path) if cached and not reload else mfcc.get_mfcc(chunk_path)
+					if cached and not reload:
+						ftr = io.load_from_file(chunk_path)
+					else:
+						ftr = mfcc.get_mfcc(chunk_path, mono=mono)
 					if cache == True:
 						if not cached or reload: io.save_to_file(ftr, suffix_conv(chunk_path, '.ftr'))
 						with open(path.join(chunk_dir, '.ftrexist.'), 'w'):
@@ -251,16 +264,16 @@ class DataPack:
 		self.data, self.labels, self.names = ftrs, labels, descriptions
 
 	def __load_sequential(self, one_step: callable, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False,
-						  reload=False):
+						  reload=False, mono=True):
 		if type(wkdir) == str:
-			one_step(wkdir, txtdir=txtdir, cache=cache, reload=reload)
+			one_step(wkdir, txtdir=txtdir, cache=cache, reload=reload, mono=mono)
 			if shuffle == True: self.shuffle_all(random_seed)
 		elif type(wkdir) == list:
 			if txtdir == None: txtdir = [None for _ in wkdir]
 
 			total = DataPack()
 			for wkdir_, txtdir_ in tqdm(zip(wkdir, txtdir)):
-				one_step(wkdir_, txtdir=txtdir_, cache=cache, reload=reload)
+				one_step(wkdir_, txtdir=txtdir_, cache=cache, reload=reload, mono=mono)
 				# concatenate
 				total += self
 
@@ -269,10 +282,21 @@ class DataPack:
 		else:
 			raise TypeError('type of wkdir which equals %s is neither str nor list.' % type(wkdir))
 
+		if mono == True:
+			self.n_channel = 1
+		else:
+			ftr = self.data[0]
+			ndim = np.ndim(ftr)
+			if ndim == 2:  # shape (n_mfcc, n_frame)
+				self.n_channel = 1
+			elif ndim == 3:  # shape (n_channel, n_mfcc, n_frame)
+				self.n_channel = np.shape(ftr)[0]
+			else:
+				raise AttributeError('ndim %d is not valid.' % ndim)
 		self.state.add('loaded')
 		return self
 
-	def from_wav_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False):
+	def from_wav_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False, mono=True):
 		''' entrance
 		dir or dirs -> ftr DataPack
 
@@ -280,11 +304,12 @@ class DataPack:
 		:param txtdir: str or list, .txt files directory, default: list of wkdir.parent.original
 		:param cache: whether to store ftr data as cache to expedite future loading
 		:param reload: whether to reload from wav file to update mfcc data
+		:param mono: whether to load into mono channel
 		:return: DataPack of ftrs, labels, descriptions
 		'''
-		return self.__load_sequential(self.__from_wav_dir, wkdir, txtdir, shuffle, random_seed, cache, reload)
+		return self.__load_sequential(self.__from_wav_dir, wkdir, txtdir, shuffle, random_seed, cache, reload, mono)
 
-	def from_chunks_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False):
+	def from_chunks_dir(self, wkdir, txtdir=None, shuffle=True, random_seed=None, cache=False, reload=False, mono=True):
 		'''
 		dir(s) -> ftr DataPack
 
@@ -292,32 +317,43 @@ class DataPack:
 		:param txtdir: str or list, .txt files directory, default: wkdir.parent.original
 		:param cache: whether to store ftr data as cache to expedite future loading
 		:param reload: whether to load from wav file to update mfcc data
+		:param mono: whether to load into mono channel
 		:return: DataPack of ftrs, labels, descriptions
 		'''
-		return self.__load_sequential(self.__from_chunks_dir, wkdir, txtdir, shuffle, random_seed, cache, reload)
+		return self.__load_sequential(self.__from_chunks_dir, wkdir, txtdir, shuffle, random_seed, cache, reload, mono)
 
 	# subsampling methods
 
-	def apply_subsampling(self,
-						  offset=subsampling_config['offset'],
-						  duration=subsampling_config['duration'],
-						  window=subsampling_config['window'],
-						  stride=subsampling_config['stride'],
-						  shuffle=True, random_seed=None):
+	def apply_subsampling(self, shuffle=True, random_seed=None):
 		'''
 		对 DataPack 施用采样，并保持labels，names长度平齐
 
-		:return: new DataPack after conversion
+		:return: new DataPack after conversion, (n_window, [n_channel,] n_mfcc, n_subframe)
 		'''
 		new_data = []
 		new_labels = []
 		new_names = []
-		for ftr, label, name in zip(self.data, self.labels, self.names):
-			new_elem = _subsampling(ftr, offset, duration, window, stride)
-			new_data += new_elem
-			extended = _extend_labels_names(new_elem, label, name)
-			new_labels += extended.labels
-			new_names += extended.names
+		if self.n_channel == 1:
+			config = subsampling_config_1_channel
+			for ftr, label, name in zip(self.data, self.labels, self.names):
+				windows = _subsampling(ftr, config['offset'], config['duration'], config['window'], config['stride'])
+				new_data += windows
+				extended = _extend_labels_names(windows, label, name)
+				new_labels += extended.labels
+				new_names += extended.names
+		else:  # multi channel
+			config = subsampling_config_2_channel
+			for ftr, label, name in zip(self.data, self.labels, self.names):
+				channels_windows = np.array([
+					_subsampling(ftr[channel], config['offset'], config['duration'], config['window'], config['stride'])
+					for channel in range(self.n_channel)])
+				# (n_channel, n_window, n_mfcc, n_subframe)
+				windows_channels = list(np.rollaxis(channels_windows, 0, 2))
+				# (n_window, n_channel, n_mfcc, n_subframe)
+				new_data += windows_channels
+				extended = _extend_labels_names(windows_channels, label, name)
+				new_labels += extended.labels
+				new_names += extended.names
 
 		self.data, self.labels, self.names = new_data, new_labels, new_names
 		if shuffle == True: self.shuffle_all(random_seed)
@@ -325,28 +361,40 @@ class DataPack:
 		self.state.add('subsample')
 		return self
 
-	def apply_subsampling_grouping(self,
-								   offset=subsampling_config['offset'],
-								   duration=subsampling_config['duration'],
-								   window=subsampling_config['window'],
-								   stride=subsampling_config['stride'],
-								   group_size=subsampling_config['group_size'],
-								   shuffle=True, random_seed=None):
+	def apply_subsampling_grouping(self, shuffle=True, random_seed=None):
 		'''
 		对 DataPack 施用子采样和重组，并保持labels，names长度平齐
 
-		:return: new DataPack after conversion
+		:return: new DataPack after conversion, (n_group, n_window, [n_channel,] n_mfcc, n_subframe)
 		'''
 		new_data = []
 		new_labels = []
 		new_names = []
-		for ftr, label, name in zip(self.data, self.labels, self.names):
-			units = _subsampling(ftr, offset, duration, window, stride)
-			groups = _grouping(units, group_size)
-			new_data += groups
-			extended = _extend_labels_names(groups, label, name)
-			new_labels += extended.labels
-			new_names += extended.names
+		if self.n_channel == 1:
+			config = subsampling_config_1_channel
+			for ftr, label, name in zip(self.data, self.labels, self.names):
+				windows = _subsampling(ftr, config['offset'], config['duration'], config['window'], config['stride'])
+				groups = _grouping(windows, config['group_size'])
+				# (n_group, n_window, n_mfcc, n_subframe)
+				new_data += groups
+				extended = _extend_labels_names(groups, label, name)
+				new_labels += extended.labels
+				new_names += extended.names
+		else:  # multichannel
+			config = subsampling_config_2_channel
+			for ftr, label, name in zip(self.data, self.labels, self.names):
+				channels_windows = np.array([
+					_subsampling(ftr[channel], config['offset'], config['duration'], config['window'], config['stride'])
+					for channel in range(self.n_channel)])
+				# (n_channel, n_window, n_mfcc, n_subframe)
+				windows_channels = list(np.rollaxis(channels_windows, 0, 2))
+				# (n_window, n_channel, n_mfcc, n_subframe)
+				groups = _grouping(windows_channels, config['group_size'])
+				# (n_group, n_window, n_channel, n_mfcc, n_subframe)
+				new_data += groups
+				extended = _extend_labels_names(groups, label, name)
+				new_labels += extended.labels
+				new_names += extended.names
 
 		self.data, self.labels, self.names = new_data, new_labels, new_names
 		if shuffle == True: self.shuffle_all(random_seed)
@@ -410,43 +458,36 @@ class DataPack:
 		else:
 			assert 0.0 <= test_size <= 1.0
 		cut = int(len(self.data) * test_size)
-		return DataPack(self.data[cut:], self.labels[cut:], self.names[cut:], self.state), \
-			   DataPack(self.data[:cut], self.labels[:cut], self.names[:cut], self.state)
+		return DataPack(self.data[cut:], self.labels[cut:], self.names[cut:], self.state, self.n_channel), \
+			   DataPack(self.data[:cut], self.labels[:cut], self.names[:cut], self.state, self.n_channel)
 
 	def to_flatten(self):
 		'''
-		压扁时间维度的数据
+		压扁时间、通道（如果有）维度的数据
 		'''
-		dim = np.ndim(self.data)
-		if dim == 3:
-			self.data = [sample.flatten() for sample in self.data]
-		elif dim == 4:
-			self.data = [[sample.flatten() for sample in batch] for batch in self.data]
+		if 'subsample' in self.state:
+			if 'group' in self.state:
+				# (n_group, n_window, [n_channel,] n_mfcc, n_subframe)
+				self.data = [[window.flatten() for window in group] for group in self.data]
+			else:
+				# (n_window, [n_channel,] n_mfcc, n_subframe)
+				self.data = [window.flatten() for window in self.data]
 		else:
-			raise ValueError('n_dim of data %d is not valid.' % dim)
+			raise AttributeError('You can\'t flatten it now, because subsampling is not applied yet.')
 
 		self.state.add('flatten')
 		return self
 
-	def roll_f_as_last(self):
-		'''
-		将频率维度后置
-		'''
-		dim = np.ndim(self.data)
-		if dim == 3:
-			self.data = np.rollaxis(np.array(self.data), 1, 3)
-		elif dim == 4:
-			self.data = np.rollaxis(np.array(self.data), 2, 4)
-		else:
-			raise ValueError('n_dim of data %d is not valid.' % dim)
-
-		self.state.add('f-last')
+	def roll_data_axis(self, axis, start):
+		self.data = list(np.rollaxis(np.array(self.data), axis, start))
 		return self
 
 	def visualize_distribution(self, dim1: int = 0, dim2: int = 1, title: str = '???', out_path=None):
 		'''
 		scatter the distribution of dataset projected on dim1 and dim2, with color of each class
+		self.state: has `subsample`, but no `group`
 		'''
+		from matplotlib import pyplot as plt
 		X0 = np.array(self.select_class(0).data)
 		n, p = None, None
 		if X0.ndim > 1: n = plt.scatter(X0[:, dim1], X0[:, dim2], s=1, c='blue')
@@ -472,7 +513,7 @@ def _subsampling(ftr, offset, duration, window, stride):
 	:param duration: 采样长度，毫秒
 	:param window: 采样单元长度
 	:param stride: 每次采样的步长
-	:return: list of units, shape like (n_unit, n_mfcc, n_frame)
+	:return: list of windows, shape like (n_window, n_mfcc, n_frame)
 	'''
 	if offset >= ftr.shape[-1]:
 		raise ValueError('subsampling offset %d is greater than length of ftr %d.' % (offset, len(ftr)))
@@ -492,9 +533,9 @@ def _grouping(units, group_size):
 	从单元列表得到组合列表，会忽略末尾凑不足group_size的单元
 	可以不用这种表示方法
 
-	:param units: list of units, shape like (n_unit, n_mfcc, n_frame)
+	:param units: list of units, shape like (n_unit, ...)
 	:param group_size: size of each group
-	:return: list of groups, shape like (n_group, n_mfcc, n_frame) where n_group = n_unit // group_size
+	:return: list of groups, shape like (n_group, n_unit, ...) where n_group = n_unit // group_size
 	'''
 	groups, group = [], []
 	for unit in units:
@@ -516,27 +557,31 @@ def _extend_labels_names(data, label, name):
 
 
 if __name__ == '__main__':
-	from configs.subsampling_config import subsampling_config
+	from configs.subsampling_config import subsampling_config_1_channel
 	import random
 
-	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects')
-	wkdirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
+	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects copy/')
+	# wkdirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
 	# wkdirs = random.sample(wkdirs, k=4)
 	# wkdirs.remove('mq')
-	# wkdirs = ['mq']#, 'gfz', 'zfs']
-	print(wkdirs)
+	# wkdirs = ['mq', 'gfz', 'zfs']
+	# print(wkdirs)
 	# wkdirs = list(map(lambda x: os.path.join(x, 'trimmed'), wkdirs))
-	wkdirs = ['wzq/trimmed']
+	wkdirs = ['cjr/trimmed2channel/']
 	pack = DataPack()
-	pack.from_chunks_dir(wkdirs, shuffle=True, cache=True, reload=False)
-	pack.show_shape()
+	pack.from_wav_dir(wkdirs, shuffle=False, cache=True, reload=False, mono=False)
+	pack.show_info()
 
 	print()
-	print(np.shape(pack.data[0]))
-	print()
 
-	pack.apply_subsampling(shuffle=True)
-	print('aftrer subsampling')
-	print(pack.labels[:5], pack.names[:5])
-	pack.show_shape()
+	pack.apply_subsampling_grouping(shuffle=True)
+	pack.show_info()
+	print()
+	print(pack.labels[:5], '\n', pack.names[:5])
+
+	pack.to_flatten()
+	pack.show_info()
+	print()
+	print(pack.labels[:5], '\n', pack.names[:5])
+
 	pass
