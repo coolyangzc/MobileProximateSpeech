@@ -107,8 +107,8 @@ def leave_one_out_validation():
 		print(X_train.shape, y_train.shape)
 		# clf = AdaBoostClassifier()
 		# bigger gamma -> higher fit acc
-		clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
-		# clf = neighbors.KNeighborsClassifier()
+		# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
+		clf = neighbors.KNeighborsClassifier()
 		# clf = tree.DecisionTreeClassifier(max_depth=10)
 		clf.fit(X_train, y_train)
 		train_acc = clf.score(X_train, y_train)
