@@ -80,8 +80,8 @@ def generate_model():
 		y_all.extend(y[i])
 	X_all, y_all = np.array(X_all), np.array(y_all)
 	print(X_all.shape, y_all.shape)
-	clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1})
-	# clf = tree.DecisionTreeClassifier(max_depth=5)
+	# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1})
+	clf = tree.DecisionTreeClassifier(max_depth=20)
 	clf.fit(X_all, y_all)
 	print(clf.score(X_all, y_all))
 
@@ -93,8 +93,7 @@ def leave_one_out_validation():
 
 	for loo in range(len(X)):
 		print(loo)
-		X_train = []
-		y_train = []
+		X_train, y_train = [], []
 		for i in range(len(X)):
 			if i != loo:
 				X_train.extend(X[i])
@@ -104,9 +103,9 @@ def leave_one_out_validation():
 		y_train, y_test = np.array(y_train), np.array(y_test)
 		print(X_train.shape, y_train.shape)
 		# clf = AdaBoostClassifier()
-		clf = svm.SVC(kernel='rbf', gamma=1e-4, class_weight={0: 1, 1: 1}, probability=True)
+		clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
 		# clf = neighbors.KNeighborsClassifier()
-		# clf = tree.DecisionTreeClassifier(max_depth=5)
+		# clf = tree.DecisionTreeClassifier(max_depth=10)
 		clf.fit(X_train, y_train)
 		train_acc = clf.score(X_train, y_train)
 		test_acc = clf.score(X_test, y_test)
@@ -118,10 +117,8 @@ def leave_one_out_validation():
 		for i in range(len(res)):
 			t = task[loo][i]
 			if t not in total:
-				total[t] = 0
-				total_vote[t] = 0
-				correct[t] = 0
-				correct_vote[t] = 0
+				total[t], total_vote[t] = 0, 0
+				correct[t], correct_vote[t] = 0, 0
 			total[t] += 1
 			if res[i] == y[loo][i]:
 				same.append(1)
@@ -172,9 +169,9 @@ def leave_one_out_validation():
 	print('Mean')
 	print(mean_train_acc / len(X))
 	print(mean_test_acc / len(X))
-
 	for t in correct:
 		print(t.ljust(24 - len(t)), correct[t], '/', total[t], correct[t] / total[t])
+
 	print('Vote')
 	mean_vote_acc = 0
 	for t in correct_vote:

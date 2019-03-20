@@ -5,11 +5,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴',
-			'水平端起，倒话筒', '话筒', '横屏']
-
 fft_size = 512
 sample_rate = 32000
+
+positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴',
+			'水平端起，倒话筒', '话筒', '横屏']
+all_pos = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴',
+			'水平端起，倒话筒', '话筒', '横屏',
+		   '手上正面', '手上反面', '桌上正面', '桌上反面',
+		   '耳旁打电话', '裤兜']
+
+
 freqs = np.linspace(0, sample_rate / 2, fft_size / 2 + 1)
 freq_tot = np.zeros((4, len(freqs)))
 count = np.zeros(4)
@@ -84,18 +90,17 @@ def calc_wav_stereo(file_path, type, output):
 
 	for i in range(numframes):
 		val = wavefile.readframes(1)
-		left = val[0:2]
-		right = val[2:4]
+		left, right = val[0:2], val[2:4]
 		y[i] = struct.unpack('h', left)[0]
 		z[i] = struct.unpack('h', right)[0]
 	s = 0
 	sum_l, sum_r = np.zeros(len(freqs)), np.zeros(len(freqs))
 	cnt = 0
-	# Trim here
-	while s + fft_size < len(y) - sample_rate * 0.5:
+
+	while s + fft_size < len(y):
 		xfp_l = get_xfp(y[s:s + fft_size])
 		xfp_r = get_xfp(z[s:s + fft_size])
-
+		s += fft_size
 		if output != 0:
 			cnt += 1
 			sum_l += xfp_l
@@ -108,15 +113,15 @@ def calc_wav_stereo(file_path, type, output):
 				cnt = 0
 				sum_l, sum_r = np.zeros(len(freqs)), np.zeros(len(freqs))
 		else:
-			#for i in range(len(freqs)):
-				# freq_tot[type+1][i] += xfp[i]
+			for i in range(len(freqs)):
+				freq_tot[type][i] += xfp_l[i]
+				freq_tot[type+1][i] += xfp_r[i]
+			count[type] += 1
 			count[type+1] += 1
-		s += fft_size
 
 
-def visualization_stereo():
+def visualization_stereo(path):
 	global freq_tot, count
-	path = '../Data/Voice Study Mono 32000Hz/'
 	for u in user_list:
 		user_path = os.path.join(path, u)
 		file_list = os.listdir(user_path)
@@ -143,6 +148,42 @@ def visualization_stereo():
 		plt.show()
 		freq_tot = np.zeros((4, len(freqs)))
 		count = np.zeros(4)
+
+
+def visualization_stereo_by_task(path):
+	global freq_tot, count
+	out_path = '../Data/voice visualization'
+	for u in user_list:
+		freq_tot = np.zeros((len(all_pos) * 2, len(freqs)))
+		count = np.zeros(len(all_pos) * 2)
+		user_path = os.path.join(path, u)
+		file_list = os.listdir(user_path)
+		for f in file_list:
+			if f[-4:] != '.txt':
+				continue
+			file = open(os.path.join(user_path, f), "r", encoding='utf-8')
+			lines = file.readlines()
+			task_pos = lines[1].strip()
+			for i in range(len(all_pos)):
+				if (task_pos == all_pos[i]):
+					type = i
+					break
+			type *= 2
+			wav_file = os.path.join(user_path, f[:-4] + '.wav')
+			calc_wav_stereo(wav_file, type, 0)
+		for t in range(len(freq_tot)):
+			for i in range(len(freqs)):
+				freq_tot[t][i] /= count[t]
+		for i in range(len(all_pos)):
+			plt.plot(freqs, freq_tot[i*2], label='down')
+			plt.plot(freqs, freq_tot[i*2+1], label='up')
+			pic_name = u + ' ' + all_pos[i]
+			plt.title(pic_name, fontproperties='SimHei')
+			plt.legend()
+			plt.savefig(os.path.join(out_path, pic_name + '.png'), format='png')
+			plt.show()
+
+
 
 
 def visualization():
@@ -224,8 +265,6 @@ def output_freqs(feature_path):
 
 def output_freqs(feature_path):
 	for u in user_list:
-		if u != 'yzc':
-			continue
 		if u in ['wwn', 'wj', 'zfs']:
 			continue
 		user_path = os.path.join(path, u)
@@ -244,15 +283,17 @@ def output_freqs(feature_path):
 				output.write(lines[1])
 				output.write(lines[2])
 				output.write(str(len(freqs) * 2) + '\n')
-				print(f)
+				print(u, f)
 				calc_wav_stereo(os.path.join(user_path, f), 0, output)
 
 
 if __name__ == "__main__":
-	path = '../Data/Voice Study Stereo 32000Hz/'
+	path = '../Data/Trimmed Stereo 32000Hz/'
 	user_list = os.listdir(path)
-	output_freqs('../Data/voice feature/')
+	visualization_stereo_by_task(path)
+	# visualization_stereo(path)
+	# output_freqs('../Data/voice feature/')
 	# visualization()
-	# visualization_mono()
+
 
 
