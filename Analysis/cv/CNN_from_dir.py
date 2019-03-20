@@ -6,7 +6,7 @@ from keras import layers, optimizers, utils, preprocessing
 
 from cv.funcs import *
 from utils import io
-from utils.cv_preprocess.img_loader import N_CLASS
+from configs.cv_config import CLASSES
 from utils.logger import DualLogger
 from utils.tools import date_time
 
@@ -15,7 +15,7 @@ from utils.tools import date_time
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'  # todo this is important on mac
 
 DATETIME = date_time() + 'PN '
-SEED = 120
+SEED = 100
 
 
 def build_model():
