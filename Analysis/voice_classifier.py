@@ -28,7 +28,7 @@ def read_file(path, file_name, id):
 	y_type = 0
 	if task_description in positive:
 		y_type = 1
-	if task_description == '耳旁打电话':
+	if task_description in ['耳旁打电话', '裤兜']:
 		return
 	sp = 3
 	while sp + feature_num <= len(lines):
@@ -49,6 +49,8 @@ def read_features(feature_path):
 	for u in user_list:
 		if u[-4:] == '.txt':
 			continue
+		# if u not in ['yzc', 'gyz']:
+			# continue
 		print('Reading', u)
 		p = os.path.join(feature_path, u)
 		files = os.listdir(p)
@@ -103,9 +105,10 @@ def leave_one_out_validation():
 		y_train, y_test = np.array(y_train), np.array(y_test)
 		print(X_train.shape, y_train.shape)
 		# clf = AdaBoostClassifier()
-		clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
+		# bigger gamma -> higher fit acc
+		clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: 1, 1: 1}, probability=True)
 		# clf = neighbors.KNeighborsClassifier()
-		# clf = tree.DecisionTreeClassifier(max_depth=10)
+		# clf = tree.DecisionTreeClassifier(max_depth=20)
 		clf.fit(X_train, y_train)
 		train_acc = clf.score(X_train, y_train)
 		test_acc = clf.score(X_test, y_test)
@@ -151,7 +154,7 @@ def leave_one_out_validation():
 		'''
 		# Proba Vote
 		res = clf.predict_proba(X[loo])
-		print(res)
+		# print(res)
 		for i in range(len(res)):
 			t = task[loo][i]
 			vote -= res[i][0]

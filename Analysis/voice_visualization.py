@@ -1,3 +1,4 @@
+import os
 import wave
 import numpy as np
 import matplotlib.pyplot as plt
@@ -134,10 +135,14 @@ def draw_time_series(wav_file):
 		freq_tot[1][i] /= count
 
 	plt.xlabel('Frequency [Hz]')
-	plt.plot(freqs, freq_tot[0], label='up')
-	plt.plot(freqs, freq_tot[1], label='down')
+	plt.plot(freqs, freq_tot[0], label='down')
+	plt.plot(freqs, freq_tot[1], label='up')
 	plt.legend()
 	plt.show()
 
 
-draw_time_series('../Data/Trimmed Stereo 32000Hz/gyz/190305 11_22_12.wav')
+# draw_time_series('../Data/Trimmed Stereo 32000Hz/gyz/190305 11_22_12.wav')
+# draw_time_series('../Data/Trimmed Stereo 32000Hz/cjr/190305 18_47_10.wav')
+
+path = '../Data/Trimmed Stereo 32000Hz/'
+for u in os.path.
