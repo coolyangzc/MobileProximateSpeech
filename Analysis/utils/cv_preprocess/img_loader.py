@@ -12,6 +12,7 @@ from utils import io
 from utils.tools import suffix_filter
 from configs.cv_config import *
 
+
 def show_shape(iterable):
 	try:
 		print(np.array(iterable).shape)
@@ -342,11 +343,17 @@ class ImagePack:
 
 			mp4_path = trg_path + '.mp4'
 			if not os.path.exists(mp4_path):  # only copy once
-				shutil.copyfile(src_path + '.mp4', mp4_path)  # possible to raise FileNotFoundError
+				try:
+					shutil.copyfile(src_path + '.mp4', mp4_path)
+				except FileNotFoundError:
+					pass
 
 			txt_path = trg_path + '.txt'
 			if not os.path.exists(txt_path):  # only copy once
-				shutil.copyfile(src_path + '.txt', trg_path + '.txt')  # possible to raise FileNotFoundError
+				try:
+					shutil.copyfile(src_path + '.txt', trg_path + '.txt')
+				except FileNotFoundError:
+					pass
 
 	def sort_to_dir(self, dst_dir, mode: str = 'class', src_dir=None):
 		'''
@@ -427,14 +434,17 @@ def train_val_test_sorter(src_dir, dst_dir=None):
 
 
 if __name__ == '__main__':
-	# 以下将对 Study2 的所有图片进行归类，分为训练、开发、测试三堆，分别储存在 train, val, test 目录，注意测试集的正例是被 leave one out 得到的
-	# CWD = '/Volumes/TOSHIBA EXT/Analysis/Data/Study2'
-	# train_val_test_sorter(CWD)
-	cwd = '/Users/james/MobileProximateSpeech/Analysis/Data/Study2/subjects'
+	from utils.tools import dir_filter
+	cwd = '/Volumes/TOSHIBA EXT/FullData/Study2/negatives'
 	os.chdir(cwd)
+	subjects = dir_filter(os.listdir('.'))
 	imgpack = ImagePack()
-	imgpack.from_subject(['hsd', 'cjr'], cache=True)
-	imgpack.sort_to_dir(dst_dir='../classes', src_dir='.', mode='class subject')
+	print('loading...\n')
+	imgpack.from_subject(subjects, cache=True, shuffle=True, progressbar=True).crop(100)
+	print('\nloaded.')
+	imgpack.show_shape()
+	print('\nwriting files...')
+	imgpack.sort_to_dir(dst_dir='../classes - subjects', src_dir='.', mode='class subject')
 # pack = ImagePack()
 # os.chdir('subjects')
 # subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
