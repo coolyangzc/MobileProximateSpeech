@@ -1,4 +1,5 @@
 import time
+import os
 
 
 def date_time() -> str:
@@ -34,12 +35,16 @@ def suffix_filter(files, suffix):
 	return list(filter(lambda x: x.endswith(suffix), files))
 
 
+def dir_filter(files):
+	return list(filter(lambda x: os.path.isdir(x), files))
+
+
 def inverse_dict(d: dict) -> dict:
 	return dict(zip(d.values(), d.keys()))
 
 
 if __name__ == '__main__':
-	a = {'a':-1, 'b':0, 'c':2, 'd':0}
+	a = {'a': -1, 'b': 0, 'c': 2, 'd': 0}
 	b = inverse_dict(a)
 	del b[0]
 	print(b, '\n', len(b))
