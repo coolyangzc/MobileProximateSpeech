@@ -61,7 +61,13 @@ def calc_wav(file_path, type, output):
 			count[type] += 1
 
 
-def calc_wav_mono(file_path, type, output):
+def get_xfp(data):
+	xf = np.fft.rfft(data) / fft_size
+	xfp = 20 * np.log10(np.clip(np.abs(xf), 1e-20, 1e100))
+	return xfp
+
+
+def calc_wav_stereo(file_path, type, output):
 	try:
 		wavefile = wave.open(file_path, 'r')
 	except wave.Error:
@@ -83,47 +89,32 @@ def calc_wav_mono(file_path, type, output):
 		y[i] = struct.unpack('h', left)[0]
 		z[i] = struct.unpack('h', right)[0]
 	s = 0
-	sum = np.zeros(len(freqs))
+	sum_l, sum_r = np.zeros(len(freqs)), np.zeros(len(freqs))
 	cnt = 0
-	while s + fft_size < len(y):
-		data = y[s:s + fft_size]
-		xf = np.fft.rfft(data) / fft_size
-		xfp = 20 * np.log10(np.clip(np.abs(xf), 1e-20, 1e100))
-
-
-		if output != 0:
-			cnt += 1
-			sum += xfp
-			if cnt == 20:
-				for f in sum:
-					output.write(str(f / cnt) + '\n')
-				cnt = 0
-				sum = np.zeros(len(freqs))
-		else:
-			for i in range(len(freqs)):
-				freq_tot[type][i] += xfp[i]
-			count[type] += 1
-
-		data = z[s:s + fft_size]
-		xf = np.fft.rfft(data) / fft_size
-		xfp = 20 * np.log10(np.clip(np.abs(xf), 1e-20, 1e100))
+	# Trim here
+	while s + fft_size < len(y) - sample_rate * 0.5:
+		xfp_l = get_xfp(y[s:s + fft_size])
+		xfp_r = get_xfp(z[s:s + fft_size])
 
 		if output != 0:
 			cnt += 1
-			sum += xfp
+			sum_l += xfp_l
+			sum_r += xfp_r
 			if cnt == 20:
-				for f in sum:
+				for f in sum_l:
+					output.write(str(f / cnt) + '\n')
+				for f in sum_r:
 					output.write(str(f / cnt) + '\n')
 				cnt = 0
-				sum = np.zeros(len(freqs))
+				sum_l, sum_r = np.zeros(len(freqs)), np.zeros(len(freqs))
 		else:
-			for i in range(len(freqs)):
-				freq_tot[type+1][i] += xfp[i]
+			#for i in range(len(freqs)):
+				# freq_tot[type+1][i] += xfp[i]
 			count[type+1] += 1
 		s += fft_size
 
 
-def visualization_mono():
+def visualization_stereo():
 	global freq_tot, count
 	path = '../Data/Voice Study Mono 32000Hz/'
 	for u in user_list:
@@ -138,7 +129,7 @@ def visualization_mono():
 			if lines[1].strip() in positive:
 				type = 2
 			wav_file = os.path.join(user_path, f[:-4] + '.wav')
-			calc_wav_mono(wav_file, type, 0)
+			calc_wav_stereo(wav_file, type, 0)
 		for t in range(4):
 			for i in range(len(freqs)):
 				freq_tot[t][i] /= count[t]
@@ -196,8 +187,8 @@ def visualization():
 		count = np.zeros(4)
 
 
-def output_freqs():
-	feature_path = '../Data/voice feature/'
+'''
+def output_freqs(feature_path):
 	for u in user_list:
 		# if u != 'yzc':
 			# continue
@@ -228,13 +219,40 @@ def output_freqs():
 				if w[-4:] != '.wav':
 					continue
 				calc_wav(os.path.join(task_path, w), 0, output)
+'''
+
+
+def output_freqs(feature_path):
+	for u in user_list:
+		if u != 'yzc':
+			continue
+		if u in ['wwn', 'wj', 'zfs']:
+			continue
+		user_path = os.path.join(path, u)
+		file_list = os.listdir(user_path)
+		out_path = os.path.join(feature_path, u)
+		if not os.path.exists(out_path):
+			os.makedirs(out_path)
+		for f in file_list:
+			if f.endswith('.wav'):
+				description_file = os.path.join(user_path, f[:-4] + '.txt')
+				file = open(description_file, "r", encoding='utf-8')
+				lines = file.readlines()
+				task_id = lines[0].strip().replace("/", "_").replace(":", "_").replace(" ", "")
+				out_file = os.path.join(out_path, task_id + ".txt")
+				output = open(out_file, 'w', encoding='utf-8')
+				output.write(lines[1])
+				output.write(lines[2])
+				output.write(str(len(freqs) * 2) + '\n')
+				print(f)
+				calc_wav_stereo(os.path.join(user_path, f), 0, output)
 
 
 if __name__ == "__main__":
-	path = '../Data/voice/'
+	path = '../Data/Voice Study Stereo 32000Hz/'
 	user_list = os.listdir(path)
+	output_freqs('../Data/voice feature/')
 	# visualization()
-	output_freqs()
 	# visualization_mono()
 
 
