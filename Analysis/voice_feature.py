@@ -4,8 +4,8 @@ import struct
 import numpy as np
 
 sample_rate = 32000
-interval_size = 16000
-feature_num = 15
+interval_size = 6400
+feature_num = 24
 
 
 def calc_features(wav_file):
@@ -31,18 +31,27 @@ def calc_features(wav_file):
 
 	s = 0
 	while s + interval_size < numframes:
-		data = [[] for i in range(3)]
-
+		data = [[] for i in range(4)]
 		data[0] = abs(y[0][s:s + interval_size])
 		data[1] = abs(y[1][s:s + interval_size])
 		data[2] = data[0] - data[1]
+		a, b = 1, 1
+		for i in range(len(data[0])):
+			if data[0][i] > 0:
+				a = data[0][i]
+			if data[1][i] > 0:
+				b = data[1][i]
+			data[3].append(a / b)
 		feature = []
-		for i in range(3):
+		for i in range(4):
 			feature.append(np.min(data[i]))
 			feature.append(np.max(data[i]))
 			feature.append(np.median(data[i]))
 			feature.append(np.mean(data[i]))
 			feature.append(np.std(data[i], ddof=1))
+			q75, q25 = np.percentile(data[i], [75, 25])
+			IQR = q75 - q25
+			feature.append(IQR)
 		for f in feature:
 			output.write(str(f) + '\n')
 		s += interval_size
@@ -72,6 +81,3 @@ if __name__ == "__main__":
 				output.write(str(feature_num) + '\n')
 				for wav in os.listdir(chunk_path):
 					calc_features(os.path.join(chunk_path, wav))
-
-
-

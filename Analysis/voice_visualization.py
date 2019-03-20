@@ -9,6 +9,11 @@ from scipy import zeros
 
 import pylab
 
+all_pos = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴',
+			'水平端起，倒话筒', '话筒', '横屏',
+		   '手上正面', '手上反面', '桌上正面', '桌上反面',
+		   '耳旁打电话', '裤兜']
+
 
 '''
 sample_rate, samples = wavfile.read(path + '/yzc/filtered/190305 10_26_49.wav')
@@ -84,7 +89,7 @@ def get_xfp(data):
 	return xfp
 
 
-def draw_time_series(wav_file):
+def draw_time_series(wav_file, pic_name):
 	wavefile = wave.open(wav_file, 'r')
 	nchannels = wavefile.getnchannels()
 	sample_width = wavefile.getsampwidth()
@@ -112,13 +117,23 @@ def draw_time_series(wav_file):
 	plt.plot(times, y, label='down')
 	plt.plot(times, z, label='up')
 	plt.legend()
-	plt.show()
+	if pic_name != '':
+		plt.savefig(pic_name + '_down_up.png', format='png')
+		plt.close()
+	else:
+		plt.show()
 
 	plt.xlabel('Times [s]')
 	plt.plot(times, z, label='up')
 	plt.plot(times, y, label='down')
 	plt.legend()
-	plt.show()
+	if pic_name != '':
+		plt.savefig(pic_name + '_up_down.png', format='png')
+		plt.close()
+		return
+	else:
+		plt.show()
+
 
 	s, count = 0, 0
 	freq_tot = np.zeros((2, len(freqs)))
@@ -145,4 +160,24 @@ def draw_time_series(wav_file):
 # draw_time_series('../Data/Trimmed Stereo 32000Hz/cjr/190305 18_47_10.wav')
 
 path = '../Data/Trimmed Stereo 32000Hz/'
-for u in os.path.
+pic_path = '../Data/voice visualization'
+for pos in all_pos:
+	pos_path = os.path.join(pic_path, pos)
+	if not os.path.exists(pos_path):
+		os.makedirs(pos_path)
+
+for u in os.listdir(path):
+	user_path = os.path.join(path, u)
+	for f in os.listdir(user_path):
+		if f.endswith('.wav'):
+			wav_file = os.path.join(user_path, f)
+			description_file = os.path.join(user_path, f[:-4] + '.txt')
+			file = open(description_file, "r", encoding='utf-8')
+			lines = file.readlines()
+			pos = lines[1].strip()
+			out_path = os.path.join(pic_path, pos)
+			pic_name = u + ' ' + lines[2].strip() + lines[0].strip()[-1]
+			save_pic = os.path.join(out_path, pic_name)
+			print(wav_file, save_pic)
+			draw_time_series(wav_file, save_pic)
+

@@ -10,7 +10,8 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
 
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴',
-			'水平端起，倒话筒', '话筒', '横屏']
+			'水平端起，倒话筒', '话筒', '横屏',
+			'耳旁打电话']
 
 
 def read_file(path, file_name, id):
@@ -28,8 +29,10 @@ def read_file(path, file_name, id):
 	y_type = 0
 	if task_description in positive:
 		y_type = 1
-	if task_description in ['耳旁打电话', '裤兜']:
+	if task_description in ['裤兜']:
 		return
+	#if task_description in ['耳旁打电话', '裤兜']:
+		#return
 	sp = 3
 	while sp + feature_num <= len(lines):
 		feature = []
@@ -49,8 +52,6 @@ def read_features(feature_path):
 	for u in user_list:
 		if u[-4:] == '.txt':
 			continue
-		# if u not in ['yzc', 'gyz']:
-			# continue
 		print('Reading', u)
 		p = os.path.join(feature_path, u)
 		files = os.listdir(p)
@@ -106,9 +107,9 @@ def leave_one_out_validation():
 		print(X_train.shape, y_train.shape)
 		# clf = AdaBoostClassifier()
 		# bigger gamma -> higher fit acc
-		clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: 1, 1: 1}, probability=True)
+		# clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: 1, 1: 1}, probability=True)
 		# clf = neighbors.KNeighborsClassifier()
-		# clf = tree.DecisionTreeClassifier(max_depth=20)
+		clf = tree.DecisionTreeClassifier(max_depth=10)
 		clf.fit(X_train, y_train)
 		train_acc = clf.score(X_train, y_train)
 		test_acc = clf.score(X_test, y_test)
@@ -187,6 +188,6 @@ def leave_one_out_validation():
 if __name__ == "__main__":
 	X, y, task, task_from = [], [], [], []
 	read_features('../Data/voice feature/')
-	# data_normalization()
+	data_normalization()
 	# generate_model()
 	leave_one_out_validation()
