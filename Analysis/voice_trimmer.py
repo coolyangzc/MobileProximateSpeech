@@ -12,7 +12,18 @@ start_interval = {  # in millisecond
 	'桌上反面': 2100, '手上反面': 2100,
 	'裤兜': 6000,
 }
-start_response_time, end_response_time = 300, 300
+end_interval = {
+	'竖直对脸，碰触鼻子': 500, '竖直对脸，不碰鼻子': 500,
+	'竖屏握持，上端遮嘴': 500,	 '水平端起，倒话筒': 500,
+	'话筒': 500, '横屏': 500,
+	'耳旁打电话': 500, '桌上正面': 500,
+	'手上正面': 500,
+
+	'桌上反面': 1000, '手上反面': 1000,
+	'裤兜': 2000,
+}
+start_response_time = 300
+
 
 
 path = '../Data/Voice Study Stereo 32000Hz'
@@ -38,5 +49,5 @@ for u in user_list:
 				output.write(l)
 			print(os.path.join(user_path, f))
 			speech = AudioSegment.from_wav(os.path.join(user_path, f))
-			trimmed_speech = speech[start_interval[pos] + start_response_time:-end_response_time]
+			trimmed_speech = speech[start_interval[pos] + start_response_time:-end_interval[pos]]
 			trimmed_speech.export(os.path.join(out_path, f), format='wav')

@@ -10,9 +10,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
@@ -56,6 +59,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
     private CaptureRequest.Builder mCaptureBuilder;
     private CaptureRequest mCaptureRequest;
     private CameraCaptureSession mCaptureSession;
+    private float focusDistance = 0;
 
     private SensorManager mSensorManager;
     private TextView textView_sensor, textView_touch;
@@ -194,6 +198,8 @@ public class SensorActivity extends Activity implements SensorEventListener {
                 sb.append(String.format(Locale.US, " %.2f", Math.toDegrees(data)));
             sb.append("\n");
         }
+        sb.append("Focus");
+        sb.append(String.format(Locale.US, " %.2f", focusDistance));
         textView_sensor.setText(sb.toString());
 
         if (!isRecording)
@@ -423,7 +429,8 @@ public class SensorActivity extends Activity implements SensorEventListener {
             Surface recorderSurface = mMediaRecorder.getSurface();
             surfaces.add(recorderSurface);
             mCaptureBuilder.addTarget(recorderSurface);
-
+            mCaptureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+                    CaptureRequest.CONTROL_AF_MODE_AUTO);
 
             mCameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
                 @Override
@@ -431,7 +438,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
                     try {
                         mCaptureRequest = mCaptureBuilder.build();
                         mCaptureSession = session;
-                        mCaptureSession.setRepeatingRequest(mCaptureRequest, null, null);
+                        mCaptureSession.setRepeatingRequest(mCaptureRequest, mCaptureCallback, null);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -446,6 +453,16 @@ public class SensorActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         }
     }
+
+
+    private CameraCaptureSession.CaptureCallback mCaptureCallback
+            = new CameraCaptureSession.CaptureCallback() {
+        @Override
+        public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
+            super.onCaptureCompleted(session, request, result);
+            focusDistance = result.get(CaptureResult.LENS_FOCUS_DISTANCE);
+        }
+    };
 
     private void startMediaRecorder() {
         Log.d(TAG, "startMediaRecorder");
