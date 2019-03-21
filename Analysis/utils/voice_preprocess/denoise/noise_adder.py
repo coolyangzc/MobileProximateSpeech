@@ -29,9 +29,9 @@ def superpose_from_path(audio_path1, audio_path2, sr=16000, mode='mono', ratio=0
 	elif mode == 'stereo':
 		y1, sr = librosa.load(audio_path1, sr=sr, mono=False)
 		y2, sr = librosa.load(audio_path2, sr=sr, mono=True)
-		np.random.seed(time.time())
+		np.random.seed(int(time.time()))
 		y1[0] = superpose(y1[0], y2, ratio)
-		np.random.seed(time.time())
+		np.random.seed(int(time.time()))
 		y1[1] = superpose(y1[1], y2, ratio)
 	else:
 		raise ValueError('mode %s is invalid.' % mode)
