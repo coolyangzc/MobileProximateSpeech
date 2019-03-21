@@ -13,8 +13,7 @@ positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
             '竖屏握持，上端遮嘴',  # '水平端起，倒话筒',
             '话筒', '横屏',
 			'左耳打电话（不碰）', '右耳打电话（不碰）',
-			'左耳打电话（碰触）', '右耳打电话（碰触）'
-			]
+			'左耳打电话（碰触）', '右耳打电话（碰触）']
 negative = ['大千世界', '自拍']
 
 
@@ -94,8 +93,6 @@ def fit_model():
 			correct[t] += 1
 	for t in correct:
 		print(t.ljust(24 - len(t)), correct[t], '/', total[t], correct[t] / total[t])
-
-
 
 
 if __name__ == '__main__':

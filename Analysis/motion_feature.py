@@ -119,11 +119,15 @@ def extract_feature(start_time, end_time, data, output):
 	output.write(str(end_time) + "\n")
 	s, e = start_time, end_time
 	m = (s + e) / 2
-	sensor_list = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE', 'PROXIMITY']
 	feature = []
+	sensor_list = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE', 'PROXIMITY']
 	for sensor in sensor_list:
+		# f = extract_time_feature(data, sensor, s, e)
+
+		# 2s
 		f = extract_time_feature(data, sensor, s, m)
 		f.extend(extract_time_feature(data, sensor, m, e))
+
 		output.write(sensor + ' ' + str(len(f)) + ' ')
 		feature.extend(f)
 	output.write('\n')
@@ -154,6 +158,25 @@ def calc_data(file_name, file_dir, out_dir):
 	output.write(d.hand + '\n')
 
 	task = int(d.task_id.split("_")[0])
+
+	# 1s
+	if task < 32 or d.description == '接听':
+		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + ".wav"))
+		print(t)
+		if d.start_pos == '裤兜':
+			end = find_suitable_end(t, 4.0, 10.0)
+		else:
+			end = find_suitable_end(t, 1.0, 4.0)
+		extract_feature(end - 1.0, end, d, output)
+	else:
+		max_time = d.get_max_time() / 1000
+		start = 2.0
+		while start + 2.5 < max_time:
+			extract_feature(start, start + 1.0, d, output)
+			start += 2.0
+
+	'''
+	# 2s
 	if task < 32 or d.description == '接听':
 		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + ".wav"))
 		print(t)
@@ -168,6 +191,7 @@ def calc_data(file_name, file_dir, out_dir):
 		while start + 2.5 < max_time:
 			extract_feature(start, start + 2.0, d, output)
 			start += 2.0
+	'''
 
 
 if __name__ == "__main__":
@@ -175,8 +199,6 @@ if __name__ == "__main__":
 	feature_path = '../Data/motion feature/'
 	user_list = os.listdir(data_path)
 	for u in user_list:
-		if u != "plh":
-			continue
 		p = os.path.join(data_path, u)
 		out_dir = os.path.join(feature_path, u)
 		if not os.path.exists(out_dir):

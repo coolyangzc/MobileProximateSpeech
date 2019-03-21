@@ -49,7 +49,7 @@ def work(data):
 	while q[c][0][0] < s:
 		q[c].popleft()
 	global last_time
-	if c != 0 or t - 300 < last_time:
+	if c != 0 or t - 200 < last_time:
 		return
 	last_time = t
 	feature = []

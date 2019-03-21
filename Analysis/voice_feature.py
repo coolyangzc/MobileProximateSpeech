@@ -5,7 +5,7 @@ import numpy as np
 
 sample_rate = 32000
 interval_size = 6400
-feature_num = 24
+feature_num = 28
 
 
 def calc_features(wav_file):
@@ -52,6 +52,7 @@ def calc_features(wav_file):
 			q75, q25 = np.percentile(data[i], [75, 25])
 			IQR = q75 - q25
 			feature.append(IQR)
+			feature.append(np.mean(np.array(data[i]) ** 2))
 		for f in feature:
 			output.write(str(f) + '\n')
 		s += interval_size

@@ -23,10 +23,14 @@ class ExtractThread(threading.Thread):
 				shutil.rmtree(dst_path)
 			if not os.path.exists(dst_path):
 				os.makedirs(dst_path)
+			s, t = 0, 0
 			if self.task_list[i] == '接听':
-				extract_frames(mov_file, dst_path, start_time=0.5, minus_time=0.5)
+				s, t = 0.5, 1.2
+			elif self.task_list[i] == '裤兜':
+				s, t = 1.0, 2.0
 			else:
-				extract_frames(mov_file, dst_path, start_time=1.1, minus_time=1.2)
+				s, t = 1.1, 1.2
+			extract_frames(mov_file, dst_path, start_time=s, minus_time=t)
 
 
 def extract_frames(mov_file, dst_path, start_time=0., minus_time=0.):

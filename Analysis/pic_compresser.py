@@ -47,7 +47,8 @@ def batch_resize(subject, dst_size=(227, 227), src_folder='trimmed', overwrite=F
 	if os.path.exists(dst_dir):
 		if overwrite:
 			shutil.rmtree(dst_dir)
-			os.makedirs(dst_dir)
+	if not os.path.exists(dst_dir):
+		os.makedirs(dst_dir)
 	user_path = os.path.join(path, subject, src_folder)
 	folders = list(filter(lambda x: os.path.isdir(os.path.join(user_path, x)), os.listdir(user_path)))
 	print(folders)

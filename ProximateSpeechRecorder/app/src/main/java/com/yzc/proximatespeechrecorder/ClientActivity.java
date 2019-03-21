@@ -141,15 +141,17 @@ public class ClientActivity extends Activity implements SensorEventListener {
             Log.i("Client","新建套接字有效");
             in = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
-            // String outMsg = "TCP connecting to " + port + System.getProperty("line.separator");//发出的数据
-            // out.write(outMsg);//发送数据
+            /*
+            String outMsg = "TCP connecting to " + port + System.getProperty("line.separator");//发出的数据
+            out.write(outMsg);//发送数据
             Log.i("Client","发送数据有效");
-            // out.flush();
-            // Log.i("TcpClient", "sent: " + outMsg);
-            // String inMsg = in.readLine() + System.getProperty("line.separator");//服务器返回的数据
-            // Log.i("TcpClient", "received: " + inMsg);
-            // msg = inMsg;
-            // socketClient.close();
+            out.flush();
+            Log.i("TcpClient", "sent: " + outMsg);
+            String inMsg = in.readLine() + System.getProperty("line.separator");//服务器返回的数据
+            Log.i("TcpClient", "received: " + inMsg);
+            msg = inMsg;
+            socketClient.close();
+            */
         } catch (UnknownHostException e){e.printStackTrace();}
         catch (IOException e){e.printStackTrace();}
     }
