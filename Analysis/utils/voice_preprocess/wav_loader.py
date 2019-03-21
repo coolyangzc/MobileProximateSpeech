@@ -4,7 +4,7 @@ import librosa
 import numpy as np
 from tqdm import tqdm
 
-from utils.tools import suffix_filter, suffix_conv, dir_filter, reverse_dict
+from utils.tools import suffix_filter, dir_filter, reverse_dict
 from utils.voice_preprocess.data_loader import DataPack
 
 label_dict = {  # 正负例分类字典, 0 表示舍弃这个特征的所有数据
@@ -30,11 +30,11 @@ except KeyError:
 	pass
 
 
-def get_doc(txt_dir, txt_name):
-	with open(os.path.join(txt_dir, txt_name)) as f:
+def get_label(txt_path):
+	with open(txt_path) as f:
 		f.readline()
 		doc = f.readline().strip()
-	return doc
+	return label_dict[doc]
 
 
 class WavPack(DataPack):
@@ -59,25 +59,9 @@ class WavPack(DataPack):
 		'''
 		if txt_dir is None:
 			txt_dir = os.path.join(wav_dir, '../original/')
-		txt_dir = os.path.abspath(txt_dir)
-
-		owd = os.getcwd()
-		os.chdir(wav_dir)
-		audio_names = suffix_filter(os.listdir('.'), format)
-		for audio_name in tqdm(audio_names):
-			try:
-				label = label_dict[get_doc(txt_dir, suffix_conv(audio_name, '.txt'))]
-			except FileNotFoundError as e:
-				print(e)
-				continue
-			y, sr = librosa.load(audio_name, sr=self.sr, mono=self.mono)
-
-			self.data.append(y)
-			self.labels.append(label)
-			self.names.append(os.path.abspath(audio_name))
-
-		os.chdir(owd)
-		return self
+		return self.from_data_dir(wav_dir, txt_dir, format,
+								  data_getter=lambda path: librosa.load(path, sr=self.sr, mono=self.mono)[0],
+								  label_getter=get_label, desc='loading audios')
 
 	def from_chunks_dir(self, wav_dir, txt_dir=None, format='wav'):
 		'''
@@ -96,9 +80,10 @@ class WavPack(DataPack):
 		os.chdir(wav_dir)
 		chunk_folders = dir_filter(os.listdir('.'))
 
-		for chunk_folder in tqdm(chunk_folders):
+		for chunk_folder in tqdm(chunk_folders, desc='loading chunks', leave=False):
+			txt_path = os.path.join(txt_dir, chunk_folder + '.txt')
 			try:
-				label = label_dict[get_doc(txt_dir, chunk_folder + '.txt')]
+				label = get_label(txt_path)
 			except FileNotFoundError as e:
 				print(e)
 				continue
@@ -136,7 +121,9 @@ class WavPack(DataPack):
 		:return: self, data shape like (n_segment, [n_channel,] n_frame)
 		'''
 		data, labels, names = [], [], []
+		progress = tqdm(total=len(self.labels), desc='segmenting', leave=False)
 		for y, label, name in zip(self.data, self.labels, self.names):
+			progress.update()
 			for segment in segmenting(y, self.sr, **kwargs):
 				data.append(segment)
 				labels.append(label)
@@ -156,7 +143,7 @@ class WavPack(DataPack):
 		'''
 		features = []
 
-		for y in self.data:
+		for y in tqdm(self.data, desc='extracting', leave=False):
 			ndim = np.ndim(y)
 			if ndim == 1:
 				features.append(librosa_method(y=y, **kwargs))

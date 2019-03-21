@@ -1,6 +1,14 @@
-import numpy as np
+import os
 import random
+import re
 import time
+from collections import Counter
+
+import numpy as np
+from tqdm import tqdm
+
+from utils import io
+from utils.tools import suffix_conv, suffix_filter
 
 
 def show_shape(iterable):
@@ -79,7 +87,14 @@ class DataPack(object):
 		return self
 
 	def squeeze_data(self):
-		self.data = np.squeeze(self.data)
+		'''
+		squeeze data axis but 0
+		'''
+		for axis in range(1, np.ndim(self.data)):
+			try:
+				self.data = np.squeeze(self.data, axis=axis)
+			except:
+				pass
 		return self
 
 	def crop(self, size: int):
@@ -123,3 +138,60 @@ class DataPack(object):
 		cut = int(len(self.data) * test_size)
 		return DataPack(self.data[cut:], self.labels[cut:], self.names[cut:]), \
 			   DataPack(self.data[:cut], self.labels[:cut], self.names[:cut])
+
+	def from_data_dir(self, data_dir, txt_dir, format, data_getter: callable, label_getter: callable, desc='loading'):
+		'''
+		load from data directory, e.g. 'cjr/trimmed2channel/'
+
+		:param data_dir: directory including lots of data files
+		:param txt_dir: directory including lots of .txt
+		:param format: 'wav', 'mp4' and so on...
+		:return: self, data shape like (n_audio, [n_channel,] n_frame[i])
+		'''
+		txt_dir = os.path.abspath(txt_dir)
+		owd = os.getcwd()
+		os.chdir(data_dir)
+
+		file_names = suffix_filter(os.listdir('.'), format)
+		for file_name in tqdm(file_names, desc=desc, leave=False):
+			# get label
+			txt_path = os.path.join(txt_dir, suffix_conv(file_name, '.txt'))
+			try:
+				label = label_getter(txt_path)
+			except FileNotFoundError as e:
+				print(e)
+				continue
+			# get data
+			x = data_getter(file_name)
+			# store to self
+			self.data.append(x)
+			self.labels.append(label)
+			self.names.append(os.path.abspath(file_name))
+
+		os.chdir(owd)
+		return self
+
+	def auto_save(self, folder_name, suffix='.ftr'):
+		'''
+		auto save the data to their source directory's folder_name
+
+		:param folder_name: sub_dir in every subject, should be the basename of a folder
+		'''
+		source_pattern = re.compile('(.+Data/Study\d/[\w ]+/[\w ]+/)[\w ]+/(.+)', re.U)
+
+		name_counter = Counter()
+		progress = tqdm(total=len(self.labels), desc='saving', leave=False)
+		for x, path in zip(self.data, self.names):
+			progress.update()
+			mt = source_pattern.match(path)
+			source_dir = mt.group(1)
+			name = mt.group(2).replace('/', ' - ').split('.')[0]
+			dst_name = name + ' #%d' % name_counter[name] + suffix
+			name_counter.update([name])
+
+			dst_dir = os.path.join(source_dir, folder_name)
+			if not os.path.exists(dst_dir):
+				os.mkdir(dst_dir)
+
+			dst_path = os.path.join(dst_dir, dst_name)
+			io.save_to_file(x, dst_path)

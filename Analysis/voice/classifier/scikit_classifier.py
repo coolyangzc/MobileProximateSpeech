@@ -12,13 +12,13 @@ from utils.io import *
 from utils.logger import DualLogger
 from utils.tools import date_time
 from utils.voice_preprocess.mfcc_data_loader import MfccPack, label_dict
-from voice.SVM.MyCLF import MySVC
+from voice.classifier.MyCLF import MySVC
 
 # globals
 gestures = label_dict.keys()
 CWD = '/Users/james/MobileProximateSpeech/Analysis'
 DATE_TIME = date_time()
-FOLDER = '%sstereo chunks whole SVM' % DATE_TIME # todo
+FOLDER = '%sstereo chunks whole classifier' % DATE_TIME # todo
 VAL_ORD = 0
 TOT_VAL = 0
 bad_testers = []
