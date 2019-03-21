@@ -77,7 +77,10 @@ def heuristic_feature(arr):
 					EXY += arr[i][k] * arr[j][k]
 				EXY /= n
 				CovXY = EXY - np.mean(arr[i]) * np.mean(arr[j])
-				CorrXY = CovXY / (np.std(arr[i], ddof=1) * np.std(arr[j], ddof=1))
+				try:
+					CorrXY = CovXY / (np.std(arr[i], ddof=1) * np.std(arr[j], ddof=1))
+				except RuntimeWarning:
+					CorrXY = 0
 				if math.isnan(CorrXY) or math.isinf(CorrXY):
 					CorrXY = 0
 				feature.append(CorrXY)
@@ -159,6 +162,7 @@ def calc_data(file_name, file_dir, out_dir):
 
 	task = int(d.task_id.split("_")[0])
 
+	'''
 	# 1s
 	if task < 32 or d.description == '接听':
 		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + ".wav"))
@@ -191,7 +195,7 @@ def calc_data(file_name, file_dir, out_dir):
 		while start + 2.5 < max_time:
 			extract_feature(start, start + 2.0, d, output)
 			start += 2.0
-	'''
+
 
 
 if __name__ == "__main__":

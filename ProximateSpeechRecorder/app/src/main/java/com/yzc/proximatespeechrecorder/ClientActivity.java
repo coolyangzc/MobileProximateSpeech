@@ -11,6 +11,8 @@ import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -23,15 +25,18 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class ClientActivity extends Activity implements SensorEventListener {
 
-    private final int port = 8888;
-    private final String host = "192.168.1.57";
-    Socket socketClient;
+    private final String HOST = "192.168.1.102";
+    private final int PORT = 8888;
+    private final int AUDIOPORT = 8889;
+    Socket socketClient, audioSocket;
+    private OutputStream audioOutputStream;
 
     private TextView textView_recv;
     private Button button_connect, button_send;
@@ -48,10 +53,63 @@ public class ClientActivity extends Activity implements SensorEventListener {
 
     private String sent = "";
 
+    //AudioRecord
+    private final static int AUDIO_SAMPLE_RATE = 32000;
+    private final static int AUDIO_INPUT = MediaRecorder.AudioSource.MIC;
+    private final static int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_STEREO;
+    private final static int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+    private int bufferSizeInBytes = 0;
+    private AudioRecord mAudioRecord;
+
     //Camera2, for same SENSOR_DELAY_GAME
     private String mCameraIdFront;
     private CameraDevice mCameraDevice;
     private MediaRecorder mMediaRecorder;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_client);
+        initView();
+        loadSensor();
+        setupCamera();
+        openCamera(mCameraIdFront);
+        startAudioRecord();
+        Thread thread = new Thread() {
+            @Override
+            public void run() {sendClient();}
+        };
+        thread.start();
+    }
+
+    private void startAudioRecord() {
+        bufferSizeInBytes = AudioRecord.getMinBufferSize(AUDIO_SAMPLE_RATE,
+                CHANNEL_CONFIG, AUDIO_FORMAT);
+        mAudioRecord = new AudioRecord(AUDIO_INPUT, AUDIO_SAMPLE_RATE,
+                CHANNEL_CONFIG, AUDIO_FORMAT, bufferSizeInBytes);
+        mAudioRecord.startRecording();
+        new Thread(new AudioThread()).start();
+    }
+
+    class AudioThread implements Runnable {
+
+        @Override
+        public void run() {
+            int readSize = 0;
+            byte[] audioData = new byte[bufferSizeInBytes];
+            while (true) {
+                readSize = mAudioRecord.read(audioData, 0, bufferSizeInBytes);
+                if (AudioRecord.ERROR_INVALID_OPERATION != readSize && audioOutputStream != null) {
+                    try {
+                        audioOutputStream.write(audioData);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }
+    }
 
 
     private synchronized void send() {
@@ -68,21 +126,6 @@ public class ClientActivity extends Activity implements SensorEventListener {
 
     private synchronized void add(String msg) {
         sent += msg;
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_client);
-        initView();
-        loadSensor();
-        setupCamera();
-        openCamera(mCameraIdFront);
-        Thread thread = new Thread() {
-            @Override
-            public void run() {sendClient();}
-        };
-        thread.start();
     }
 
     private void loadSensor() {
@@ -137,10 +180,13 @@ public class ClientActivity extends Activity implements SensorEventListener {
     private void tcpClient(){
         try {
             Log.i("Client","新建套接字");
-            socketClient = new Socket(host, port);
+            socketClient = new Socket(HOST, PORT);
             Log.i("Client","新建套接字有效");
             in = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
+
+            audioSocket = new Socket(HOST, AUDIOPORT);
+            audioOutputStream = audioSocket.getOutputStream();
             /*
             String outMsg = "TCP connecting to " + port + System.getProperty("line.separator");//发出的数据
             out.write(outMsg);//发送数据

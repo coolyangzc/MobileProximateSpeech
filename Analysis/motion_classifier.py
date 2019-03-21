@@ -87,7 +87,7 @@ def generate_model():
 	for i in range(len(X)):
 		X_all.extend(X[i])
 		y_all.extend(y[i])
-	clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: 1, 1: 1})
+	clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: 1, 1: 1}, probability=True)
 	clf.fit(X_all, y_all)
 	joblib.dump(clf, "motion_model.m")
 	print(clf.score(X_all, y_all))
@@ -111,7 +111,7 @@ def leave_one_out_validation():
 		y_train, y_test = np.array(y_train), np.array(y_test)
 		print(X_train.shape, y_train.shape)
 		# clf = AdaBoostClassifier()
-		clf = svm.SVC(kernel='rbf', gamma=1e-4, class_weight={0: 1, 1: 1})
+		clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: 1, 1: 1})
 		# clf = tree.DecisionTreeClassifier(max_depth=5)
 		clf.fit(X_train, y_train)
 
@@ -150,6 +150,6 @@ if __name__ == "__main__":
 	X, y, task = [], [], []
 	read_features('../Data/motion feature/')
 	# data_normalization()
-	# generate_model()
-	leave_one_out_validation()
+	generate_model()
+	# leave_one_out_validation()
 
