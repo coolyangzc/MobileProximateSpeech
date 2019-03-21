@@ -63,14 +63,14 @@ for u in os.listdir(subject_path):
 			pic_file = os.path.join(pic_path, pic)
 			img = cv2.imdecode(np.fromfile(pic_file, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
 			# img = cv2.imread(pic_file, cv2.IMREAD_GRAYSCALE)
-			img = cv2.resize(img, (64, 64))
+			# img = cv2.resize(img, (64, 64))
 			[r, c] = img.shape
 			px_min, px_max = np.min(img), np.max(img)
 			feature = []
 			feature.extend(GLCM(img, 0, -1))
 			feature.extend(GLCM(img, -1, 0))
-			# feature.extend(GLCM(img, -1, -1))
-			# feature.extend(GLCM(img, 1, -1))
+			feature.extend(GLCM(img, -1, -1))
+			feature.extend(GLCM(img, 1, -1))
 			for f in feature:
 				output.write(str(f) + '\n')
 
