@@ -1,3 +1,4 @@
+import os
 import time
 
 
@@ -32,3 +33,11 @@ def suffix_filter(files, suffix):
 	return list of files with given suffix
 	'''
 	return list(filter(lambda x: x.endswith(suffix), files))
+
+
+def dir_filter(files):
+	return list(filter(lambda x: os.path.isdir(x), files))
+
+
+def reverse_dict(d: dict):
+	return dict(zip(d.values(), d.keys()))

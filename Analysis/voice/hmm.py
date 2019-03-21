@@ -9,7 +9,7 @@ from hmmlearn import hmm
 from utils.io import *
 from utils.logger import DualLogger
 from utils.tools import date_time
-from utils.voice_preprocess.mfcc_data_loader import DataPack, label_dict
+from utils.voice_preprocess.mfcc_data_loader import MfccPack, label_dict
 
 gestures = label_dict.keys()
 EPSILON = 1e-8
@@ -29,7 +29,7 @@ class MyHMM:
 		self.model1 = hmm.GaussianHMM(n_components=self.n_components, verbose=True,
 									  covariance_type=self.cov_type, n_iter=self.n_iter)
 
-	def fit(self, dataset: DataPack):
+	def fit(self, dataset: MfccPack):
 		'''
 		fit on dataset
 
@@ -61,7 +61,7 @@ class MyHMM:
 		'''
 		return [1 if self.model0.score(sample) < self.model1.score(sample) else 0 for sample in samples]
 
-	def score(self, dataset: DataPack):
+	def score(self, dataset: MfccPack):
 		'''
 		score dataset with mistake count
 
@@ -99,7 +99,7 @@ class MyHMM:
 		return acc, f1, mistakes, counter
 
 
-def visualize_distribution(dataset: DataPack, dim1: int = 0, dim2: int = 1, title: str = '???'):
+def visualize_distribution(dataset: MfccPack, dim1: int = 0, dim2: int = 1, title: str = '???'):
 	'''
 	scatter the distribution of dataset projected on dim1 and dim2, with color of each class
 	'''
@@ -115,7 +115,7 @@ def visualize_distribution(dataset: DataPack, dim1: int = 0, dim2: int = 1, titl
 	plt.show()
 
 
-def evaluate(which, dataset: DataPack):
+def evaluate(which, dataset: MfccPack):
 	print('== on %s ==' % which)
 	acc, f1, mistakes, counter = clf.score(dataset)
 	print('acc = %.4f%%, f1 = %.4f%%' % (acc * 100, f1 * 100))
@@ -147,11 +147,11 @@ DualLogger('logs/%shmm.txt' % DATE_TIME)
 
 # load ######################################################
 # todo can use load from chunks
-dataset = DataPack()
+dataset = MfccPack()
 dataset.from_chunks_dir(wkdirs, cache=True, reload=False)
 # dataset.crop(500)
 
-test = DataPack()
+test = MfccPack()
 test.from_chunks_dir(testdir, cache=True, reload=False)
 # test.crop(100)
 

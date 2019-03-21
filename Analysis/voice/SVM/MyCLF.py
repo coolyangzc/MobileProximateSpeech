@@ -5,7 +5,7 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from tqdm import tqdm
 
-from utils.voice_preprocess.mfcc_data_loader import DataPack, label_dict
+from utils.voice_preprocess.mfcc_data_loader import MfccPack, label_dict
 
 gestures = label_dict.keys()
 
@@ -15,7 +15,7 @@ class MySVC(SVC):
 	Support Vector Classifier which provide feedback of incorrect classified samples' descriptions
 	'''
 
-	def learn(self, dataset: DataPack):
+	def learn(self, dataset: MfccPack):
 		dataset._ungroup(extend_labels=True)
 		super().fit(dataset.data, dataset.labels)
 		dataset._regroup(lessen_labels=True)
@@ -48,7 +48,7 @@ class MySVC(SVC):
 			probs.append(prob)
 		return probs
 
-	def evaluate(self, dataset: DataPack, group=False):
+	def evaluate(self, dataset: MfccPack, group=False):
 		'''
 		score dataset with mistake count
 
@@ -87,7 +87,7 @@ class MySVC(SVC):
 
 		return acc, f1, mistakes, counter
 
-	def get_predict_proba_distribution(self, dataset: DataPack, group=False):
+	def get_predict_proba_distribution(self, dataset: MfccPack, group=False):
 		'''
 		get the predict probability distribution over dataset
 
@@ -119,7 +119,7 @@ class MyKNN(KNeighborsClassifier):
 	KNeighborsClassifier which provide feedback of incorrect classified samples' descriptions
 	'''
 
-	def learn(self, dataset: DataPack):
+	def learn(self, dataset: MfccPack):
 		dataset._ungroup(extend_labels=True)
 		super().fit(dataset.data, dataset.labels)
 		dataset._regroup(lessen_labels=True)
@@ -156,7 +156,7 @@ class MyKNN(KNeighborsClassifier):
 			probs.append(prob)
 		return probs
 
-	def evaluate(self, dataset: DataPack, group=False):
+	def evaluate(self, dataset: MfccPack, group=False):
 		'''
 		score dataset with mistake count
 
@@ -195,7 +195,7 @@ class MyKNN(KNeighborsClassifier):
 
 		return acc, f1, mistakes, counter
 
-	def get_predict_proba_distribution(self, dataset: DataPack, group=False):
+	def get_predict_proba_distribution(self, dataset: MfccPack, group=False):
 		'''
 		get the predict probability distribution over dataset
 

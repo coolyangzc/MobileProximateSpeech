@@ -7,18 +7,18 @@ from collections import Counter
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
-from configs.subsampling_config import subsampling_config_1_channel
+from configs.subsampling_config import subsampling_config_2_channel
 from utils.io import *
 from utils.logger import DualLogger
 from utils.tools import date_time
-from utils.voice_preprocess.mfcc_data_loader import DataPack, label_dict
+from utils.voice_preprocess.mfcc_data_loader import MfccPack, label_dict
 from voice.SVM.MyCLF import MySVC
 
 # globals
 gestures = label_dict.keys()
 CWD = '/Users/james/MobileProximateSpeech/Analysis'
 DATE_TIME = date_time()
-FOLDER = '%s1 channel from wav males SVM' % DATE_TIME # todo
+FOLDER = '%sstereo chunks whole SVM' % DATE_TIME # todo
 VAL_ORD = 0
 TOT_VAL = 0
 bad_testers = []
@@ -110,7 +110,7 @@ def show_table(mistakes, counter):
 	print()
 
 
-def evaluate(clf, which, dataset: DataPack, group=False):
+def evaluate(clf, which, dataset: MfccPack, group=False):
 	'''
 	:return: Results
 	'''
@@ -147,11 +147,11 @@ def leave_one_out(wkdirs, testdir):
 	# load ######################################################
 	# todo can use load from chunks
 	print('=== Data ===')
-	dataset = DataPack()
-	dataset.from_wav_dir(wkdirs, cache=True, reload=False, mono=True)
+	dataset = MfccPack()
+	dataset.from_chunks_dir(wkdirs, cache=True, reload=False, mono=False)
 
-	test = DataPack()
-	test.from_wav_dir(testdir, cache=True, reload=False, mono=True)
+	test = MfccPack()
+	test.from_chunks_dir(testdir, cache=True, reload=False, mono=False)
 	print('data loaded.')
 
 	# print('dataset shape:')
@@ -189,10 +189,10 @@ def leave_one_out(wkdirs, testdir):
 
 	# visualize ######################################################
 	# todo whether to enable distribution visualization
-	output_path1 = os.path.join(CWD, 'output/%s/val-%d/Distribution of train & dev.png' % (FOLDER, VAL_ORD))
-	output_path2 = os.path.join(CWD, 'output/%s/val-%d/Distribution of test.png' % (FOLDER, VAL_ORD))
-	dataset.visualize_distribution(title='train & dev', out_path=output_path1)
-	test.visualize_distribution(title='test', out_path=output_path2)
+	# output_path1 = os.path.join(CWD, 'output/%s/val-%d/Distribution of train & dev.png' % (FOLDER, VAL_ORD))
+	# output_path2 = os.path.join(CWD, 'output/%s/val-%d/Distribution of test.png' % (FOLDER, VAL_ORD))
+	# dataset.visualize_distribution(title='train & dev', out_path=output_path1)
+	# test.visualize_distribution(title='test', out_path=output_path2)
 
 	# classifier ######################################################
 	# todo adjustable
@@ -238,11 +238,11 @@ if __name__ == '__main__':
 	os.chdir('Data/Study3/subjects copy')
 
 	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
-	females = ['gfz', 'jwy', 'mq', 'wrl']
+	females = ['gfz', 'jwy', 'mq', 'wrl', 'lgh']
 	males = ['wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr']
 	# subject_dirs = random.sample(females, k=1)
 	# subject_dirs += random.sample(males, k=3)
-	subject_dirs = males
+	subject_dirs = males + females
 	print('subjects: ', subject_dirs)
 	TOT_VAL = len(subject_dirs)
 
@@ -271,8 +271,8 @@ if __name__ == '__main__':
 	print()
 
 	print('subsampling config:')
-	for item in subsampling_config_1_channel:
-		print(item, ':', subsampling_config_1_channel[item])
+	for item in subsampling_config_2_channel:
+		print(item, ':', subsampling_config_2_channel[item])
 	print()
 
 	elapse = int(time.time() - since)

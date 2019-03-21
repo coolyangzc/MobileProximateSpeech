@@ -6,7 +6,7 @@ import os
 from utils.logger import DualLogger
 from utils.tools import date_time
 
-from utils.voice_preprocess.mfcc_data_loader import DataPack
+from utils.voice_preprocess.mfcc_data_loader import MfccPack
 
 def build_model():
 	print('building model...')
@@ -23,7 +23,7 @@ def build_model():
 
 
 def load_train_test(wkdir, test_size=None):
-	dataset = DataPack()
+	dataset = MfccPack()
 	dataset.from_chunks_dir(wkdir)
 	dataset.apply_subsampling()
 	dataset.roll_f_as_last()

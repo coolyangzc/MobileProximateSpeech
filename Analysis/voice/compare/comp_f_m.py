@@ -1,4 +1,4 @@
-from utils.voice_preprocess.mfcc_data_loader import DataPack
+from utils.voice_preprocess.mfcc_data_loader import MfccPack
 from matplotlib import pyplot as plt
 import numpy as np
 import os
@@ -10,7 +10,7 @@ from sklearn.metrics import pairwise_distances
 def load_data(subjects):
 	if not isinstance(subjects, list): subjects = [subjects]
 	dirs = list(map(lambda x: os.path.join('Data/Study3/subjects', x, 'trimmed'), subjects))
-	dataset = DataPack()
+	dataset = MfccPack()
 	dataset.from_chunks_dir(dirs)
 	dataset.apply_subsampling()
 	# dataset.to_flatten()
@@ -22,7 +22,7 @@ def load_data(subjects):
 	return dataset
 
 
-def draw_which(dataset: DataPack, dim1, dim2, color, label=None):
+def draw_which(dataset: MfccPack, dim1, dim2, color, label=None):
 	plt.scatter(dataset.data[:, dim1], dataset.data[:, dim2], c=color, s=1, alpha=0.2, label=label)
 	plt.xlabel(dim1)
 	plt.ylabel(dim2)

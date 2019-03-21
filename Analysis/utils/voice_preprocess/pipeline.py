@@ -3,8 +3,7 @@
 import os
 from utils.tools import date_time
 from utils.logger import DualLogger
-from utils import raw_data_filter
-from utils.voice_preprocess import re_encoder, voice_trimmer, VAD
+from utils.voice_preprocess.denoise import VAD
 
 if __name__ == '__main__':
 	DualLogger('../../logs/%svoice file filtering.txt' % date_time())

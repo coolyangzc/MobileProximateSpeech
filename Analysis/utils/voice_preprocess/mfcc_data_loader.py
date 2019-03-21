@@ -12,8 +12,7 @@ from configs.subsampling_config import subsampling_config_1_channel, subsampling
 from utils import io
 from utils.tools import suffix_conv
 from utils.voice_preprocess import mfcc
-
-# DataPack = namedtuple('DataPack', 'data labels names')
+from utils.voice_preprocess.data_loader import DataPack
 
 label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数据
 	'竖直对脸，碰触鼻子': 1,
@@ -32,23 +31,6 @@ label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数
 }
 
 
-# label_dict = {  # 正负例分类字典, -1 表示舍弃这个特征的所有数据
-# 	'竖直对脸，碰触鼻子': -1,
-# 	'竖直对脸，不碰鼻子': 1,
-# 	'竖屏握持，上端遮嘴': -1,
-# 	'水平端起，倒话筒': 1,
-# 	'话筒': -1,
-# 	'横屏': 1,
-#
-# 	'耳旁打电话': -1,
-# 	'桌上正面': -1,
-# 	'手上正面': 0,
-# 	'桌上反面': -1,
-# 	'手上反面': 0,
-# 	'裤兜': 0,
-# }
-
-
 def suffix_filter(files, suffix):
 	'''
 	return list of files with given suffix
@@ -56,66 +38,27 @@ def suffix_filter(files, suffix):
 	return list(filter(lambda x: x.endswith(suffix), files))
 
 
-def show_shape(iterable):
-	try:
-		print(np.array(iterable).shape)
-	except ValueError:
-		print('the shape is not standard, len = %d.' % len(iterable))
-
-
-class DataPack:
+class MfccPack(DataPack):
 	'''
 	mfcc data pack class
 	'''
 
 	def __init__(self, data=None, labels=None, names=None, state=None, n_channel=None):
-		self.data = [] if data is None else data  # list of samples
-		self.labels = [] if labels is None else labels  # list of numbers
-		self.names = [] if names is None else names  # list of str
+		super(MfccPack, self).__init__(data, labels, names)
 		self.state = set() if state is None else state
 		self.n_channel = n_channel
 
-	def __iter__(self):
-		self.n_var = 0
-		return self
-
-	def __next__(self):
-		n_var = self.n_var
-		self.n_var += 1
-		if n_var == 0:
-			return self.data
-		elif n_var == 1:
-			return self.labels
-		elif n_var == 2:
-			return self.names
-		else:
-			raise StopIteration
-
-	def show_shape(self):
-		print('\t\tdata: ', end='')
-		show_shape(self.data)
-		print('\t\tlabels: ', end='')
-		show_shape(self.labels)
-		print('\t\tnames: ', end='')
-		show_shape(self.names)
-
 	def show_info(self):
-		print('\tstate:')
+		print(' state:')
 		for key in self.state:
 			print('  ', key)
-		print('\tn_channel =', self.n_channel)
-		print('\tshape:')
+		print(' n_channel =', self.n_channel)
+		print(' shape:')
 		self.show_shape()
 		print()
 
 	def shuffle_all(self, random_seed=None):
-		if random_seed is None: random_seed = time.time()
-		random.seed(random_seed)
-		random.shuffle(self.data)
-		random.seed(random_seed)
-		random.shuffle(self.labels)
-		random.seed(random_seed)
-		random.shuffle(self.names)
+		super().shuffle_all(random_seed)
 		self.state.add('shuffled')
 
 	def select_class(self, selected_label: int):
@@ -124,30 +67,16 @@ class DataPack:
 		:param selected_label: 0 or 1
 		:return: a sub DataPack
 		'''
-		samples, labels, gestures = [], [], []
-		for sample, label, gesture in zip(self.data, self.labels, self.names):
-			if label == selected_label:
-				samples.append(sample)
-				labels.append(label)
-				gestures.append(gesture)
-		return DataPack(samples, labels, gestures, self.state, self.n_channel)
-
-	def crop(self, size: int):
-		'''
-		crop the datapack to the designated size ( ≤ len(self.data) )
-		'''
-		assert size <= len(self.data)
-		self.data = self.data[:size]
-		self.labels = self.labels[:size]
-		self.names = self.names[:size]
+		data, labels, names = super().select_class(selected_label)
+		return MfccPack(data, labels, names, self.state, self.n_channel)
 
 	def __add__(self, other):
 		'''
 		concatenate another DataPack
 		:param other:  DataPack
 		'''
-		return DataPack(list(self.data) + list(other.data), self.labels + other.labels, self.names + other.names,
-						self.state, self.n_channel)
+		data, labels, names = super().__add__(other)
+		return MfccPack(data, labels, names, self.state, self.n_channel)
 
 	# loading method
 	def __from_wav_dir(self, wkdir, txtdir=None, cache=False, reload=False, mono=True):
@@ -273,8 +202,10 @@ class DataPack:
 		elif type(wkdir) == list:
 			if txtdir == None: txtdir = [None for _ in wkdir]
 
-			total = DataPack()
-			for wkdir_, txtdir_ in tqdm(zip(wkdir, txtdir)):
+			total = MfccPack()
+			progress = tqdm(total=len(wkdir))
+			for wkdir_, txtdir_ in zip(wkdir, txtdir):
+				progress.update()
 				one_step(wkdir_, txtdir=txtdir_, cache=cache, reload=reload, mono=mono)
 				# concatenate
 				total += self
@@ -448,20 +379,9 @@ class DataPack:
 		:param test_size: test size ratio, float number
 		:return: train_pack, test_pack
 		'''
-		if test_size is None:  # auto
-			if len(self.data) < 5000:
-				test_size = 0.3
-			elif len(self.data) < 10000:
-				test_size = 0.2
-			elif len(self.data) < 50000:
-				test_size = 0.1
-			else:
-				test_size = 0.05
-		else:
-			assert 0.0 <= test_size <= 1.0
-		cut = int(len(self.data) * test_size)
-		return DataPack(self.data[cut:], self.labels[cut:], self.names[cut:], self.state, self.n_channel), \
-			   DataPack(self.data[:cut], self.labels[:cut], self.names[:cut], self.state, self.n_channel)
+		train, test = super().train_test_split(test_size)
+		return MfccPack(train.data, train.labels, train.names, self.state, self.n_channel), \
+			   MfccPack(train.data, train.labels, train.names, self.state, self.n_channel)
 
 	def to_flatten(self):
 		'''
@@ -478,10 +398,6 @@ class DataPack:
 			raise AttributeError('You can\'t flatten it now, because subsampling is not applied yet.')
 
 		self.state.add('flatten')
-		return self
-
-	def roll_data_axis(self, axis, start):
-		self.data = list(np.rollaxis(np.array(self.data), axis, start))
 		return self
 
 	def visualize_distribution(self, dim1: int = 0, dim2: int = 1, title: str = '???', out_path=None):
@@ -519,15 +435,15 @@ def _subsampling(ftr, offset, duration, window, stride):
 	:param stride: 每次采样的步长
 	:return: list of windows, shape like (n_window, n_mfcc, n_frame)
 	'''
-	units = []
+	windows = []
 	high = min(offset + duration, ftr.shape[-1])
 	left = offset
 	right = left + window
 	while right <= high:
-		units.append(ftr[:, left: right])
+		windows.append(ftr[:, left: right])
 		left += stride
 		right += stride
-	return units
+	return windows
 
 
 def _grouping(units, group_size):
@@ -555,7 +471,7 @@ def _extend_labels_names(data, label, name):
 	:param data: a list of units or groups generated from one .ftr data
 	:return: DataPack of (data, labels, names)
 	'''
-	return DataPack(data, [label for _ in data], [name for _ in data])
+	return MfccPack(data, [label for _ in data], [name for _ in data])
 
 
 if __name__ == '__main__':
@@ -564,17 +480,14 @@ if __name__ == '__main__':
 
 	os.chdir('/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects copy/')
 	subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	subjects.remove('zfs')
-	subjects.remove('wj')
-	subjects.remove('wwn')
 	# wkdirs = random.sample(wkdirs, k=4)
 	# wkdirs.remove('mq')
 	# wkdirs = ['mq', 'gfz', 'zfs']
 	print(subjects)
 	subjects = list(map(lambda x: os.path.join(x, 'trimmed2channel'), subjects))
 
-	pack = DataPack()
-	pack.from_wav_dir(subjects, shuffle=False, cache=True, reload=False, mono=True)
+	pack = MfccPack()
+	pack.from_chunks_dir(subjects, shuffle=False, cache=True, reload=False, mono=False)
 	pack.show_info()
 
 	pack.apply_subsampling_grouping()
@@ -582,4 +495,3 @@ if __name__ == '__main__':
 
 	pack.to_flatten()
 	pack.show_info()
-

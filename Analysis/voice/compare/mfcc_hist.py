@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from utils.voice_preprocess.mfcc_data_loader import DataPack
+from utils.voice_preprocess.mfcc_data_loader import MfccPack
 import os
 from tqdm import tqdm
 import librosa
@@ -19,11 +19,11 @@ if __name__ == '__main__':
 	subjects = filter(lambda x: os.path.isdir(x), os.listdir('.'))
 	subjects = list(map(lambda x: os.path.join(x, 'trimmed'), subjects))[:5]
 
-	pack = DataPack()
+	pack = MfccPack()
 	pack.from_chunks_dir(subjects, shuffle=True, reload=False, cache=True)
 	pack.apply_subsampling(shuffle=True)
 	pack.show_shape()
-	pack.roll_f_as_last()
+	pack.roll_data_axis(1, 3)
 	pack.state.add('group')
 	p, n = pack.select_class(1), pack.select_class(0)
 	p._ungroup(extend_labels=True, extend_names=True)
