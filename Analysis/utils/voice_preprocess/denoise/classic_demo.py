@@ -26,9 +26,9 @@ def reduce_noise_power(y, sr):
 	threshold_h = round(np.median(cent)) * 1.5
 	threshold_l = round(np.median(cent)) * 0.1
 
-	less_noise = AudioEffectsChain().lowshelf(gain=-30.0, frequency=threshold_l, slope=0.8).highshelf(gain=-12.0,
-																									  frequency=threshold_h,
-																									  slope=0.5)  # .limiter(gain=6.0)
+	less_noise = AudioEffectsChain() \
+		.lowshelf(gain=-30.0, frequency=threshold_l, slope=0.8) \
+		.highshelf(gain=-12.0, frequency=threshold_h, slope=0.5)  # .limiter(gain=6.0)
 	y_clean = less_noise(y)
 
 	return y_clean
@@ -213,7 +213,8 @@ def output_file(destination, filename, y, sr, ext=""):
 
 
 if __name__ == '__main__':
-	from utils.voice_preprocess.denoise.noise_adder import white_noise, superpose
+	from utils.voice_preprocess.denoise.noise_adder import white_noised_from_path, superpose_from_path
+
 	'''------------------------------------
 	LOGIC:
 		[1] load file
@@ -238,7 +239,7 @@ if __name__ == '__main__':
 	noisedname = 'noise - ' + filename
 
 	# todo add noise here
-	superpose(filename, 'cafe.wav', out_path=noisedname, ratio=1.0, sr=16000)
+	superpose_from_path(filename, 'cafe.wav', out_path=noisedname, ratio=1.0, sr=16000)
 	# white_noise(filename, noisedname, ratio=0.01, sr=16000)
 
 	y, sr = librosa.load(noisedname, sr=16000)
