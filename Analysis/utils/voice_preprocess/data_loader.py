@@ -60,7 +60,8 @@ class DataPack(object):
 				names.append(name)
 		return DataPack(samples, labels, names)
 
-	def select_classes(self, selected_labels: list):
+	def select_classes(self, selected_labels):
+		selected_labels = set(selected_labels)
 		samples, labels, names = [], [], []
 		for sample, label, name in zip(self.data, self.labels, self.names):
 			if label in selected_labels:
@@ -68,6 +69,18 @@ class DataPack(object):
 				labels.append(label)
 				names.append(name)
 		return DataPack(samples, labels, names)
+
+	def into_data_ndarray(self):
+		self.data = np.array(self.data)
+		return self
+
+	def into_data_list(self):
+		self.data = list(self.data)
+		return self
+
+	def squeeze_data(self):
+		self.data = np.squeeze(self.data)
+		return self
 
 	def crop(self, size: int):
 		'''

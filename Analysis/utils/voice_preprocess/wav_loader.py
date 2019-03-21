@@ -133,11 +133,9 @@ class WavPack(DataPack):
 		:param kwargs: segmenting params
 		:return: self, data shape like (n_segment, [n_channel,] n_frame)
 		'''
-		kwargs['sr'] = self.sr
-
 		data, labels, names = [], [], []
 		for y, label, name in zip(self.data, self.labels, self.names):
-			for segment in segmenting(y, **kwargs):
+			for segment in segmenting(y, self.sr, **kwargs):
 				data.append(segment)
 				labels.append(label)
 				names.append(name)
@@ -148,24 +146,29 @@ class WavPack(DataPack):
 	def extract_feature(self, librosa_method: callable, **kwargs) -> DataPack:
 		'''
 		extract features of each y from data and return a new DataPack
-		!! use this method after segmenting
+		!! use this method after segmenting, data should shape like (n_segment, [n_channel,] n_frame)
 
 		:param librosa_method: callable, a librosa feature extraction method
 		:param kwargs: params passed to librosa_method
-		:return: DataPack(features, labels, audio_names)
+		:return: DataPack(features, labels, audio_names), features shape like (n_segment, [n_channel,] ,...)
 		'''
 		features = []
-		kwargs['sr'] = self.sr
 
 		for y in self.data:
-			features.append(librosa_method(y=y, **kwargs))
+			ndim = np.ndim(y)
+			if ndim == 1:
+				features.append(librosa_method(y=y, **kwargs))
+			elif ndim == 2:
+				features.append([librosa_method(y=yi, **kwargs) for yi in y])
+			else:
+				raise AttributeError('ndim of y: %d, is not valid for feature extraction.' % ndim)
 
 		return DataPack(features, self.labels, self.names)
 
 
 def segmenting(y, sr, start=0., duration=10., window_size=0.020, stride=0.010):
 	'''
-	从帧的波形数据进行子采样，得到一系列子样本单元。可为多通道
+	从帧的波形数据进行子采样，得到一系列子样本单元。可为多通道  sliding window algorithm
 
 	:param y: wave data, shape like mono (n_frame, ), or stereo (n_channel, n_frame)
 	:param sr: sample rate, fps
@@ -205,45 +208,97 @@ def segmenting(y, sr, start=0., duration=10., window_size=0.020, stride=0.010):
 if __name__ == '__main__':
 	from matplotlib import pyplot as plt
 	import librosa.display
-	from utils.voice_preprocess.data_loader import show_shape
 
 	cwd = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects copy/'
 	os.chdir(cwd)
 
-	pack = WavPack(sr=32000, mode='stereo')
-	pack.from_audio_dir('cjr/trimmed2channel/')
-	print('\nsr =', pack.sr)
-	pack.show_shape().shuffle_all()
-	print()
+	def load_pack(subjects: list, mode, n_seg) -> WavPack:
+		pack = WavPack(sr=32000, mode=mode)
+		for subject in subjects:
+			pack.from_audio_dir('%s/trimmed2channel/' % subject)
+		print('\nsr =', pack.sr)
+		print('all data:')
+		pack.show_shape().shuffle_all()
+		print()
 
-	sr = pack.sr
-	y = pack.data[0]
-	show_shape(y)
-	print(pack.names[0])
+		print('\napplying segmenting and cropped')
+		pack.apply_segmenting(window_size=0.100, stride=0.050)
+		pack.shuffle_all().crop(n_seg).show_shape()
+		print(pack.labels[:5])
+		print(pack.names[:5])
+		return pack
 
-	plt.figure()
-	librosa.display.waveplot(y, sr=sr)
-	plt.title('Stereo Wave')
-	plt.show()
+	# spectral_centroid
+	def analyze_spectral_centroid(pack: WavPack):
+		print('\nextract spectral_centroid')
+		f = pack.extract_feature(librosa.feature.spectral_centroid, sr=pack.sr).squeeze_data()
+		f.show_shape()
+		p = f.select_classes(range(1, 10)).into_data_ndarray()
+		n = f.select_classes(range(-10, 0)).into_data_ndarray()
 
-	print('\napplied segmenting')
-	pack.crop(10).apply_segmenting().show_shape()
-	pack.shuffle_all()
-	# print(pack.labels[:5])
-	# print(pack.names[:5])
+		plt.figure()
+		for channel in 0, 1:
+			plt.subplot(2, 1, channel + 1)
+			plt.plot(p.data[0, channel, :], c='red', alpha=0.5, label='close')
+			plt.plot(n.data[0, channel, :], c='blue', alpha=0.5, label='far')
+			for curve in p.data[1:, channel, :]:
+				plt.plot(curve, c='red', alpha=0.5)
+			for curve in n.data[1:, channel, :]:
+				plt.plot(curve, c='blue', alpha=0.5)
+			plt.title('Spectral Centroid distribution of p/n channel %d' % channel)
+			plt.ylabel('Freq')
+			plt.xlabel('Frame')
+			plt.legend()
+		plt.show()
 
+	# rms
+	def analyze_rms(pack: WavPack):
+		print('\nextract rms')
+		f = pack.extract_feature(librosa.feature.rms).into_data_ndarray().squeeze_data()
+		f.show_shape()
 
-	# y_seg = librosa.segment.subsegment(y, frames=np.linspace(0, 233408, num=100, dtype=np.int), n_segments=10)
-	# print(np.shape(y_seg))
+		p = f.select_classes(range(1, 10)).into_data_ndarray()
+		n = f.select_classes(range(-10, 0)).into_data_ndarray()
 
-	# print('extract features\n')
-	# cents = pack.extract_feature(librosa.feature.spectral_centroid)
-	# plt.figure()
-	# plt.subplot(2, 1, 1)
-	# plt.semilogy(cents.data[0].T, label='Spectral centroid')
-	# plt.ylabel('Hz')
-	# plt.xticks([])
-	# plt.xlim([0, cents.data[0].shape[-1]])
-	# plt.legend()
-	# plt.show()
-	pass
+		plt.figure()
+		for channel in 0, 1:
+			plt.subplot(2, 1, channel + 1)
+			plt.plot(p.data[0, channel, :], c='red', alpha=0.5, label='close')
+			plt.plot(n.data[0, channel, :], c='blue', alpha=0.5, label='far')
+			for curve in p.data[1:, channel, :]:
+				plt.plot(curve, c='red', alpha=0.5)
+			for curve in n.data[1:, channel, :]:
+				plt.plot(curve, c='blue', alpha=0.5)
+			plt.title('RMS distribution of p/n channel %d' % channel)
+			plt.ylabel('RMS')
+			plt.xlabel('Frame')
+			plt.legend()
+		plt.show()
+
+	# zero_crossing_rate
+	def analyze_zero_crossing_rate(pack: WavPack):
+		print('\nextract zero_crossing_rate')
+		f = pack.extract_feature(librosa.feature.zero_crossing_rate).into_data_ndarray().squeeze_data()
+		f.show_shape()
+
+		p = f.select_classes(range(1, 10)).into_data_ndarray()
+		n = f.select_classes(range(-10, 0)).into_data_ndarray()
+
+		plt.figure()
+		for channel in 0, 1:
+			plt.subplot(2, 1, channel + 1)
+			plt.plot(p.data[0, channel, :], c='red', alpha=0.5, label='close')
+			plt.plot(n.data[0, channel, :], c='blue', alpha=0.5, label='far')
+			for curve in p.data[1:, channel, :]:
+				plt.plot(curve, c='red', alpha=0.5)
+			for curve in n.data[1:, channel, :]:
+				plt.plot(curve, c='blue', alpha=0.5)
+			plt.title('ZCR distribution of p/n channel %d' % channel)
+			plt.ylabel('ZCR')
+			plt.xlabel('Frame')
+			plt.legend()
+		plt.show()
+
+	# todo build pipeline here...
+	pack = load_pack(['wrl', 'gfz', 'cjr', 'wzq'], mode='stereo', n_seg=100)
+	analyze_rms(pack)
