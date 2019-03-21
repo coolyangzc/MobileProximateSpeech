@@ -1,7 +1,9 @@
 import os
+
+import librosa
 import numpy as np
 from tqdm import tqdm
-import librosa
+
 from utils.tools import suffix_filter, suffix_conv, dir_filter, reverse_dict
 from utils.voice_preprocess.data_loader import DataPack
 
@@ -165,6 +167,41 @@ class WavPack(DataPack):
 
 		return DataPack(features, self.labels, self.names)
 
+	def into_mono_mean(self):
+		'''
+		make data into mono channel by calculating the mean of two channels
+
+		:return: self, data shape like (n_segment, n_frame)
+		'''
+		if self.mono == True: return self
+		self.data = np.mean(self.data, axis=1)
+		self.mono = True
+		return self
+
+	def into_mono_diff(self):
+		'''
+		make data into mono channel by calculating the difference between two channels
+
+		:return: self, data shape like (n_segment, n_frame)
+		'''
+		if self.mono == True: return self
+		self.into_data_ndarray()
+		self.data = self.data[:, 0, :] - self.data[:, 1, :]
+		self.mono = True
+		return self
+
+	def into_mono_div(self):
+		'''
+		make data into mono channel by calculating the ratio between two channels
+
+		:return: self, data shape like (n_segment, n_frame)
+		'''
+		if self.mono == True: return self
+		self.into_data_ndarray()
+		self.data = self.data[:, 0, :] / self.data[:, 1, :]
+		self.mono = True
+		return self
+
 
 def segmenting(y, sr, start=0., duration=10., window_size=0.020, stride=0.010):
 	'''
@@ -203,102 +240,3 @@ def segmenting(y, sr, start=0., duration=10., window_size=0.020, stride=0.010):
 
 	else:
 		raise AttributeError('ndim of y: %d, is not valid for segmenting.' % ndim)
-
-
-if __name__ == '__main__':
-	from matplotlib import pyplot as plt
-	import librosa.display
-
-	cwd = '/Users/james/MobileProximateSpeech/Analysis/Data/Study3/subjects copy/'
-	os.chdir(cwd)
-
-	def load_pack(subjects: list, mode, n_seg) -> WavPack:
-		pack = WavPack(sr=32000, mode=mode)
-		for subject in subjects:
-			pack.from_audio_dir('%s/trimmed2channel/' % subject)
-		print('\nsr =', pack.sr)
-		print('all data:')
-		pack.show_shape().shuffle_all()
-		print()
-
-		print('\napplying segmenting and cropped')
-		pack.apply_segmenting(window_size=0.100, stride=0.050)
-		pack.shuffle_all().crop(n_seg).show_shape()
-		print(pack.labels[:5])
-		print(pack.names[:5])
-		return pack
-
-	# spectral_centroid
-	def analyze_spectral_centroid(pack: WavPack):
-		print('\nextract spectral_centroid')
-		f = pack.extract_feature(librosa.feature.spectral_centroid, sr=pack.sr).squeeze_data()
-		f.show_shape()
-		p = f.select_classes(range(1, 10)).into_data_ndarray()
-		n = f.select_classes(range(-10, 0)).into_data_ndarray()
-
-		plt.figure()
-		for channel in 0, 1:
-			plt.subplot(2, 1, channel + 1)
-			plt.plot(p.data[0, channel, :], c='red', alpha=0.5, label='close')
-			plt.plot(n.data[0, channel, :], c='blue', alpha=0.5, label='far')
-			for curve in p.data[1:, channel, :]:
-				plt.plot(curve, c='red', alpha=0.5)
-			for curve in n.data[1:, channel, :]:
-				plt.plot(curve, c='blue', alpha=0.5)
-			plt.title('Spectral Centroid distribution of p/n channel %d' % channel)
-			plt.ylabel('Freq')
-			plt.xlabel('Frame')
-			plt.legend()
-		plt.show()
-
-	# rms
-	def analyze_rms(pack: WavPack):
-		print('\nextract rms')
-		f = pack.extract_feature(librosa.feature.rms).into_data_ndarray().squeeze_data()
-		f.show_shape()
-
-		p = f.select_classes(range(1, 10)).into_data_ndarray()
-		n = f.select_classes(range(-10, 0)).into_data_ndarray()
-
-		plt.figure()
-		for channel in 0, 1:
-			plt.subplot(2, 1, channel + 1)
-			plt.plot(p.data[0, channel, :], c='red', alpha=0.5, label='close')
-			plt.plot(n.data[0, channel, :], c='blue', alpha=0.5, label='far')
-			for curve in p.data[1:, channel, :]:
-				plt.plot(curve, c='red', alpha=0.5)
-			for curve in n.data[1:, channel, :]:
-				plt.plot(curve, c='blue', alpha=0.5)
-			plt.title('RMS distribution of p/n channel %d' % channel)
-			plt.ylabel('RMS')
-			plt.xlabel('Frame')
-			plt.legend()
-		plt.show()
-
-	# zero_crossing_rate
-	def analyze_zero_crossing_rate(pack: WavPack):
-		print('\nextract zero_crossing_rate')
-		f = pack.extract_feature(librosa.feature.zero_crossing_rate).into_data_ndarray().squeeze_data()
-		f.show_shape()
-
-		p = f.select_classes(range(1, 10)).into_data_ndarray()
-		n = f.select_classes(range(-10, 0)).into_data_ndarray()
-
-		plt.figure()
-		for channel in 0, 1:
-			plt.subplot(2, 1, channel + 1)
-			plt.plot(p.data[0, channel, :], c='red', alpha=0.5, label='close')
-			plt.plot(n.data[0, channel, :], c='blue', alpha=0.5, label='far')
-			for curve in p.data[1:, channel, :]:
-				plt.plot(curve, c='red', alpha=0.5)
-			for curve in n.data[1:, channel, :]:
-				plt.plot(curve, c='blue', alpha=0.5)
-			plt.title('ZCR distribution of p/n channel %d' % channel)
-			plt.ylabel('ZCR')
-			plt.xlabel('Frame')
-			plt.legend()
-		plt.show()
-
-	# todo build pipeline here...
-	pack = load_pack(['wrl', 'gfz', 'cjr', 'wzq'], mode='stereo', n_seg=100)
-	analyze_rms(pack)
