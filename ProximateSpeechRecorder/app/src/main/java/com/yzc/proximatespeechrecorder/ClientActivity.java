@@ -75,11 +75,13 @@ public class ClientActivity extends Activity implements SensorEventListener {
         setupCamera();
         openCamera(mCameraIdFront);
         // startAudioRecord();
+        /*
         Thread thread = new Thread() {
             @Override
             public void run() {sendClient();}
         };
         thread.start();
+        */
     }
 
     private void startAudioRecord() {
@@ -160,11 +162,14 @@ public class ClientActivity extends Activity implements SensorEventListener {
             Thread thread;
             switch (view.getId()) {
                 case R.id.button_connect:
+                    /*
                     thread=new Thread(){
                         @Override
                         public void run() { tcpClient();}
                     };
                     thread.start();
+                    */
+                    SocketManager.getInstance().connect();
                     break;
                 case R.id.button_send:
                     break;
@@ -185,8 +190,8 @@ public class ClientActivity extends Activity implements SensorEventListener {
             in = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
 
-            audioSocket = new Socket(HOST, AUDIOPORT);
-            audioOutputStream = audioSocket.getOutputStream();
+            // audioSocket = new Socket(HOST, AUDIOPORT);
+            // audioOutputStream = audioSocket.getOutputStream();
             /*
             String outMsg = "TCP connecting to " + port + System.getProperty("line.separator");//发出的数据
             out.write(outMsg);//发送数据
@@ -206,7 +211,7 @@ public class ClientActivity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         float[] values = sensorEvent.values;
         int type = sensorEvent.sensor.getType();
-        if (out == null)
+        if (!SocketManager.getInstance().isConnected())
             return;
         String msg = "";
         switch (type) {
@@ -231,7 +236,8 @@ public class ClientActivity extends Activity implements SensorEventListener {
             msg += " " + values[i];
         msg += "#";
         Log.i("ClientTrue", msg);
-        add(msg);
+        SocketManager.getInstance().send(msg);
+        // add(msg);
     }
 
     @Override
