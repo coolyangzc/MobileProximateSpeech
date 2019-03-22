@@ -250,14 +250,14 @@ if __name__ == '__main__':
 			os.mkdir('features/')
 		os.chdir('features/')
 
-		f = analyze_rms(pack, mono=True)
-		io.save_to_file(f, 'rms_diff.DataPack')
-
-		f = analyze_spectral_flatness(pack, mono=True)
-		io.save_to_file(f, 'spectral_flatness_diff.DataPack')
-
-		f = analyze_mfcc(pack, mono=True)
-		io.save_to_file(f, 'mfcc_diff.DataPack')
+		# f = analyze_rms(pack, mono=True)
+		# io.save_to_file(f, 'rms_diff.DataPack')
+		#
+		# f = analyze_spectral_flatness(pack, mono=True)
+		# io.save_to_file(f, 'spectral_flatness_diff.DataPack')
+		#
+		# f = analyze_mfcc(pack, mono=True)
+		# io.save_to_file(f, 'mfcc_diff.DataPack')
 
 		# f = analyze_rms(pack)
 		# io.save_to_file(f, 'rms.DataPack')

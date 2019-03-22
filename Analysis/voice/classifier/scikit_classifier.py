@@ -19,7 +19,7 @@ from voice.classifier.MyCLF import MySVC
 gestures = label_dict.keys()
 CWD = '/Users/james/MobileProximateSpeech/Analysis'
 DATE_TIME = date_time()
-FOLDER = '%sstereo chunks features' % DATE_TIME  # todo
+FOLDER = '%sstereo chunks whole set 4 features' % DATE_TIME  # todo
 AVAILABLE_STEREO_FEATURES = [
 	'rms.DataPack',
 	'zcr.DataPack',
@@ -210,7 +210,7 @@ def leave_one_out(wkdirs, testdir):
 	# classifier ######################################################
 	# todo adjustable
 	print('=== train & dev ===')
-	clf = MySVC(kernel='rbf', gamma='scale', C=1.0, class_weight='balanced', probability=True,
+	clf = MySVC(kernel='rbf', gamma=0.03, C=1.0, class_weight='balanced', probability=True,
 				verbose=False, cache_size=1000)
 	# clf = MyKNN(n_neighbors=8, weights='distance', algorithm='auto', leaf_size=30, n_jobs=-1)
 	print('\nclf config:\n%s\n' % clf)
@@ -258,7 +258,7 @@ if __name__ == '__main__':
 	# males = ['wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr']
 	# subject_dirs = random.sample(females, k=1)
 	# subject_dirs += random.sample(males, k=3)
-	subject_dirs = subject_dirs[:5]
+	subject_dirs = subject_dirs # todo
 	print('subjects: ', subject_dirs)
 	TOT_VAL = len(subject_dirs)
 
