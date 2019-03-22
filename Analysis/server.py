@@ -184,9 +184,9 @@ if __name__ == "__main__":
 	motion_thread = MotionThread()
 	motion_thread.start()
 
-	audio_model = joblib.load('voice_model.m')
-	audio_thread = AudioThread()
-	audio_thread.start()
+	# audio_model = joblib.load('voice_model.m')
+	# audio_thread = AudioThread()
+	# audio_thread.start()
 
 	motion_thread.join()
-	audio_thread.join()
+	# audio_thread.join()

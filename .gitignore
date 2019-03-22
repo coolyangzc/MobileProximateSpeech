@@ -1,4 +1,5 @@
 /Data/*
+*.h5
 
 # Built application files
 *.apk

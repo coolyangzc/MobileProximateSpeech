@@ -74,7 +74,7 @@ public class ClientActivity extends Activity implements SensorEventListener {
         loadSensor();
         setupCamera();
         openCamera(mCameraIdFront);
-        startAudioRecord();
+        // startAudioRecord();
         Thread thread = new Thread() {
             @Override
             public void run() {sendClient();}
