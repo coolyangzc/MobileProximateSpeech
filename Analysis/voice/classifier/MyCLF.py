@@ -5,9 +5,17 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from tqdm import tqdm
 
-from utils.voice_preprocess.mfcc_data_loader import MfccPack, label_dict
+from utils.voice_preprocess.data_loader import DataPack
+from utils.voice_preprocess.wav_loader import label_dict, doc_dict
 
 gestures = label_dict.keys()
+epsilon = 1e-8
+
+def to_category(labels):
+	ys = np.array(labels)
+	ys[ys > 0] = 1
+	ys[ys < 0] = 0
+	return ys
 
 
 class MySVC(SVC):
@@ -15,10 +23,8 @@ class MySVC(SVC):
 	Support Vector Classifier which provide feedback of incorrect classified samples' descriptions
 	'''
 
-	def learn(self, dataset: MfccPack):
-		dataset._ungroup(extend_labels=True)
-		super().fit(dataset.data, dataset.labels)
-		dataset._regroup(lessen_labels=True)
+	def learn(self, dataset: DataPack):
+		super().fit(dataset.data, to_category(dataset.labels))
 
 	def predict_grouply(self, data):
 		'''
@@ -48,7 +54,7 @@ class MySVC(SVC):
 			probs.append(prob)
 		return probs
 
-	def evaluate(self, dataset: MfccPack, group=False):
+	def evaluate(self, dataset: DataPack, group=False):
 		'''
 		score dataset with mistake count
 
@@ -58,36 +64,36 @@ class MySVC(SVC):
 		'''
 		if group == True:
 			predictions = self.predict_grouply(dataset.data)
-			_, labels, names = dataset
 		else:
-			_, labels, names = dataset._ungroup(extend_labels=True, extend_names=True)
 			predictions = self.predict(dataset.data)
-			dataset._regroup(lessen_labels=True, lessen_names=True)
 
-		counter = Counter(names)  # count each gesture
+		labels = dataset.labels
+		ys = to_category(labels)
+
+		counter = Counter(labels)  # count each gesture
 		mistakes = Counter()  # incorrect count for all gestures
 		tp, tn, fp, fn = 0, 0, 0, 0
 
-		for prediction, label, gesture in zip(predictions, labels, names):
-			if prediction == label:
-				if label == 1:
+		for prediction, y, label in zip(predictions, ys, labels):
+			if prediction == y:
+				if y == 1:
 					tp += 1
 				else:
 					tn += 1
 			else:  # classified wrongly
-				if label == 1:
+				if y == 1:
 					fn += 1
 				else:
 					fp += 1
-				mistakes.update([gesture])
-		precision = tp / (tp + fp)
-		recall = tp / (tp + fn)
-		acc = (tp + tn) / (tp + tn + fp + fn)
-		f1 = 2 * precision * recall / (precision + recall)
+				mistakes.update([label])
+		precision = tp / (tp + fp + epsilon)
+		recall = tp / (tp + fn + epsilon)
+		acc = (tp + tn) / (tp + tn + fp + fn + epsilon)
+		f1 = 2 * precision * recall / (precision + recall + epsilon)
 
 		return acc, f1, mistakes, counter
 
-	def get_predict_proba_distribution(self, dataset: MfccPack, group=False):
+	def get_predict_proba_distribution(self, dataset: DataPack, group=False):
 		'''
 		get the predict probability distribution over dataset
 
@@ -100,13 +106,13 @@ class MySVC(SVC):
 			probs = self.predict_proba_grouply(dataset.data)
 			preds = self.predict_grouply(dataset.data)
 			labels = dataset.labels
+			ys = to_category(labels)
 		else:
-			labels = dataset._ungroup(extend_labels=True).labels
+			ys = to_category(dataset.labels)
 			probs = self.predict_proba(dataset.data)
-			dataset._regroup(lessen_labels=True)
 			preds = np.argmax(probs, axis=1)
 
-		for prob, pred, target in zip(probs, preds, labels):
+		for prob, pred, target in zip(probs, preds, ys):
 			if pred == target:
 				true_prob_list.append(prob[pred])
 			else:
@@ -119,7 +125,7 @@ class MyKNN(KNeighborsClassifier):
 	KNeighborsClassifier which provide feedback of incorrect classified samples' descriptions
 	'''
 
-	def learn(self, dataset: MfccPack):
+	def learn(self, dataset: DataPack):
 		dataset._ungroup(extend_labels=True)
 		super().fit(dataset.data, dataset.labels)
 		dataset._regroup(lessen_labels=True)
@@ -156,7 +162,7 @@ class MyKNN(KNeighborsClassifier):
 			probs.append(prob)
 		return probs
 
-	def evaluate(self, dataset: MfccPack, group=False):
+	def evaluate(self, dataset: DataPack, group=False):
 		'''
 		score dataset with mistake count
 
@@ -195,7 +201,7 @@ class MyKNN(KNeighborsClassifier):
 
 		return acc, f1, mistakes, counter
 
-	def get_predict_proba_distribution(self, dataset: MfccPack, group=False):
+	def get_predict_proba_distribution(self, dataset: DataPack, group=False):
 		'''
 		get the predict probability distribution over dataset
 

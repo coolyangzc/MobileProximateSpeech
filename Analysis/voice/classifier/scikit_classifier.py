@@ -8,17 +8,31 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
 from configs.subsampling_config import subsampling_config_2_channel
-from utils.io import *
+from utils import io
 from utils.logger import DualLogger
 from utils.tools import date_time
-from utils.voice_preprocess.mfcc_data_loader import MfccPack, label_dict
+from utils.voice_preprocess.data_loader import DataPack
+from utils.voice_preprocess.wav_loader import label_dict, doc_dict
 from voice.classifier.MyCLF import MySVC
 
 # globals
 gestures = label_dict.keys()
 CWD = '/Users/james/MobileProximateSpeech/Analysis'
 DATE_TIME = date_time()
-FOLDER = '%sstereo chunks whole classifier' % DATE_TIME # todo
+FOLDER = '%sstereo chunks features' % DATE_TIME  # todo
+AVAILABLE_STEREO_FEATURES = [
+	'rms.DataPack',
+	'zcr.DataPack',
+	# 'spectral_centroid.DataPack',
+	# 'spectral_rolloff.DataPack',
+	# 'spectral_bandwidth.DataPack',
+	# 'spectral_contrast.DataPack',
+]
+AVAILABLE_MONO_FEATURES = [
+	'rms_diff.DataPack',
+	'mfcc_diff.DataPack',
+	# 'spectral_flatness_diff.DataPack'
+]
 VAL_ORD = 0
 TOT_VAL = 0
 bad_testers = []
@@ -48,10 +62,11 @@ class Results:
 		return self
 
 	def summary(self):
+		global output_dir
 		print('\n== Summary of %s ==\n' % self.name)
 		print('acc = %.4f%%, f1 = %.4f%%\n' % (self.acc * 100, self.f1 * 100))
 		show_table(self.mistakes, self.counter)
-		visualize_proba(self.tl, self.fl, self.name, out_path='output/%s/%s summary.png' % (FOLDER, self.name))
+		visualize_proba(self.tl, self.fl, self.name, out_path=os.path.join(output_dir, '%s summary.png' % self.name))
 
 	def as_csv(self):
 		return self.name + ' ACC, ' + str(self.acc) + '\n' + self.name + ' F1, ' + str(self.f1) + '\n'
@@ -74,7 +89,7 @@ def visualize_proba(tl, fl, title, out_path=None):
 	plt.ylabel('Frequency')
 	plt.legend()
 	if out_path is None:
-		out_path = os.path.join(CWD, 'output/%s/val-%d/%s.png' % (FOLDER, VAL_ORD, name))
+		out_path = os.path.join(CWD, os.path.join(output_dir, 'val-%d/%s.png' % (VAL_ORD, name)))
 	plt.savefig(out_path)
 	plt.show()
 
@@ -102,15 +117,16 @@ def pca_reduction(dataset, test, n_components):
 def show_table(mistakes, counter):
 	print('\t[Gesture] 　　　 [Mistakes Rate]  [Gesture Count]')
 	for gesture in gestures:
-		if counter[gesture] == 0:
+		label = label_dict[gesture]
+		if counter[label] == 0:
 			mistake_rate = float('nan')
 		else:
-			mistake_rate = mistakes[gesture] / counter[gesture]
-		print('\t{0:{1}<10}  {2:>8.2f}%  {3:>10}'.format(gesture, chr(12288), mistake_rate * 100, counter[gesture]))
+			mistake_rate = mistakes[label] / counter[label]
+		print('\t{0:{1}<10}  {2:>8.2f}%  {3:>10}'.format(gesture, chr(12288), mistake_rate * 100, counter[label]))
 	print()
 
 
-def evaluate(clf, which, dataset: MfccPack, group=False):
+def evaluate(clf, which, dataset: DataPack, group=False):
 	'''
 	:return: Results
 	'''
@@ -124,6 +140,18 @@ def evaluate(clf, which, dataset: MfccPack, group=False):
 	return Results(acc, f1, mistakes, counter, tl, fl)
 
 
+def load_features(wkdir: str) -> DataPack:
+	fs = DataPack()
+	for feature in AVAILABLE_STEREO_FEATURES:
+		f = io.load_from_file(os.path.join(wkdir, feature))
+		fs.juxtapose(f, axis=-1)
+	fs.into_2d()
+	for feature in AVAILABLE_MONO_FEATURES:
+		f = io.load_from_file(os.path.join(wkdir, feature))
+		fs.juxtapose(f, axis=-1)
+	return fs
+
+
 def leave_one_out(wkdirs, testdir):
 	'''
 	train and validate on wkdirs, transfer testing on testdir
@@ -133,71 +161,56 @@ def leave_one_out(wkdirs, testdir):
 	'''
 	global VAL_ORD, TOT_VAL, TRAIN_RES, VAL_RES, TEST_RES, TRAIN_RES_G, VAL_RES_G, TEST_RES_G, bad_testers
 	VAL_ORD += 1
-	logger = DualLogger(os.path.join(CWD, 'logs/%s/val-%d.txt' % (FOLDER, VAL_ORD)))
-	os.mkdir(os.path.join(CWD, 'output/%s/val-%d' % (FOLDER, VAL_ORD)))
+	logger = DualLogger(os.path.join(logs_dir, 'val-%d.txt' % VAL_ORD))
+	os.mkdir(os.path.join(output_dir, 'val-%d' % VAL_ORD))
 
 	print('====== Leave One Out # %d / %d ======\n' % (VAL_ORD, TOT_VAL))
 	print('Training and validating on %s' % wkdirs)
 	print('Testing on %s' % testdir)
 	print()
-	wkdirs = [os.path.join(wkdir, 'trimmed2channel') for wkdir in wkdirs]
+	wkdirs = [os.path.join(wkdir, 'features') for wkdir in wkdirs]
 	tester_name = testdir
-	testdir = os.path.join(testdir, 'trimmed2channel')
+	testdir = os.path.join(testdir, 'features')
 
 	# load ######################################################
 	# todo can use load from chunks
 	print('=== Data ===')
-	dataset = MfccPack()
-	dataset.from_chunks_dir(wkdirs, cache=True, reload=False, mono=False)
+	dataset = DataPack()
+	for wkdir in wkdirs:
+		dataset += load_features(wkdir)
 
-	test = MfccPack()
-	test.from_chunks_dir(testdir, cache=True, reload=False, mono=False)
+	print('train & val:')
+	dataset.shuffle_all().normalize().into_ndarray().show_shape()
+
+	test = load_features(testdir)
+	print('test:')
+	test.shuffle_all().normalize().into_ndarray().show_shape()
+
 	print('data loaded.')
-
-	# print('dataset shape:')
-	# dataset.show_shape()
-	# print()
-	# print('test shape:')
-	# test.show_shape()
-	# print()
-
-	dataset.apply_subsampling_grouping()
-	test.apply_subsampling_grouping()
-	# dataset.apply_subsampling()
-	# test.apply_subsampling()
-	dataset.to_flatten()
-	test.to_flatten()
-
-	print('after flatten:\n')
-	print('dataset info:')
-	dataset.show_info()
-	print('test info:')
-	test.show_info()
 
 	# PCA ######################################################
 	# todo adjustable
-	pca_reduction(dataset, test, n_components=20)
-	print('\napplied transform on train, dev & test.')
+	# pca_reduction(dataset, test, n_components=20)
+	# print('\napplied transform on train, dev & test.')
+
 	train, val = dataset.train_test_split(test_size=0.1)
 	print('train shape:')
 	train.show_shape()
-	print('\ndev shape:')
+	print('dev shape:')
 	val.show_shape()
-	print('\ntest  shape:')
-	test.show_shape()
 	print()
 
 	# visualize ######################################################
 	# todo whether to enable distribution visualization
-	# output_path1 = os.path.join(CWD, 'output/%s/val-%d/Distribution of train & dev.png' % (FOLDER, VAL_ORD))
-	# output_path2 = os.path.join(CWD, 'output/%s/val-%d/Distribution of test.png' % (FOLDER, VAL_ORD))
+	# output_path1 = os.path.join(output_dir, 'val-%d/Distribution of train & dev.png' % VAL_ORD)
+	# output_path2 = os.path.join(output_dir, 'val-%d/Distribution of test.png' % VAL_ORD)
 	# dataset.visualize_distribution(title='train & dev', out_path=output_path1)
 	# test.visualize_distribution(title='test', out_path=output_path2)
 
 	# classifier ######################################################
 	# todo adjustable
 	print('=== train & dev ===')
-	clf = MySVC(kernel='rbf', gamma=1e-5, C=1.0, class_weight='balanced', probability=True,
+	clf = MySVC(kernel='rbf', gamma='scale', C=1.0, class_weight='balanced', probability=True,
 				verbose=False, cache_size=1000)
 	# clf = MyKNN(n_neighbors=8, weights='distance', algorithm='auto', leaf_size=30, n_jobs=-1)
 	print('\nclf config:\n%s\n' % clf)
@@ -219,12 +232,12 @@ def leave_one_out(wkdirs, testdir):
 	if res.acc < 0.80: bad_testers.append((tester_name, res.acc))
 	TEST_RES += res
 
-	print('\n== with group voting ==')
-	TRAIN_RES_G += evaluate(clf, 'train', train, group=True)
-	VAL_RES_G += evaluate(clf, 'dev', val, group=True)
-	TEST_RES_G += evaluate(clf, 'test', test, group=True)
+	# print('\n== with group voting ==')
+	# TRAIN_RES_G += evaluate(clf, 'train', train, group=True)
+	# VAL_RES_G += evaluate(clf, 'dev', val, group=True)
+	# TEST_RES_G += evaluate(clf, 'test', test, group=True)
 
-	save_to_file(clf, os.path.join(CWD, 'voice/model_state/%s/val-%d-%s.clf' % (FOLDER, VAL_ORD, type(clf))))
+	io.save_to_file(clf, os.path.join(model_state_dir, 'val-%d-%s.clf' % (VAL_ORD, type(clf))))
 	logger.close()
 
 
@@ -232,17 +245,20 @@ if __name__ == '__main__':
 
 	since = time.time()
 	os.chdir(CWD)
-	os.mkdir('output/%s' % FOLDER)
-	os.mkdir('logs/%s' % FOLDER)
-	os.mkdir('voice/model_state/%s' % FOLDER)
-	os.chdir('Data/Study3/subjects copy')
+	output_dir = os.path.abspath('output/%s' % FOLDER)
+	logs_dir = os.path.abspath('logs/%s' % FOLDER)
+	model_state_dir = os.path.abspath('voice/model_state/%s' % FOLDER)
+	os.mkdir(output_dir)
+	os.mkdir(logs_dir)
+	os.mkdir(model_state_dir)
+	os.chdir('../Data/Study3/subjects copy')
 
-	# subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
-	females = ['gfz', 'jwy', 'mq', 'wrl', 'lgh']
-	males = ['wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr']
+	subject_dirs = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))  # whole set
+	# females = ['gfz', 'jwy', 'mq', 'wrl', 'lgh']
+	# males = ['wty', 'wzq', 'yzc', 'xy', 'gyz', 'cjr']
 	# subject_dirs = random.sample(females, k=1)
 	# subject_dirs += random.sample(males, k=3)
-	subject_dirs = males + females
+	subject_dirs = subject_dirs[:5]
 	print('subjects: ', subject_dirs)
 	TOT_VAL = len(subject_dirs)
 
@@ -252,12 +268,19 @@ if __name__ == '__main__':
 		leave_one_out(wkdirs, testdir)
 
 	os.chdir(CWD)
-	logger = DualLogger('logs/%s/summary.txt' % FOLDER)
+	logger = DualLogger(os.path.join(logs_dir, 'summary.txt'))
 	print('===== Summary =====\n')
 
-	for res in TRAIN_RES, VAL_RES, TEST_RES, TRAIN_RES_G, VAL_RES_G, TEST_RES_G:
+	for res in TRAIN_RES, VAL_RES, TEST_RES:#, TRAIN_RES_G, VAL_RES_G, TEST_RES_G:
 		res /= TOT_VAL
 		res.summary()
+	print()
+
+	print('used features:')
+	for item in AVAILABLE_MONO_FEATURES:
+		print(item, ': mono')
+	for item in AVAILABLE_STEREO_FEATURES:
+		print(item, ': stereo')
 	print()
 
 	print('bad testers:')
@@ -282,6 +305,6 @@ if __name__ == '__main__':
 	logger.close()
 
 	# save to .csv
-	with open('logs/%s/summary.csv' % FOLDER, 'w') as f:
-		for res in TRAIN_RES, VAL_RES, TEST_RES, TRAIN_RES_G, VAL_RES_G, TEST_RES_G:
+	with open(os.path.join(logs_dir, 'summary.csv'), 'w') as f:
+		for res in TRAIN_RES, VAL_RES, TEST_RES: #, TRAIN_RES_G, VAL_RES_G, TEST_RES_G:
 			f.write(res.as_csv())

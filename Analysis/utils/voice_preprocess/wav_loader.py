@@ -172,7 +172,7 @@ class WavPack(DataPack):
 		:return: self, data shape like (n_segment, n_frame)
 		'''
 		if self.mono == True: return self
-		self.into_data_ndarray()
+		self.into_ndarray()
 		self.data = self.data[:, 0, :] - self.data[:, 1, :]
 		self.mono = True
 		return self
@@ -184,9 +184,13 @@ class WavPack(DataPack):
 		:return: self, data shape like (n_segment, n_frame)
 		'''
 		if self.mono == True: return self
-		self.into_data_ndarray()
+		self.into_ndarray()
 		self.data = self.data[:, 0, :] / self.data[:, 1, :]
 		self.mono = True
+		return self
+
+	def apply_abs(self):
+		self.data = np.abs(self.data)
 		return self
 
 

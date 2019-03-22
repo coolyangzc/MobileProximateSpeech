@@ -11,9 +11,9 @@ from utils import io
 from utils.tools import suffix_conv, suffix_filter
 
 
-def show_shape(iterable):
+def show_shape(iterable, end='\n'):
 	try:
-		print(np.array(iterable).shape)
+		print(np.array(iterable).shape, end=end)
 	except ValueError:
 		print('the shape is not standard, len = %d.' % len(iterable))
 
@@ -42,11 +42,12 @@ class DataPack(object):
 
 	def show_shape(self):
 		print('  data: ', end='')
-		show_shape(self.data)
-		print('  labels: ', end='')
-		show_shape(self.labels)
-		print('  names: ', end='')
+		show_shape(self.data, end='\t')
+		print('labels: ', end='')
+		show_shape(self.labels, end='\t')
+		print('names: ', end='')
 		show_shape(self.names)
+		print()
 		return self
 
 	def shuffle_all(self, random_seed=None):
@@ -78,12 +79,16 @@ class DataPack(object):
 				names.append(name)
 		return DataPack(samples, labels, names)
 
-	def into_data_ndarray(self):
+	def into_ndarray(self):
 		self.data = np.array(self.data)
 		return self
 
-	def into_data_list(self):
+	def into_list(self):
 		self.data = list(self.data)
+		return self
+
+	def into_2d(self):
+		self.data = np.array([x.flatten() for x in self.data])
 		return self
 
 	def squeeze_data(self):
@@ -112,6 +117,22 @@ class DataPack(object):
 		:param other:  DataPack
 		'''
 		return DataPack(list(self.data) + list(other.data), self.labels + other.labels, self.names + other.names)
+
+	def juxtapose(self, other, axis):
+		'''
+		concatenate another DataPack parallelly
+
+		:param other: DataPack
+		:param axis: which axis of data to concatenate
+		:return: self
+		'''
+		if len(self.data) == 0:
+			self.data = other.data
+			self.labels = other.labels
+			self.names = other.names
+		else:
+			self.data = np.concatenate((self.data, other.data), axis=axis)
+		return self
 
 	def roll_data_axis(self, axis, start):
 		self.data = list(np.rollaxis(np.array(self.data), axis, start))
@@ -195,3 +216,29 @@ class DataPack(object):
 
 			dst_path = os.path.join(dst_dir, dst_name)
 			io.save_to_file(x, dst_path)
+
+	def grouping(self, group_size):
+		'''
+		从self.data得到组合列表，会忽略末尾凑不足group_size的单元
+		可以不用这种表示方法
+
+		:param group_size: size of each group
+		:return: list of groups, shape like (n_group, n_unit, ...) where n_group = n_unit // group_size
+		'''
+		groups, group = [], []
+		for x in self.data:
+			group.append(x)
+			if len(group) == group_size:
+				groups.append(group)
+				group = []
+		self.data = groups
+		return self
+
+	def normalize(self, std=True):
+		self.into_ndarray()
+		mean = np.mean(self.data, axis=0, keepdims=True)
+		self.data -= mean
+		if std:
+			std = np.std(self.data, axis=0, keepdims=True)
+			self.data /= std
+		return self
