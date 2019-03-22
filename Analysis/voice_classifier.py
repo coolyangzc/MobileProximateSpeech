@@ -8,6 +8,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴',
 			'水平端起，倒话筒', '话筒', '横屏',
@@ -83,10 +84,28 @@ def generate_model():
 		y_all.extend(y[i])
 	X_all, y_all = np.array(X_all), np.array(y_all)
 	print(X_all.shape, y_all.shape)
-	# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1})
-	clf = tree.DecisionTreeClassifier(max_depth=20)
+	# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
+	clf = tree.DecisionTreeClassifier(max_depth=8)
 	clf.fit(X_all, y_all)
+	joblib.dump(clf, "voice_model.m")
 	print(clf.score(X_all, y_all))
+
+	cnt = np.zeros((2, 100 + 1))
+	proba = clf.predict_proba(X_all)
+	for i in range(len(X_all)):
+		for res in range(2):
+			if proba[i][res] > 0.5:
+				if res == y_all[i]:
+					correct = 1
+				else:
+					correct = 0
+				p = int(proba[i][res] / 0.01)
+				cnt[correct][p] += 1
+	x_range = np.linspace(50, 100, 51)
+	plt.plot(x_range, cnt[0][50:], label='wrong')
+	plt.plot(x_range, cnt[1][50:], label='correct')
+	plt.legend()
+	plt.show()
 
 
 def leave_one_out_validation():
@@ -189,5 +208,5 @@ if __name__ == "__main__":
 	X, y, task, task_from = [], [], [], []
 	read_features('../Data/voice feature/')
 	# data_normalization()
-	# generate_model()
-	leave_one_out_validation()
+	generate_model()
+	# leave_one_out_validation()

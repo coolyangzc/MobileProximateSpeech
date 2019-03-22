@@ -8,6 +8,33 @@ interval_size = 6400
 feature_num = 28
 
 
+def extract_voice_features(left, right):
+	data = [[] for i in range(4)]
+	n = len(left)
+	data[0], data[1] = abs(left), abs(right)
+	a, b = 1, 1
+	for i in range(n):
+		data[2].append(data[0][i] - data[1][i])
+		if data[0][i] > 0:
+			a = data[0][i]
+		if data[1][i] > 0:
+			b = data[1][i]
+		data[3].append(a / b)
+
+	feature = []
+	for i in range(4):
+		feature.append(np.min(data[i]))
+		feature.append(np.max(data[i]))
+		feature.append(np.median(data[i]))
+		feature.append(np.mean(data[i]))
+		feature.append(np.std(data[i], ddof=1))
+		q75, q25 = np.percentile(data[i], [75, 25])
+		IQR = q75 - q25
+		feature.append(IQR)
+		feature.append(np.mean(np.array(data[i]) ** 2))
+	return feature
+
+
 def calc_features(wav_file):
 	try:
 		wavefile = wave.open(wav_file, 'r')
@@ -31,28 +58,7 @@ def calc_features(wav_file):
 
 	s = 0
 	while s + interval_size < numframes:
-		data = [[] for i in range(4)]
-		data[0] = abs(y[0][s:s + interval_size])
-		data[1] = abs(y[1][s:s + interval_size])
-		data[2] = data[0] - data[1]
-		a, b = 1, 1
-		for i in range(len(data[0])):
-			if data[0][i] > 0:
-				a = data[0][i]
-			if data[1][i] > 0:
-				b = data[1][i]
-			data[3].append(a / b)
-		feature = []
-		for i in range(4):
-			feature.append(np.min(data[i]))
-			feature.append(np.max(data[i]))
-			feature.append(np.median(data[i]))
-			feature.append(np.mean(data[i]))
-			feature.append(np.std(data[i], ddof=1))
-			q75, q25 = np.percentile(data[i], [75, 25])
-			IQR = q75 - q25
-			feature.append(IQR)
-			feature.append(np.mean(np.array(data[i]) ** 2))
+		feature = extract_voice_features(y[0][s:s + interval_size], y[1][s:s + interval_size])
 		for f in feature:
 			output.write(str(f) + '\n')
 		s += interval_size

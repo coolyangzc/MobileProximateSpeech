@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from collections import deque
 from sklearn.externals import joblib
 from motion_feature import extract_sensor_feature
+from voice_feature import extract_voice_features
 from time import ctime
 
 HOST = '192.168.1.102'
@@ -145,13 +146,16 @@ class AudioThread(threading.Thread):
 				data = conn.recv(5120)
 				if not data:
 					break
-				print('audio:' + str(len(data)))
+				# print('audio:' + str(len(data)))
 				for i in range(len(data) // 4):
 					left, right = data[i*4+0: i*4+2], data[i*4+2:i*4+4]
 					y.append(struct.unpack('h', left)[0])
 					z.append(struct.unpack('h', right)[0])
 
 				if len(y) >= 6400:
+					y, z = np.array(y), np.array(z)
+					feature = extract_voice_features(y, z)
+					'''
 					numframes = len(y)
 					framerate = 32000
 					times = []
@@ -162,7 +166,9 @@ class AudioThread(threading.Thread):
 					plt.plot(times, z, label='up')
 					plt.legend()
 					plt.show()
+					'''
 					y, z = [], []
+					print('audio:', audio_model.predict([feature])[0])
 				# buffer += data
 			# conn.send(('[%s] %s' % (ctime(), data)).encode())
 			# print('[%s] %s' % (ctime(), data))
@@ -174,11 +180,11 @@ class AudioThread(threading.Thread):
 
 if __name__ == "__main__":
 	q = []
-	motion_model = joblib.load("motion_model.m")
+	motion_model = joblib.load('motion_model.m')
 	motion_thread = MotionThread()
 	motion_thread.start()
 
-	# audio_model =
+	audio_model = joblib.load('voice_model.m')
 	audio_thread = AudioThread()
 	audio_thread.start()
 
