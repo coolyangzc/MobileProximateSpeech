@@ -9,20 +9,21 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
 
-'''
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
             '竖屏握持，上端遮嘴',  # '水平端起，倒话筒',
             '话筒', '横屏',
 			'左耳打电话（不碰）', '右耳打电话（不碰）',
 			'左耳打电话（碰触）', '右耳打电话（碰触）']
 negative = ['大千世界', '自拍']
-'''
 
+
+'''
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
             '竖屏握持，上端遮嘴',  # '水平端起，倒话筒',
             '话筒']
 negative = ['左耳打电话（不碰）', '右耳打电话（不碰）',
 			'左耳打电话（碰触）', '右耳打电话（碰触）']
+'''
 
 
 def read_file(path, file_name, id):
