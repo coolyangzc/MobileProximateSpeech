@@ -1,16 +1,14 @@
+import io
 import os
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-import cv2
 import math
 import socket
 import struct
 import threading
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 from collections import deque
 
 from keras.models import load_model
@@ -87,10 +85,8 @@ def work(data):
 
 
 def deal_img(pic):
-	f = open('./recv.jpg', 'wb')
-	f.write(pic)
-	f.close()
-	img = Image.open('./recv.jpg')
+	stream = io.BytesIO(pic)
+	img = Image.open(stream)
 	X = [img_to_array(img)]
 	X = np.array(X)
 	X /= 255
@@ -101,8 +97,6 @@ def deal_img(pic):
 	else:
 		print("img: 1 %.2f" % (res[1] * 100))
 
-	# src = cv2.imread('./recv.jpg')
-	# cv2.imshow('input_image', src)
 	return True
 
 
