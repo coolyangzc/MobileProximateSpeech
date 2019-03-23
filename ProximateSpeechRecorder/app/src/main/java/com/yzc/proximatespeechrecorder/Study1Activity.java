@@ -379,6 +379,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice camera) {
+            Log.d(TAG, "onOpened");
             mCameraDevice = camera;
         }
 

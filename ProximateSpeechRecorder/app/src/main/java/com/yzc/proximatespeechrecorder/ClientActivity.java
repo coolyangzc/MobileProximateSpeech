@@ -4,37 +4,54 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ImageFormat;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CaptureRequest;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.media.Image;
+import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.util.Range;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ClientActivity extends Activity implements SensorEventListener {
 
-    private final String HOST = "192.168.1.102";
-    private final int PORT = 8888;
-    private final int AUDIOPORT = 8889;
     Socket socketClient, audioSocket;
     private OutputStream audioOutputStream;
 
@@ -53,18 +70,15 @@ public class ClientActivity extends Activity implements SensorEventListener {
 
     private String sent = "";
 
-    //AudioRecord
-    private final static int AUDIO_SAMPLE_RATE = 32000;
-    private final static int AUDIO_INPUT = MediaRecorder.AudioSource.MIC;
-    private final static int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_STEREO;
-    private final static int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-    private int bufferSizeInBytes = 0;
-    private AudioRecord mAudioRecord;
-
     //Camera2, for same SENSOR_DELAY_GAME
     private String mCameraIdFront;
     private CameraDevice mCameraDevice;
     private MediaRecorder mMediaRecorder;
+    private CaptureRequest.Builder mCaptureBuilder;
+    private ImageReader mImageReader;
+    private CaptureRequest mCaptureRequest;
+    private CameraCaptureSession mCaptureSession;
+    private Range<Integer>[] fpsRanges;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,60 +88,6 @@ public class ClientActivity extends Activity implements SensorEventListener {
         loadSensor();
         setupCamera();
         openCamera(mCameraIdFront);
-        // startAudioRecord();
-        /*
-        Thread thread = new Thread() {
-            @Override
-            public void run() {sendClient();}
-        };
-        thread.start();
-        */
-    }
-
-    private void startAudioRecord() {
-        bufferSizeInBytes = AudioRecord.getMinBufferSize(AUDIO_SAMPLE_RATE,
-                CHANNEL_CONFIG, AUDIO_FORMAT);
-        mAudioRecord = new AudioRecord(AUDIO_INPUT, AUDIO_SAMPLE_RATE,
-                CHANNEL_CONFIG, AUDIO_FORMAT, bufferSizeInBytes);
-        mAudioRecord.startRecording();
-        new Thread(new AudioThread()).start();
-    }
-
-    class AudioThread implements Runnable {
-
-        @Override
-        public void run() {
-            int readSize = 0;
-            byte[] audioData = new byte[bufferSizeInBytes];
-            while (true) {
-                readSize = mAudioRecord.read(audioData, 0, bufferSizeInBytes);
-                if (AudioRecord.ERROR_INVALID_OPERATION != readSize && audioOutputStream != null) {
-                    try {
-                        audioOutputStream.write(audioData);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-        }
-    }
-
-
-    private synchronized void send() {
-        if (sent.length() > 0)
-            try {
-                Log.i("ClientSend", sent);
-                out.write(sent);
-                out.flush();
-                sent = "";
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-    }
-
-    private synchronized void add(String msg) {
-        sent += msg;
     }
 
     private void loadSensor() {
@@ -159,53 +119,16 @@ public class ClientActivity extends Activity implements SensorEventListener {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Thread thread;
             switch (view.getId()) {
                 case R.id.button_connect:
-                    /*
-                    thread=new Thread(){
-                        @Override
-                        public void run() { tcpClient();}
-                    };
-                    thread.start();
-                    */
                     SocketManager.getInstance().connect();
                     break;
                 case R.id.button_send:
+                    startCapture();
                     break;
             }
         }
     };
-
-    private void sendClient() {
-        while (true)
-            send();
-    }
-
-    private void tcpClient(){
-        try {
-            Log.i("Client","新建套接字");
-            socketClient = new Socket(HOST, PORT);
-            Log.i("Client","新建套接字有效");
-            in = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
-            out = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
-
-            // audioSocket = new Socket(HOST, AUDIOPORT);
-            // audioOutputStream = audioSocket.getOutputStream();
-            /*
-            String outMsg = "TCP connecting to " + port + System.getProperty("line.separator");//发出的数据
-            out.write(outMsg);//发送数据
-            Log.i("Client","发送数据有效");
-            out.flush();
-            Log.i("TcpClient", "sent: " + outMsg);
-            String inMsg = in.readLine() + System.getProperty("line.separator");//服务器返回的数据
-            Log.i("TcpClient", "received: " + inMsg);
-            msg = inMsg;
-            socketClient.close();
-            */
-        } catch (UnknownHostException e){e.printStackTrace();}
-        catch (IOException e){e.printStackTrace();}
-    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -236,8 +159,7 @@ public class ClientActivity extends Activity implements SensorEventListener {
             msg += " " + values[i];
         msg += "#";
         Log.i("ClientTrue", msg);
-        SocketManager.getInstance().send(msg);
-        // add(msg);
+        SocketManager.getInstance().send_motion(msg);
     }
 
     @Override
@@ -261,6 +183,63 @@ public class ClientActivity extends Activity implements SensorEventListener {
         }
     }
 
+    private ImageReader.OnImageAvailableListener mOnImageAvailableListener =
+            new ImageReader.OnImageAvailableListener() {
+        @Override
+        public void onImageAvailable(ImageReader reader) {
+            Image image = reader.acquireLatestImage();
+            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+            byte[] bytes = new byte[buffer.remaining()];
+            buffer.get(bytes);
+            Log.d("ImageReader", String.valueOf(bytes.length));
+            Log.d("ImageReader", String.valueOf(image.getWidth()) + " " + String.valueOf(image.getHeight()));
+            // save(bytes, file);
+            /*Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+            Bitmap newBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+            Canvas canvas = new Canvas(newBitmap);
+            Paint paint = new Paint();
+            canvas.drawBitmap(bitmap, 500, 500, paint);*/
+            image.close();
+        }
+    };
+
+    private void startCapture() {
+
+        mImageReader = ImageReader.newInstance(108, 192, ImageFormat.JPEG, 2);
+        mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
+        try {
+            mCaptureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            List<Surface> surfaces = new ArrayList<>();
+
+            Surface recorderSurface = mImageReader.getSurface();
+            surfaces.add(recorderSurface);
+            mCaptureBuilder.addTarget(recorderSurface);
+            mCaptureBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRanges[fpsRanges.length - 1]);
+            Log.d("FPS", "Used fps: " + String.valueOf(fpsRanges[fpsRanges.length - 1]));
+            mCameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onConfigured(CameraCaptureSession session) {
+                    try {
+                        mCaptureRequest = mCaptureBuilder.build();
+                        mCaptureSession = session;
+                        mCaptureSession.setRepeatingRequest(mCaptureRequest, null, null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onConfigureFailed(CameraCaptureSession session) {
+                    Log.d(TAG, "onConfigureFailed");
+                }
+            }, null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void openCamera(String CameraId) {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
@@ -269,9 +248,14 @@ public class ClientActivity extends Activity implements SensorEventListener {
                 return;
             }
             manager.openCamera(CameraId, mStateCallback, null);
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(CameraId);
+            fpsRanges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+            Log.d("FPS", "SYNC_MAX_LATENCY_PER_FRAME_CONTROL: " + Arrays.toString(fpsRanges));
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+
+
     }
 
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {

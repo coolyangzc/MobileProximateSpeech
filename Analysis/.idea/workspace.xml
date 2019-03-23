@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="de7ba81e-35ff-462d-bbea-3ee31447ea18" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/SocketManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/ClientActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/ClientActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/SocketManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/SocketManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/Study1Activity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/Study1Activity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/res/layout/activity_client.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/res/layout/activity_client.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -80,7 +82,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-327">
+            <state relative-caret-position="-371">
               <caret line="93" column="9" selection-start-line="93" selection-start-column="9" selection-end-line="93" selection-end-column="9" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -194,7 +196,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="53" />
     <option name="y" value="262" />
     <option name="width" value="1940" />
@@ -441,12 +443,12 @@
       <workItem from="1553044160923" duration="24303000" />
       <workItem from="1553071538827" duration="38504000" />
       <workItem from="1553218193822" duration="4394000" />
-      <workItem from="1553223700814" duration="22730000" />
+      <workItem from="1553223700814" duration="24429000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="314985000" />
+    <option name="totallyTimeSpent" value="316684000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -458,14 +460,14 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18766756" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.2549575" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.062322944" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -873,7 +875,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-327">
+        <state relative-caret-position="-371">
           <caret line="93" column="9" selection-start-line="93" selection-start-column="9" selection-end-line="93" selection-end-column="9" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
