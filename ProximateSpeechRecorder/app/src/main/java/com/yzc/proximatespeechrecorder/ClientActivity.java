@@ -162,7 +162,6 @@ public class ClientActivity extends Activity implements SensorEventListener {
         for (int i = 0; i < values.length; ++i)
             msg += " " + values[i];
         msg += "#";
-        Log.i("ClientTrue", msg);
         SocketManager.getInstance().send_motion(msg);
     }
 

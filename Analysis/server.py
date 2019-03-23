@@ -1,9 +1,9 @@
-import io
 import os
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
+import io
 import math
 import socket
 import struct
@@ -20,8 +20,12 @@ from motion_feature import extract_sensor_feature
 from voice_feature import extract_voice_features
 
 HOST = '192.168.1.102'
-PORT, IMG_PORT, AUDIO_PORT = 8888, 8889, 8890
+MOTION_PORT, IMG_PORT, SEND_PORT, AUDIO_PORT = 8888, 8889, 8890, 8891
 res, last_time = 0, 0
+
+# Thread Lock
+lock = threading.Lock()
+msg = ''
 
 sensor_list = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE', 'PROXIMITY']
 
@@ -44,7 +48,7 @@ def work_sensor(sensor_name, queue, start_time, end_time):
 def work(data):
 	# print("trimmed: " + data + '\n')
 	if len(data) == 0:
-		return
+		return -1
 	item = data.split(' ')
 	c = -1
 	for i in range(len(sensor_list)):
@@ -56,7 +60,7 @@ def work(data):
 		for i in range(len(item) - 1):
 			val.append(float(item[i+1]))
 	except ValueError:
-		return
+		return -1
 	q[c].append(val)
 	t = val[0]
 	s = t - 2000
@@ -64,7 +68,7 @@ def work(data):
 		q[c].popleft()
 	global last_time
 	if c != 0 or t - 200 < last_time:
-		return
+		return -1
 	last_time = t
 	feature = []
 	m = (s + t) / 2
@@ -73,15 +77,17 @@ def work(data):
 		feature.extend(work_sensor(sensor_list[i], q[i], m, t))
 	for f in feature:
 		if math.isnan(f) or math.isinf(f):
-			return
+			return -1
 	new_res = motion_model.predict([feature])[0]
 	prob = motion_model.predict_proba([feature])[0]
 	# print('feature', feature)
-	# print('%d %.2f' % (new_res, prob[1]))
-	global res
+	print('motion: %d %.2f' % (new_res, prob[1]))
+	global lock, msg, res
+
 	if new_res != res:
 		res = new_res
 		print(res)
+	return prob[1]
 
 
 def deal_img(pic):
@@ -91,13 +97,36 @@ def deal_img(pic):
 	X = np.array(X)
 	X /= 255
 	X = X.astype(np.float32)
-	res = img_model.predict(X)[0]
-	if res[0] > res[1]:
-		print("img: 0 %.2f" % (res[0] * 100))
-	else:
-		print("img: 1 %.2f" % (res[1] * 100))
+	# res = img_model.predict(X)[0]
+	res = [0, 0]
+	print("img: %.2f" % (res[1] * 100))
+	global lock, msg
+	lock.acquire()
+	msg += 'I ' + str(res[1]) + '#'
+	lock.release()
 
-	return True
+
+class SendThread(threading.Thread):
+
+	def run(self):
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		try:
+			s.bind((HOST, SEND_PORT))
+		except socket.error as err:
+			print('Bind Failed, Error Code: ' + str(err[0]) + ' ,Message: ' + err[1])
+		print('Send Socket Bind Success!')
+		s.listen(5)
+		print('Send Socket is now listening')
+		global lock, msg
+		while True:
+			conn, addr = s.accept()
+			print('Connect with ' + addr[0] + ':' + str(addr[1]))
+			while True:
+				lock.acquire()
+				while len(msg) > 0:
+					conn.send(msg.encode())
+					msg = ''
+				lock.release()
 
 
 class MotionThread(threading.Thread):
@@ -106,11 +135,10 @@ class MotionThread(threading.Thread):
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 		try:
-			s.bind((HOST, PORT))
+			s.bind((HOST, MOTION_PORT))
 		except socket.error as err:
 			print('Bind Failed, Error Code: ' + str(err[0]) + ' ,Message: ' + err[1])
 		print('Motion Socket Bind Success!')
-
 		s.listen(5)
 		print('Motion Socket is now listening')
 		for i in range(len(sensor_list)):
@@ -131,10 +159,11 @@ class MotionThread(threading.Thread):
 					sp = buffer.find('#')
 					if sp == -1:
 						break
-					work(buffer[:sp])
+					motion_res = work(buffer[:sp])
+					if motion_res != -1:
+						msg = format(motion_res, '.4f') + '#'
+						conn.send(msg.encode())
 					buffer = buffer[sp + 1:]
-			# conn.send(('[%s] %s' % (ctime(), data)).encode())
-			# print('[%s] %s' % (ctime(), data))
 
 			conn.close()
 			print('Motion Client Disconnected')
@@ -240,20 +269,23 @@ class ImgThread(threading.Thread):
 if __name__ == "__main__":
 	q = []
 	motion_model = joblib.load('motion_model.m')
-	img_model = load_model('ear_cnn_model.h5')
+	# img_model = load_model('ear_cnn_model.h5')
 
 	img = Image.open('./sample.jpg')
 	X = [img_to_array(img)]
 	X = np.array(X)
 	X /= 255
 	X = X.astype(np.float32)
-	img_model.predict(X)[0]
+	# img_model.predict(X)[0]
 
 	motion_thread = MotionThread()
-	motion_thread.start()
-
 	img_thread = ImgThread()
+	# send_thread = SendThread()
+
+	motion_thread.start()
 	img_thread.start()
+	# send_thread.start()
 
 	motion_thread.join()
 	img_thread.join()
+	# send_thread.join()

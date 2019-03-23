@@ -2,9 +2,10 @@ package com.yzc.proximatespeechrecorder;
 
 import android.util.Log;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,10 +15,11 @@ public class SocketManager {
     private final String HOST = "192.168.1.102";
     private final int MOTION_PORT = 8888;
     private final int IMG_PORT = 8889;
+    private final int RECV_PORT = 8890;
     private static SocketManager shared = new SocketManager();
     public static SocketManager getInstance() { return shared; }
 
-    private Socket motion_socket, img_socket;
+    private Socket motion_socket, img_socket, recv_socket;
 
     private ExecutorService mThreadPool;
 
@@ -40,8 +42,46 @@ public class SocketManager {
                     e.printStackTrace();
                 }
             }
-
         });
+
+        mThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (motion_socket==null)
+                        Thread.sleep(100);
+                    InputStream is = motion_socket.getInputStream();
+                    byte buffer[] = new byte[128];
+                    int temp;
+                    while ((temp = is.read(buffer)) != -1)
+                        Log.d("RECV", new String(buffer, 0, temp));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        /*mThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    recv_socket = new Socket(HOST, RECV_PORT);
+                    InputStream is = recv_socket.getInputStream();
+                    byte buffer[] = new byte[128];
+                    int temp;
+                    while (true) {
+                        while ((temp = is.read(buffer)) != -1) {
+                            Log.d("RECV", new String(buffer, 0, temp));
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });*/
     }
 
     public boolean isConnected() {
@@ -68,6 +108,13 @@ public class SocketManager {
                     os.write(intToByteArray(byteArray.length));
                     os.write(byteArray);
                     os.flush();
+
+                    /*InputStream is = img_socket.getInputStream();
+                    byte buffer[] = new byte[128];
+                    int temp;
+                    while ((temp = is.read(buffer)) != -1) {
+                        Log.d("RECV", new String(buffer, 0, temp));
+                    }*/
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -79,7 +126,6 @@ public class SocketManager {
     public void send_motion(String msg) {
         final String str = msg;
 
-        // 利用线程池直接开启一个线程 & 执行该线程
         mThreadPool.execute(new Runnable() {
             @Override
             public void run() {

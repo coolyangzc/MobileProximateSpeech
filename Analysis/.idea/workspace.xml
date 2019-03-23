@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="de7ba81e-35ff-462d-bbea-3ee31447ea18" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/recv.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/recv.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,7 +16,7 @@
     <SUITE FILE_PATH="coverage/Analysis$speech_recognition.coverage" NAME="speech_recognition Coverage Results" MODIFIED="1552894653503" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$voice_trimmer.coverage" NAME="voice_trimmer Coverage Results" MODIFIED="1553048718586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$pic_classifier.coverage" NAME="pic_classifier Coverage Results" MODIFIED="1553222680032" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Analysis$server.coverage" NAME="server Coverage Results" MODIFIED="1553338620749" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$server.coverage" NAME="server Coverage Results" MODIFIED="1553345346408" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$ana.coverage" NAME="ana Coverage Results" MODIFIED="1552271133614" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$voice_SVM.coverage" NAME="voice_SVM Coverage Results" MODIFIED="1552879752995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$voice_visualization.coverage" NAME="voice_visualization Coverage Results" MODIFIED="1553073672738" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -56,7 +55,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pic_sort.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="131">
+            <state relative-caret-position="300">
               <caret line="16" column="22" selection-start-line="16" selection-start-column="22" selection-end-line="16" selection-end-column="22" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -68,8 +67,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pic_cnn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="112">
-              <caret line="50" column="9" selection-start-line="50" selection-start-column="4" selection-end-line="50" selection-end-column="9" />
+            <state relative-caret-position="-260">
+              <caret line="15" column="8" selection-start-line="15" selection-end-line="15" selection-end-column="8" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -80,12 +79,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="348">
-              <caret line="99" column="8" lean-forward="true" selection-start-line="99" selection-start-column="8" selection-end-line="99" selection-end-column="8" />
+            <state relative-caret-position="162">
+              <caret line="163" column="54" selection-start-line="163" selection-start-column="54" selection-end-line="163" selection-end-column="54" />
               <folding>
-                <element signature="e#0#9#0" expanded="true" />
-                <element signature="e#1902#3807#0" />
-                <element signature="e#2902#4318#0" />
+                <element signature="e#3356#4772#0" />
               </folding>
             </state>
           </provider>
@@ -94,8 +91,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/motion_classifier.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="111">
-              <caret line="150" column="44" lean-forward="true" selection-start-line="150" selection-start-column="44" selection-end-line="150" selection-end-column="44" />
+            <state relative-caret-position="2840">
+              <caret line="150" column="44" selection-start-line="150" selection-start-column="44" selection-end-line="150" selection-end-column="44" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -106,7 +103,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pic_feature.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
+            <state relative-caret-position="1720">
               <caret line="91" column="50" selection-start-line="91" selection-start-column="12" selection-end-line="91" selection-end-column="50" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -149,9 +146,12 @@
       <find>float64</find>
       <find>_KERAS_BACKEND</find>
       <find>backend</find>
-      <find>print</find>
       <find>print(</find>
       <find>print(X</find>
+      <find>print</find>
+      <find>bind</find>
+      <find>res</find>
+      <find>img_model</find>
     </findStrings>
     <replaceStrings>
       <replace>file_id</replace>
@@ -192,15 +192,16 @@
         <option value="E:/Tsinghua/博二上/人工智能/作业/手写数字识别/src/CNN.py" />
         <option value="$PROJECT_DIR$/pic_compresser.py" />
         <option value="$PROJECT_DIR$/pic_cnn.py" />
+        <option value="$PROJECT_DIR$/../../sorted pics_192_108/test.py" />
         <option value="$PROJECT_DIR$/server.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="53" />
-    <option name="y" value="262" />
+    <option name="x" value="122" />
+    <option name="y" value="407" />
     <option name="width" value="1940" />
-    <option name="height" value="982" />
+    <option name="height" value="983" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -261,25 +262,6 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.server">
-    <configuration name="CNN" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="Analysis" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="E:/Tsinghua/博二上/人工智能/作业/手写数字识别/src" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="E:/Tsinghua/博二上/人工智能/作业/手写数字识别/src/CNN.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -328,6 +310,9 @@
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -347,6 +332,9 @@
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -366,6 +354,9 @@
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -381,20 +372,42 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Analysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../sorted pics_192_108" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../../sorted pics_192_108/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Python.pic_cnn" />
-      <item itemvalue="Python.CNN" />
       <item itemvalue="Python.pic_sort" />
       <item itemvalue="Python.pic_compresser" />
       <item itemvalue="Python.server" />
+      <item itemvalue="Python.test" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.server" />
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.pic_cnn" />
         <item itemvalue="Python.pic_sort" />
         <item itemvalue="Python.pic_compresser" />
-        <item itemvalue="Python.CNN" />
       </list>
     </recent_temporary>
   </component>
@@ -443,12 +456,13 @@
       <workItem from="1553044160923" duration="24303000" />
       <workItem from="1553071538827" duration="38504000" />
       <workItem from="1553218193822" duration="4394000" />
-      <workItem from="1553223700814" duration="36415000" />
+      <workItem from="1553223700814" duration="37792000" />
+      <workItem from="1553340505753" duration="4831000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="328670000" />
+    <option name="totallyTimeSpent" value="334878000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -460,29 +474,29 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <frame x="98" y="326" width="1552" height="786" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18766756" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19009371" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.398017" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.07798165" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.32808024" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32719547" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.3286119" />
-      <window_info anchor="bottom" id="Python Console" order="12" weight="0.47025496" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.30028328" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="23" width="1536" height="801" id="SciView" order="3" visible="true" weight="0.17091152" />
+      <window_info anchor="right" x="0" y="23" width="1536" height="801" id="SciView" order="3" visible="true" weight="0.16934404" />
       <window_info anchor="right" id="Database" order="4" weight="0.3297587" />
       <window_info anchor="right" x="0" y="0" width="337" height="638" id="Documentation" order="5" side_tool="true" weight="0.3297587" />
     </layout>
@@ -491,13 +505,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/scipy/io/wavfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="272" selection-start-line="272" selection-end-line="272" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/voice.py" />
     <entry file="file://$PROJECT_DIR$/../../zfs voice/Analysis/utils/voice_preprocess/voice_trimmer.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -709,16 +716,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pic_feature.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="91" column="50" selection-start-line="91" selection-start-column="12" selection-end-line="91" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/keras/utils/np_utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="400">
@@ -805,16 +802,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pic_sort.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="131">
-          <caret line="16" column="22" selection-start-line="16" selection-start-column="22" selection-end-line="16" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/keras_preprocessing/image.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
@@ -836,30 +823,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/motion_classifier.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
-          <caret line="150" column="44" lean-forward="true" selection-start-line="150" selection-start-column="44" selection-end-line="150" selection-end-column="44" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/threading.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="117">
           <caret line="915" selection-start-line="915" selection-end-line="915" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pic_cnn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="50" column="9" selection-start-line="50" selection-start-column="4" selection-end-line="50" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -877,14 +844,53 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server.py">
+    <entry file="file://$PROJECT_DIR$/../../sorted pics_192_108/test.py" />
+    <entry file="file://$PROJECT_DIR$/pic_sort.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="348">
-          <caret line="99" column="8" lean-forward="true" selection-start-line="99" selection-start-column="8" selection-end-line="99" selection-end-column="8" />
+        <state relative-caret-position="300">
+          <caret line="16" column="22" selection-start-line="16" selection-start-column="22" selection-end-line="16" selection-end-column="22" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
-            <element signature="e#1902#3807#0" />
-            <element signature="e#2902#4318#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motion_classifier.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2840">
+          <caret line="150" column="44" selection-start-line="150" selection-start-column="44" selection-end-line="150" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pic_feature.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1720">
+          <caret line="91" column="50" selection-start-line="91" selection-start-column="12" selection-end-line="91" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pic_cnn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-260">
+          <caret line="15" column="8" selection-start-line="15" selection-end-line="15" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="163" column="54" selection-start-line="163" selection-start-column="54" selection-end-line="163" selection-end-column="54" />
+          <folding>
+            <element signature="e#3356#4772#0" />
           </folding>
         </state>
       </provider>
