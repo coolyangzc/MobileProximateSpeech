@@ -83,7 +83,7 @@ def batch_resize(subject_dir, dst_size=(227, 227), src_folder='trimmed', overwri
 	:param overwrite: whether to cover the existing 'resized' folder
 	:return dst_dir
 	'''
-	print('\nWorking in %s...' % subject_dir)
+	print('\nWorking in %s...' % os.path.abspath(subject_dir))
 	old_path = os.getcwd()
 	dst_dir = os.path.join(old_path, subject_dir, 'resized')
 	if os.path.exists(dst_dir):
@@ -134,10 +134,7 @@ def batch_resize(subject_dir, dst_size=(227, 227), src_folder='trimmed', overwri
 
 
 if __name__ == '__main__':
-	# CWD = '/Volumes/TOSHIBA EXT/Analysis/Data/Study2/subjects'
-	CWD = '/Users/james/MobileProximateSpeech/Analysis/Data/Study2/subjects'
-	os.chdir(CWD)
-	# subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	subjects = ['hsd']
-	for subject in subjects:
-		batch_resize(subject, src_folder='trimmed', overwrite=False)
+	from configs import cv_config as config
+	os.chdir(config.data_source)
+	os.chdir('negatives/zfs_confusing_iphone/')
+	batch_resize('./', src_folder='original', overwrite=False)

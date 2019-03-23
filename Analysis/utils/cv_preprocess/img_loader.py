@@ -10,8 +10,7 @@ from tqdm import tqdm
 
 from utils import io
 from utils.tools import suffix_filter
-from configs.cv_config import *
-
+from configs import cv_config as config
 
 def show_shape(iterable):
 	try:
@@ -31,7 +30,7 @@ def get_description(folder):
 	txt_path = os.path.join('../original', folder) + '.txt'
 	with open(txt_path, 'r', encoding='utf-8') as f:
 		line = f.readline()
-	mt = description_pattern.match(line)
+	mt = config.description_pattern.match(line)
 	try:
 		desc = mt.group(1)
 		return desc
@@ -161,7 +160,7 @@ class ImagePack:
 		os.chdir('resized')
 		folders = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
 
-		for folder in tqdm(folders) if progressbar else folders:
+		for folder in tqdm(folders, desc='loading from subfolders', leave=False) if progressbar else folders:
 			# get the description and label
 			# cwd: .../xxx/resized/
 			try:
@@ -174,7 +173,7 @@ class ImagePack:
 					continue
 
 			try:
-				label = label_dict[desc]
+				label = config.label_dict[desc]
 			except KeyError:
 				raise KeyError('Unidentified description %s in %s, %s' % (desc, folder, subject_dir))
 			if label == 0: continue
@@ -234,24 +233,28 @@ class ImagePack:
 
 	def from_data_dir(self, data_dir, format='jpg', shuffle=True, random_seed=None):
 		'''
-		load from data directory (train/val/test)
-		:param data_dir: directory including 0~N_CLASS-1 subdirectories
+		load from all image data in the directory (train/val/test)
+		:param data_dir: directory including images or subdirectories including images
 		:param format: format of images
 		:return: self
 		'''
-		old_path = os.getcwd()
-		os.chdir(data_dir)
-		for c in tqdm(CLASSES):
-			os.chdir(str(c))
-			for file in suffix_filter(os.listdir('.'), suffix=format):
-				img = Image.open(file)
-				self.images.append(np.array(img))
-				self.labels.append(c)
-				self.names.append(file.split('.')[0])
-				self.subjects.append('')  # unknown
-			os.chdir('..')
-		if shuffle == True: self.shuffle_all(random_seed)
-		os.chdir(old_path)
+		for dir_path, sub_dirs, file_names in os.walk(data_dir):
+			image_names = suffix_filter(file_names, suffix=format)
+			if len(image_names) == 0: continue
+			try:
+				label = int(os.path.split(dir_path)[-1])
+			except ValueError as e:
+				print(e, os.path.abspath(dir_path))
+				continue
+			for image_name in tqdm(image_names, desc='loading', leave=False):
+				image_path = os.path.join(dir_path, image_name)
+				img = Image.open(image_path)
+				npimg = np.array(img)
+				self.images.append(npimg)
+				self.labels.append(label)
+				self.names.append(image_name)
+
+		if shuffle: self.shuffle_all(random_seed)
 		return self
 
 	def train_val_split(self, val_size=None):
@@ -277,10 +280,11 @@ class ImagePack:
 		return ImagePack(list(self.images)[cut:], list(self.labels)[cut:], self.names[cut:], self.subjects[cut:]), \
 			   ImagePack(list(self.images)[:cut], list(self.labels)[:cut], self.names[:cut], self.subjects[:cut])
 
-	def __sort_to_class_dirs(self, dst_dir):
+	def __sort_to_class_dirs(self, dst_dir, binary=False):
 		'''
 		sort images with different labels and store them in dst_dir's subdirectories
-		todo, dir tree like: dst_dir / class_number / jpg
+		todo, dir tree like: dst_dir / class_number / jpg   if binary==False
+		todo or dst_dir / '1' or '0' / p_class_number or n_class_number   if binary==True
 
 		:param dst_dir: target directory
 		'''
@@ -288,18 +292,28 @@ class ImagePack:
 			os.mkdir(dst_dir)
 		old_path = os.getcwd()
 		os.chdir(dst_dir)
-		for c in CLASSES:
-			if c == 0: continue
+		if not os.path.exists('0'):
+			os.mkdir('0')
+		if not os.path.exists('1'):
+			os.mkdir('1')
+		for c in config.CLASSES:
+			if c == 0: continue # filter out 0
+			if c > 0:
+				os.chdir('1')
+			else:
+				os.chdir('0')
 			c = str(c)
 			if not os.path.exists(c):
 				os.mkdir(c)
+			os.chdir('../')
 
 		name_counter = Counter()
-		progress = tqdm(total=len(self.names))
+		progress = tqdm(total=len(self.names), desc='saving', leave=False)
 		for image, label, name in zip(self.images, self.labels, self.names):
 			progress.update()
 			img = Image.fromarray(image)
-			img.save(os.path.join(str(label), name + ' - %d.jpg' % name_counter[name]))
+			save_path = os.path.join('1' if label > 0 else '0', str(label), name + ' - %d.jpg' % name_counter[name])
+			img.save(save_path)
 			name_counter.update([name])
 
 		os.chdir(old_path)
@@ -316,7 +330,7 @@ class ImagePack:
 		if not os.path.exists(dst_dir):
 			os.mkdir(dst_dir)
 		# prepare for class directories
-		for c in CLASSES:
+		for c in config.CLASSES:
 			if c == 0: continue
 			class_dir = os.path.join(dst_dir, str(c))
 			if not os.path.exists(class_dir):
@@ -324,7 +338,7 @@ class ImagePack:
 
 		# sort all pack data to class directories
 		name_counter = Counter()
-		progress = tqdm(total=len(self.names))
+		progress = tqdm(total=len(self.names), desc='saving', leave=False)
 		for image, label, name, subject in zip(self.images, self.labels, self.names, self.subjects):
 			progress.update()
 			img = Image.fromarray(image)
@@ -355,7 +369,7 @@ class ImagePack:
 				except FileNotFoundError:
 					pass
 
-	def sort_to_dir(self, dst_dir, mode: str = 'class', src_dir=None):
+	def sort_to_dir(self, dst_dir, mode: str = 'class', src_dir=None, binary=False):
 		'''
 		sort images with different labels, subjects and store them in dst_dir's sub-sub-directories
 		it will supplement the dst_dir unless files with the same name exist, that way, will be overwritten.
@@ -366,9 +380,10 @@ class ImagePack:
 		:param mode: either 'class' or 'class subject'
 		:param src_dir: source directory to look for stores subjects' original files, should include 'cjr', 'hsd' ...
 			(only needed when mode == 'class subject')
+		:param binary: create a '1' and a '0' folder to restore all positive and negative images
 		'''
 		if mode == 'class':
-			self.__sort_to_class_dirs(dst_dir=dst_dir)
+			self.__sort_to_class_dirs(dst_dir=dst_dir, binary=binary)
 		elif mode == 'class subject':
 			if src_dir is None:
 				raise AttributeError('You must specify `src_dst` if mode == \'class subject\'.')
@@ -435,16 +450,40 @@ def train_val_test_sorter(src_dir, dst_dir=None):
 
 if __name__ == '__main__':
 	from utils.tools import dir_filter
-	cwd = '/Volumes/TOSHIBA EXT/FullData/Study2/negatives'
-	os.chdir(cwd)
-	subjects = dir_filter(os.listdir('.'))
-	imgpack = ImagePack()
-	print('loading...\n')
-	imgpack.from_subject(subjects, cache=True, shuffle=True, progressbar=True).crop(100)
-	print('\nloaded.')
-	imgpack.show_shape()
-	print('\nwriting files...')
-	imgpack.sort_to_dir(dst_dir='../classes - subjects', src_dir='.', mode='class subject')
+	os.chdir(config.data_source)
+
+	os.chdir('fixed subjects/')
+	subjects = dir_filter(os.listdir('./'))
+	tester = random.choice(subjects)
+	subjects.remove(tester)
+	positives, negatives, train, val, test = ImagePack(), ImagePack(), ImagePack(), ImagePack(), ImagePack()
+
+	positives.from_subject(subjects, shuffle=True, progressbar=True).crop(2000)
+	train_pos, val_pos = positives.train_val_split(val_size=0.2)
+	train += train_pos
+	val += val_pos
+	test.from_subject(tester, progressbar=True)
+
+	os.chdir('../negatives')
+
+	negatives.from_subject(['zfs_confusing', 'zfs_confusing_iphone'], progressbar=True, shuffle=True)
+	train_val_neg, test_neg = negatives.train_val_split(val_size=0.3)
+	train_neg, val_neg = train_val_neg.train_val_split(val_size=0.2)
+
+	train += train_neg
+	val += val_neg
+	test += test_neg
+
+	# train_neg.show_shape()
+	# train_pos.show_shape()
+	# train.show_shape()
+	# val.show_shape()
+	# test.show_shape()
+
+	train.sort_to_dir(os.path.join(config.data_directory, 'train/'), binary=True)
+	val.sort_to_dir(os.path.join(config.data_directory, 'val/'), binary=True)
+	test.sort_to_dir(os.path.join(config.data_directory, 'test/'), binary=True)
+
 # pack = ImagePack()
 # os.chdir('subjects')
 # subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))

@@ -6,7 +6,7 @@ from keras import layers, optimizers, utils, preprocessing
 
 from cv.funcs import *
 from utils import io
-from utils.cv_preprocess.img_loader import ImagePack, N_CLASS
+from utils.cv_preprocess.img_loader import ImagePack
 from utils.logger import DualLogger
 from utils.tools import date_time
 
@@ -81,17 +81,17 @@ if __name__ == '__main__':
 	print()
 
 	# data augmenting tool
-	datagen = io.load_from_file('cv/model_state/190316 21_26_45 PN datagen.h5')
-	# datagen = preprocessing.image.ImageDataGenerator(
-	# 	featurewise_center=True,
-	# 	featurewise_std_normalization=True,
-	# 	rotation_range=40,
-	# 	width_shift_range=0.2,
-	# 	height_shift_range=0.2,
-	# 	horizontal_flip=True)
-	# print('datagen fitting...')
-	# datagen.fit(train.select_class([1, 2, 3, 4, 5]).images)
-	# io.save_to_file(datagen, 'cv/model_state/%sdatagen.h5' % DATETIME)
+	# datagen = io.load_from_file('cv/model_state/190316 21_26_45 PN datagen.h5')
+	datagen = preprocessing.image.ImageDataGenerator(
+		featurewise_center=True,
+		featurewise_std_normalization=True,
+		rotation_range=40,
+		width_shift_range=0.2,
+		height_shift_range=0.2,
+		horizontal_flip=True)
+	print('datagen fitting...')
+	datagen.fit(train.select_class([1, 2, 3, 4, 5]).images)
+	io.save_to_file(datagen, 'cv/model_state/%sdatagen.h5' % DATETIME)
 	train.labels = utils.to_categorical(train.labels)
 	val.labels = utils.to_categorical(val.labels)
 
@@ -104,7 +104,7 @@ if __name__ == '__main__':
 		'outputs/%sCNN hist.csv' % DATETIME,
 		separator=',', append=False)
 	checkpoint_logger = keras.callbacks.ModelCheckpoint(
-		'cv/model_state/%sbest model.h5' % DATETIME,
+		'cv/model_state/%sbest.h5' % DATETIME,
 		monitor='val_loss', verbose=1, save_best_only=True)
 
 	print('===== begin training =====')

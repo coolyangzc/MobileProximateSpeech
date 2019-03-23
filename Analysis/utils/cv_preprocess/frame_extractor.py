@@ -92,7 +92,7 @@ def extract_frames(video_path, start_time=0., minus_time=0., stride_time=None, s
 
 
 def extract_frames_in_dir(wkdir, start_time=0., minus_time=0., stride_time=None, stride_frame=10, threshold=None,
-						  overwrite=False, n_jobs=2):
+						  overwrite=False, n_jobs=2, format='mp4'):
 	'''
 	从视频目录中批量提取帧，输出到许多子目录
 	extract picture frames from mp4 video directory
@@ -105,11 +105,12 @@ def extract_frames_in_dir(wkdir, start_time=0., minus_time=0., stride_time=None,
 	:param threshold: float, how bright a frame should at least be to be regarded as valid
 	:param overwrite: bool, whether to overwrite when destined path already exists
 	:param n_jobs: int, how many threads to start
+	:param format: video file format
 	'''
 	old_path = os.getcwd()
 	os.chdir(wkdir)
 	print('Extracting frames in directory %s...' % wkdir)
-	video_paths = suffix_filter(os.listdir('.'), suffix='.mp4')
+	video_paths = suffix_filter(os.listdir('.'), suffix=format)
 
 	n_video = len(video_paths)
 	progress = tqdm(total=n_video)
@@ -148,12 +149,7 @@ class MyThread(threading.Thread):
 
 
 if __name__ == '__main__':
-	CWD = '/Volumes/TOSHIBA EXT/Analysis/Data/Study2/subjects'
-	os.chdir(CWD)
-	# subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	subjects = ['jcq']
-	print(subjects)
-
-	for wkdir in subjects:
-		wkdir = os.path.join(wkdir, 'original')
-		extract_frames_in_dir(wkdir, stride_frame=10, start_time=1.1, minus_time=1.2, overwrite=False, n_jobs=3)
+	from configs.cv_config import data_source
+	os.chdir(data_source)
+	extract_frames_in_dir('negatives/zfs_confusing_iphone/original/', format='MOV',
+						  stride_frame=10, start_time=1.5, minus_time=1.5, overwrite=False, n_jobs=5)

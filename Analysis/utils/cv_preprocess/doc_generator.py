@@ -21,17 +21,18 @@ def generate_doc_for_subfolders(wkdir: str, description: str):
 	os.chdir(old_path)
 
 
-def generate_doc_for_mp4(wkdir: str, description: str):
+def generate_doc_for_videos(wkdir: str, description: str, format='mp4'):
 	'''
-	generate doc .txt file in directory for .mp4 files
+	generate doc .txt file in directory for video files
 	necessary only when .txt files are missing
 
 	:param wkdir: directory to deal with
 	:param description: description text
+	:param format: video file format
 	'''
 	old_path = os.getcwd()
 	os.chdir(wkdir)
-	video_names = suffix_filter(os.listdir('.'), '.mp4')
+	video_names = suffix_filter(os.listdir('.'), format)
 	for video_name in video_names:
 		txt_name = suffix_conv(video_name, '.txt')
 		with open(txt_name, 'w', encoding='utf-8') as f:
@@ -40,7 +41,8 @@ def generate_doc_for_mp4(wkdir: str, description: str):
 
 
 if __name__ == '__main__':
-	CWD = 'E:\ZFS_TEST\Analysis\Data\Study2\\negatives'
-	os.chdir(CWD)
-	generate_doc_for_subfolders('world/original', '大千世界')
+	from configs.cv_config import data_source
+	os.chdir(data_source)
+	os.chdir('negatives/zfs_confusing_iphone/original')
+	generate_doc_for_videos('./', '易混淆', format='MOV')
 	pass
