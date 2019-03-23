@@ -1,18 +1,28 @@
+import os
+
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+import cv2
 import math
 import socket
 import struct
 import threading
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 from collections import deque
+
+from keras.models import load_model
+from keras.preprocessing.image import img_to_array
+
+from PIL import Image
 from sklearn.externals import joblib
 from motion_feature import extract_sensor_feature
 from voice_feature import extract_voice_features
-from time import ctime
 
 HOST = '192.168.1.102'
-PORT = 8888
-AUDIO_PORT = 8889
+PORT, IMG_PORT, AUDIO_PORT = 8888, 8889, 8890
 res, last_time = 0, 0
 
 sensor_list = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE', 'PROXIMITY']
@@ -67,19 +77,36 @@ def work(data):
 		if math.isnan(f) or math.isinf(f):
 			return
 	new_res = motion_model.predict([feature])[0]
-	print('feature', feature)
 	prob = motion_model.predict_proba([feature])[0]
-	print('%d %.2f' % (new_res, prob[1]))
+	# print('feature', feature)
+	# print('%d %.2f' % (new_res, prob[1]))
 	global res
 	if new_res != res:
 		res = new_res
 		print(res)
 
 
-class MotionThread(threading.Thread):
+def deal_img(pic):
+	f = open('./recv.jpg', 'wb')
+	f.write(pic)
+	f.close()
+	img = Image.open('./recv.jpg')
+	X = [img_to_array(img)]
+	X = np.array(X)
+	X /= 255
+	X = X.astype(np.float32)
+	res = img_model.predict(X)[0]
+	if res[0] > res[1]:
+		print("img: 0 %.2f" % (res[0] * 100))
+	else:
+		print("img: 1 %.2f" % (res[1] * 100))
 
-	def __init__(self):
-		super().__init__()
+	# src = cv2.imread('./recv.jpg')
+	# cv2.imshow('input_image', src)
+	return True
+
+
+class MotionThread(threading.Thread):
 
 	def run(self):
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -178,15 +205,61 @@ class AudioThread(threading.Thread):
 		s.close()
 
 
+class ImgThread(threading.Thread):
+
+	def run(self):
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		try:
+			s.bind((HOST, IMG_PORT))
+		except socket.error as err:
+			print('Bind Failed, Error Code: ' + str(err[0]) + ' ,Message: ' + err[1])
+		print('Image Socket Bind Success!')
+
+		s.listen(5)
+		print('Image Socket is now listening')
+		while True:
+			conn, addr = s.accept()
+			print('Connect with ' + addr[0] + ':' + str(addr[1]))
+			pic_len = 0
+			buffer, pic = b'', b''
+			while True:
+				data = conn.recv(4096)
+				if not data:
+					break
+				# print('data' + str(data))
+				buffer += data
+				# print('buffer' + str(buffer))
+				while len(buffer) >= 4:
+					pic_len = int.from_bytes(buffer[:4], byteorder='big')
+					if len(buffer) - 4 >= pic_len:
+						print(pic_len)
+						pic = buffer[4:pic_len+4]
+						buffer = buffer[pic_len+4:]
+						deal_img(pic)
+					else:
+						break
+			conn.close()
+			print('Image Client Disconnected')
+		s.close()
+
+
 if __name__ == "__main__":
 	q = []
 	motion_model = joblib.load('motion_model.m')
+	img_model = load_model('ear_cnn_model.h5')
+
+	img = Image.open('./sample.jpg')
+	X = [img_to_array(img)]
+	X = np.array(X)
+	X /= 255
+	X = X.astype(np.float32)
+	img_model.predict(X)[0]
+
 	motion_thread = MotionThread()
 	motion_thread.start()
 
-	# audio_model = joblib.load('voice_model.m')
-	# audio_thread = AudioThread()
-	# audio_thread.start()
+	img_thread = ImgThread()
+	img_thread.start()
 
 	motion_thread.join()
-	# audio_thread.join()
+	img_thread.join()

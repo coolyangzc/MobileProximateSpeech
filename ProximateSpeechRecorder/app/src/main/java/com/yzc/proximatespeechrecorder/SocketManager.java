@@ -2,6 +2,7 @@ package com.yzc.proximatespeechrecorder;
 
 import android.util.Log;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -47,8 +48,32 @@ public class SocketManager {
         return motion_socket != null && motion_socket.isConnected();
     }
 
-    public void send_img() {
+    public static byte[] intToByteArray(int a) {
+        return new byte[] {
+                (byte) ((a >> 24) & 0xFF),
+                (byte) ((a >> 16) & 0xFF),
+                (byte) ((a >> 8) & 0xFF),
+                (byte) (a & 0xFF)
+        };
+    }
 
+    public void send_img(byte[] bytes) {
+        final byte[] byteArray = bytes;
+        mThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OutputStream os = img_socket.getOutputStream();
+                    Log.d("SocketManager", "pic len: " + String.valueOf(byteArray.length));
+                    os.write(intToByteArray(byteArray.length));
+                    os.write(byteArray);
+                    os.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 
     public void send_motion(String msg) {

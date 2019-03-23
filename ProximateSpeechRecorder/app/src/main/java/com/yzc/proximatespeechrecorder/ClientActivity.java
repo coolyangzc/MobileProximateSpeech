@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.Paint;
+import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -19,6 +20,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.Image;
@@ -29,6 +31,7 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.Range;
+import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -37,6 +40,7 @@ import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -191,22 +195,23 @@ public class ClientActivity extends Activity implements SensorEventListener {
             ByteBuffer buffer = image.getPlanes()[0].getBuffer();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
-            Log.d("ImageReader", String.valueOf(bytes.length));
-            Log.d("ImageReader", String.valueOf(image.getWidth()) + " " + String.valueOf(image.getHeight()));
-            // save(bytes, file);
-            /*Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-            Bitmap newBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
-            Canvas canvas = new Canvas(newBitmap);
-            Paint paint = new Paint();
-            canvas.drawBitmap(bitmap, 500, 500, paint);*/
             image.close();
+            if (!SocketManager.getInstance().isConnected())
+                return;
+            Bitmap oriBitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+            Bitmap newBitmap = Bitmap.createScaledBitmap(oriBitmap, 192, 108, false);
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            newBitmap.compress(Bitmap.CompressFormat.JPEG,100 , outStream);
+            bytes = outStream.toByteArray();
+            Log.d("ImageReader", String.valueOf(bytes.length));
+            SocketManager.getInstance().send_img(bytes);
+
         }
     };
 
     private void startCapture() {
 
-        mImageReader = ImageReader.newInstance(108, 192, ImageFormat.JPEG, 2);
+        mImageReader = ImageReader.newInstance(1280, 720, ImageFormat.JPEG, 2);
         mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
         try {
             mCaptureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -215,7 +220,9 @@ public class ClientActivity extends Activity implements SensorEventListener {
             Surface recorderSurface = mImageReader.getSurface();
             surfaces.add(recorderSurface);
             mCaptureBuilder.addTarget(recorderSurface);
-            mCaptureBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRanges[fpsRanges.length - 1]);
+            // mCaptureBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRanges[fpsRanges.length - 1]);
+            Range<Integer> fpsRange = new Range<>(5, 5);
+            mCaptureBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
             Log.d("FPS", "Used fps: " + String.valueOf(fpsRanges[fpsRanges.length - 1]));
             mCameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
                 @Override
@@ -249,6 +256,10 @@ public class ClientActivity extends Activity implements SensorEventListener {
             }
             manager.openCamera(CameraId, mStateCallback, null);
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(CameraId);
+            StreamConfigurationMap streamConfigurationMap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            Size[] sizes = streamConfigurationMap.getOutputSizes(ImageFormat.JPEG);
+            for(int i = 0; i < sizes.length; ++i)
+                Log.d("SIZE_AV", String.valueOf(sizes[i]));
             fpsRanges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
             Log.d("FPS", "SYNC_MAX_LATENCY_PER_FRAME_CONTROL: " + Arrays.toString(fpsRanges));
         } catch (CameraAccessException e) {
