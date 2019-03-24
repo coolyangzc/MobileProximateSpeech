@@ -98,8 +98,8 @@ def deal_img(pic):
 	X = np.array(X)
 	X /= 255
 	X = X.astype(np.float32)
-	# res = img_model.predict(X)[0]
-	res = [0, 0]
+	res = img_model.predict(X)[0]
+	# res = [0, 0]
 	print("img: %.2f" % (res[1] * 100))
 	return res[1]
 
@@ -270,14 +270,14 @@ class ImgThread(threading.Thread):
 if __name__ == "__main__":
 	q = []
 	motion_model = joblib.load('motion_model.m')
-	# img_model = load_model('ear_cnn_model.h5')
+	img_model = load_model('ear_cnn_model.h5')
 
 	img = Image.open('./sample.jpg')
 	X = [img_to_array(img)]
 	X = np.array(X)
 	X /= 255
 	X = X.astype(np.float32)
-	# img_model.predict(X)[0]
+	img_model.predict(X)[0]
 
 	motion_thread = MotionThread()
 	img_thread = ImgThread()

@@ -82,9 +82,18 @@ public class SocketManager {
                         Thread.sleep(100);
                     InputStream is = img_socket.getInputStream();
                     byte buffer[] = new byte[128];
-                    int temp;
-                    while ((temp = is.read(buffer)) != -1)
-                        Log.d("RECV_IMG", new String(buffer, 0, temp));
+                    int temp, sp;
+                    String data = "";
+                    while ((temp = is.read(buffer)) != -1) {
+                        String recv = new String(buffer, 0, temp);
+                        Log.d("RECV_IMG", recv);
+                        data += recv;
+                        while ((sp = data.indexOf('#')) != -1) {
+                            float res = Float.valueOf(data.substring(0, sp));
+                            img_res.add(res);
+                            data = data.substring(sp+1);
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {

@@ -74,7 +74,10 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
     private final String pathName =
             Environment.getExternalStorageDirectory().getPath() +
                     "/SensorData/Evaluation/";
-
+    private final String picPath =
+            Environment.getExternalStorageDirectory().getPath() +
+                    "/SensorData/Evaluation/pic/";
+    private String curPathName;
     private Vibrator mVibrator;
 
     //Camera2, for same SENSOR_DELAY_GAME
@@ -96,11 +99,11 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
 
     //experiment state
     private boolean isRecording = false, has_triggerd = false;
-    private int task_id = 0;
+    private int task_id = 0, remaining_img = -1;
     private Random random = new Random();
 
     private ArrayList<Float> motion_res = new ArrayList<Float> (Arrays.asList(0f, 0f, 0f, 0f, 0f));
-    private ArrayList<Float> img_res = new ArrayList<Float> (Arrays.asList(0f, 0f, 0f, 0f, 0f));
+    private ArrayList<Float> img_res = new ArrayList<Float> ();
     private boolean proximityHasZero = false, orientationOK = false;
 
 
@@ -170,20 +173,16 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                             mMediaRecorder.start();
                         }
                     } else {
-                        try {
-                            fos.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        closeTxtFile();
                         if (task_id <= 10) {
                             mMediaRecorder.stop();
                             mMediaRecorder.reset();
                             SocketManager.getInstance().send_motion("END " + fileName + "#");
                             mMediaRecorder = new MediaRecorder();
-                            MediaScannerConnection.scanFile(ctx,
-                                    new String[]{file.getAbsolutePath(), audioFile.getAbsolutePath()},
-                                    null, null);
                         }
+                        MediaScannerConnection.scanFile(ctx,
+                                new String[]{file.getAbsolutePath(), audioFile.getAbsolutePath()},
+                                null, null);
                         task_id += 1;
                         if (task_id > 20)
                             task_id = 0;
@@ -214,6 +213,9 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
     private void setTask(int task_id) {
         has_triggerd = false;
         proximityHasZero = sensorData[4] == null || sensorData[4][2] == 0;
+        img_res.clear();
+        remaining_img = -1;
+
         String task = String.valueOf(task_id) + " / 20\n";
         if (task_id <= 10) {
             int n = sentences.length;
@@ -239,7 +241,7 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyMMdd HH_mm_ss", Locale.US);
             fileName = format.format(new Date()) + " " + String.valueOf(task_id);
-            String curPathName = pathName +
+            curPathName = pathName +
                     new SimpleDateFormat("yyMMdd", Locale.US).format(new Date()) + "/";
             File path = new File(curPathName);
             file = new File(curPathName + fileName + ".txt");
@@ -302,6 +304,21 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
         }
     }
 
+    private void closeTxtFile() {
+        try {
+            if (task_id > 10 && !has_triggerd) {
+                String s = "NOTRIGGER";
+                for (float img_predict : img_res)
+                    s += " " + String.valueOf(img_predict);
+                s += "\n";
+                fos.write(s.getBytes());
+            }
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -324,17 +341,36 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                 name = "LINEAR_ACCELERATION";
                 if (values[2] > 3)
                     rapidTimestamp = event.timestamp;
-                else if (event.timestamp - rapidTimestamp >= 1000 * 1000000L)
+                else if (task_id <= 10 && event.timestamp - rapidTimestamp >= 1000 * 1000000L)
                     break;
                 if (!isRecording || has_triggerd)
                     break;
                 if (sensorData[4][2] > 0 && proximityHasZero && orientationOK) {
                     if (motion_res.get(4) > 0.5) {
+                        if (task_id > 10) {
+                            if (img_res.size() < 5)
+                                break;
+                            String tmp = "";
+                            for (float r:img_res)
+                                tmp += " " + String.valueOf(r);
+                            Log.d("IMG_RES", tmp);
+                            float sum = 0;
+                            for (float img_predict:img_res)
+                                sum += img_predict;
+                            if (sum <= 2.5)
+                                break;
+                        }
                         VibrationEffect ve = VibrationEffect.createOneShot(100, 1);
                         mVibrator.vibrate(ve);
-                        s = "Trigger " +
-                                Long.toString((event.timestamp - startTimestamp) / 1000000L) +
-                                " " + String.valueOf(motion_res.get(4)) + "\n";
+                        s = "TRIGGER " +
+                                Long.toString((event.timestamp - startTimestamp) / 1000000L);
+                        if (task_id <= 10)
+                            s += " " + String.valueOf(motion_res.get(4)) + "\n";
+                        else {
+                            for (float img_predict : img_res)
+                                s += " " + String.valueOf(img_predict);
+                            s += "\n";
+                        }
                         has_triggerd = true;
                     }
                 }
@@ -359,6 +395,8 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                 name = "PROXIMITY";
                 if (values[2] == 0)
                     proximityHasZero = true;
+                if (remaining_img == -1)
+                    remaining_img = 5;
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
                 return;
@@ -399,9 +437,28 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
             if (manager != null)
                 mCameraIdFront = manager.getCameraIdList()[1];
             else
-                Log.d(TAG, "getSystemService failed");
+                Log.w(TAG, "getSystemService failed");
             mMediaRecorder = new MediaRecorder();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void savePic(Bitmap bitmap, int id) {
+        try {
+            File picFile = new File(picPath +
+                    fileName + " " + String.valueOf(id) + ".jpg");
+            FileOutputStream out = new FileOutputStream(picFile);
+            if(bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out))
+            {
+                out.flush();
+                out.close();
+            }
+            MediaScannerConnection.scanFile(ctx,
+                    new String[]{picFile.getAbsolutePath()},
+                    null, null);
+            Log.d("savePic", picFile.getAbsolutePath());
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -419,14 +476,23 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                     image.close();
                     if (task_id <= 10 || !SocketManager.getInstance().isConnected())
                         return;
-                    Bitmap oriBitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                    Bitmap newBitmap = Bitmap.createScaledBitmap(oriBitmap, 192, 108, false);
-                    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                    newBitmap.compress(Bitmap.CompressFormat.JPEG,100 , outStream);
-                    bytes = outStream.toByteArray();
-                    Log.d("ImageReader", String.valueOf(bytes.length));
-                    SocketManager.getInstance().send_img(bytes);
-
+                    if (remaining_img > 0) {
+                        final Bitmap oriBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        final int id = 5 - remaining_img;
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                savePic(oriBitmap, id);
+                            }
+                        }).start();
+                        Bitmap newBitmap = Bitmap.createScaledBitmap(oriBitmap, 192, 108, false);
+                        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                        newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
+                        bytes = outStream.toByteArray();
+                        Log.d("ImageReader", String.valueOf(bytes.length));
+                        SocketManager.getInstance().send_img(bytes);
+                        remaining_img -= 1;
+                    }
                 }
             };
 
