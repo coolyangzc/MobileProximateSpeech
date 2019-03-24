@@ -2,8 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="de7ba81e-35ff-462d-bbea-3ee31447ea18" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/EvaluationActivity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/res/layout/activity_evaluation.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/ClientActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/ClientActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/SensorActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/SensorActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/SocketManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/java/com/yzc/proximatespeechrecorder/SocketManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ProximateSpeechRecorder/app/src/main/res/layout/activity_main.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,7 +24,7 @@
     <SUITE FILE_PATH="coverage/Analysis$speech_recognition.coverage" NAME="speech_recognition Coverage Results" MODIFIED="1552894653503" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$voice_trimmer.coverage" NAME="voice_trimmer Coverage Results" MODIFIED="1553048718586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$pic_classifier.coverage" NAME="pic_classifier Coverage Results" MODIFIED="1553222680032" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Analysis$server.coverage" NAME="server Coverage Results" MODIFIED="1553345346408" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$server.coverage" NAME="server Coverage Results" MODIFIED="1553406023502" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$ana.coverage" NAME="ana Coverage Results" MODIFIED="1552271133614" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$voice_SVM.coverage" NAME="voice_SVM Coverage Results" MODIFIED="1552879752995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$voice_visualization.coverage" NAME="voice_visualization Coverage Results" MODIFIED="1553073672738" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -67,7 +75,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pic_cnn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-260">
+            <state relative-caret-position="40">
               <caret line="15" column="8" selection-start-line="15" selection-end-line="15" selection-end-column="8" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -79,10 +87,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="162">
-              <caret line="163" column="54" selection-start-line="163" selection-start-column="54" selection-end-line="163" selection-end-column="54" />
+            <state relative-caret-position="224">
+              <caret line="169" column="25" lean-forward="true" selection-start-line="169" selection-start-column="25" selection-end-line="169" selection-end-column="25" />
               <folding>
-                <element signature="e#3356#4772#0" />
+                <element signature="e#4088#5504#0" />
               </folding>
             </state>
           </provider>
@@ -198,10 +206,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="122" />
-    <option name="y" value="407" />
+    <option name="x" value="121" />
+    <option name="y" value="406" />
     <option name="width" value="1940" />
-    <option name="height" value="983" />
+    <option name="height" value="984" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -227,6 +235,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -238,7 +247,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -457,12 +465,13 @@
       <workItem from="1553071538827" duration="38504000" />
       <workItem from="1553218193822" duration="4394000" />
       <workItem from="1553223700814" duration="37792000" />
-      <workItem from="1553340505753" duration="4831000" />
+      <workItem from="1553340505753" duration="4919000" />
+      <workItem from="1553392360719" duration="6746000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="334878000" />
+    <option name="totallyTimeSpent" value="341712000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -474,15 +483,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="98" y="326" width="1552" height="786" extended-state="0" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19009371" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1930295" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.07798165" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.23371105" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -496,7 +505,7 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="23" width="1536" height="801" id="SciView" order="3" visible="true" weight="0.16934404" />
+      <window_info anchor="right" x="0" y="23" width="1536" height="801" id="SciView" order="3" visible="true" weight="0.16957104" />
       <window_info anchor="right" id="Database" order="4" weight="0.3297587" />
       <window_info anchor="right" x="0" y="0" width="337" height="638" id="Documentation" order="5" side_tool="true" weight="0.3297587" />
     </layout>
@@ -855,6 +864,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pic_cnn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="40">
+          <caret line="15" column="8" selection-start-line="15" selection-end-line="15" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/motion_classifier.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2840">
@@ -875,22 +894,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pic_cnn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-260">
-          <caret line="15" column="8" selection-start-line="15" selection-end-line="15" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="163" column="54" selection-start-line="163" selection-start-column="54" selection-end-line="163" selection-end-column="54" />
+        <state relative-caret-position="224">
+          <caret line="169" column="25" lean-forward="true" selection-start-line="169" selection-start-column="25" selection-end-line="169" selection-end-column="25" />
           <folding>
-            <element signature="e#3356#4772#0" />
+            <element signature="e#4088#5504#0" />
           </folding>
         </state>
       </provider>

@@ -23,10 +23,6 @@ HOST = '192.168.1.102'
 MOTION_PORT, IMG_PORT, SEND_PORT, AUDIO_PORT = 8888, 8889, 8890, 8891
 res, last_time = 0, 0
 
-# Thread Lock
-lock = threading.Lock()
-msg = ''
-
 sensor_list = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE', 'PROXIMITY']
 
 
@@ -40,8 +36,6 @@ def work_sensor(sensor_name, queue, start_time, end_time):
 			break
 		for i in range(len(frame) - 1):
 			arr[i].append(frame[i+1])
-	# print('arr: ', arr)
-	# print(sensor_name, extract_sensor_feature(arr, sensor_name))
 	return extract_sensor_feature(arr, sensor_name)
 
 
@@ -55,6 +49,13 @@ def work(data):
 		if sensor_list[i] == item[0]:
 			c = i
 			break
+	if c == -1:
+		if item[0] == 'START':
+			print('start recording ' + data[6:])
+			return -1
+		if item[0] == 'END':
+			print('end recording ' + data[4:])
+			return -1
 	val = []
 	try:
 		for i in range(len(item) - 1):
@@ -82,7 +83,7 @@ def work(data):
 	prob = motion_model.predict_proba([feature])[0]
 	# print('feature', feature)
 	print('motion: %d %.2f' % (new_res, prob[1]))
-	global lock, msg, res
+	global res
 
 	if new_res != res:
 		res = new_res
@@ -100,10 +101,7 @@ def deal_img(pic):
 	# res = img_model.predict(X)[0]
 	res = [0, 0]
 	print("img: %.2f" % (res[1] * 100))
-	global lock, msg
-	lock.acquire()
-	msg += 'I ' + str(res[1]) + '#'
-	lock.release()
+	return res[1]
 
 
 class SendThread(threading.Thread):
@@ -145,25 +143,28 @@ class MotionThread(threading.Thread):
 			q.append(deque())
 			q[i].append([0 for i in range(3 + 1)])
 
-		buffer = ''
 		while True:
+			buffer = ''
 			conn, addr = s.accept()
 			print('Connect with ' + addr[0] + ':' + str(addr[1]))
 			while True:
-				data = conn.recv(512).decode()
-				if not data:
-					break
-				# print('data:' + data)
-				buffer += data
-				while True:
-					sp = buffer.find('#')
-					if sp == -1:
+				try:
+					data = conn.recv(512).decode()
+					if not data:
 						break
-					motion_res = work(buffer[:sp])
-					if motion_res != -1:
-						msg = format(motion_res, '.4f') + '#'
-						conn.send(msg.encode())
-					buffer = buffer[sp + 1:]
+					# print('data:' + data)
+					buffer += data
+					while True:
+						sp = buffer.find('#')
+						if sp == -1:
+							break
+						motion_res = work(buffer[:sp])
+						if motion_res != -1:
+							msg = format(motion_res, '.4f') + '#'
+							conn.send(msg.encode())
+						buffer = buffer[sp + 1:]
+				except ConnectionResetError:
+					break
 
 			conn.close()
 			print('Motion Client Disconnected')
@@ -243,22 +244,22 @@ class ImgThread(threading.Thread):
 		while True:
 			conn, addr = s.accept()
 			print('Connect with ' + addr[0] + ':' + str(addr[1]))
-			pic_len = 0
 			buffer, pic = b'', b''
 			while True:
 				data = conn.recv(4096)
 				if not data:
 					break
-				# print('data' + str(data))
 				buffer += data
-				# print('buffer' + str(buffer))
 				while len(buffer) >= 4:
 					pic_len = int.from_bytes(buffer[:4], byteorder='big')
 					if len(buffer) - 4 >= pic_len:
 						print(pic_len)
 						pic = buffer[4:pic_len+4]
 						buffer = buffer[pic_len+4:]
-						deal_img(pic)
+						img_res = deal_img(pic)
+						if img_res != -1:
+							msg = format(img_res, '.4f') + '#'
+							conn.send(msg.encode())
 					else:
 						break
 			conn.close()

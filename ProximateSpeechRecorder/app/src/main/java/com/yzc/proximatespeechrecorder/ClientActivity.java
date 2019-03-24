@@ -6,10 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.ImageFormat;
-import android.graphics.Paint;
-import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -21,19 +18,15 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.Range;
 import android.util.Size;
 import android.view.Surface;
-import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -41,14 +34,7 @@ import android.widget.TextView;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,13 +42,8 @@ import java.util.List;
 
 public class ClientActivity extends Activity implements SensorEventListener {
 
-    Socket socketClient, audioSocket;
-    private OutputStream audioOutputStream;
-
     private TextView textView_recv;
     private Button button_connect, button_send;
-    private BufferedReader in;
-    private BufferedWriter out;
     private String TAG = "ClientActivity";
     private int sensorType[] = {
             Sensor.TYPE_ACCELEROMETER,
@@ -71,8 +52,6 @@ public class ClientActivity extends Activity implements SensorEventListener {
             Sensor.TYPE_GYROSCOPE,
             Sensor.TYPE_PROXIMITY
     };
-
-    private String sent = "";
 
     //Camera2, for same SENSOR_DELAY_GAME
     private String mCameraIdFront;
@@ -109,7 +88,6 @@ public class ClientActivity extends Activity implements SensorEventListener {
             } else
                 Log.w(TAG, "register sensor failed");
         }
-
     }
 
     private void initView() {

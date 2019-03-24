@@ -44,11 +44,13 @@ public class MainActivity extends AppCompatActivity {
         Button button_study1 = findViewById(R.id.button_study1);
         Button button_voice = findViewById(R.id.button_voice);
         Button button_client = findViewById(R.id.button_client);
+        Button button_evaluation = findViewById(R.id.button_evaluation);
         button_demo.setOnClickListener(clickListener);
         button_record.setOnClickListener(clickListener);
         button_study1.setOnClickListener(clickListener);
         button_voice.setOnClickListener(clickListener);
         button_client.setOnClickListener(clickListener);
+        button_evaluation.setOnClickListener(clickListener);
 
         et_randomSeed = findViewById(R.id.editText_randomSeed);
     }
@@ -81,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.button_client:
                     intent.setClass(ctx, ClientActivity.class);
+                    startActivity(intent);
+                    break;
+                case R.id.button_evaluation:
+                    intent.setClass(ctx, EvaluationActivity.class);
                     startActivity(intent);
                     break;
             }

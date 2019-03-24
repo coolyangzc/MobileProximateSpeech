@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,15 +16,14 @@ public class SocketManager {
     private final String HOST = "192.168.1.102";
     private final int MOTION_PORT = 8888;
     private final int IMG_PORT = 8889;
-    private final int RECV_PORT = 8890;
     private static SocketManager shared = new SocketManager();
     public static SocketManager getInstance() { return shared; }
 
-    private Socket motion_socket, img_socket, recv_socket;
+    private Socket motion_socket, img_socket;
 
     private ExecutorService mThreadPool;
 
-    OutputStream os;
+    public ArrayList<Float> motion_res, img_res;
 
     private SocketManager() {
         mThreadPool = Executors.newCachedThreadPool();
@@ -48,13 +48,23 @@ public class SocketManager {
             @Override
             public void run() {
                 try {
-                    while (motion_socket==null)
+                    while (motion_socket == null)
                         Thread.sleep(100);
                     InputStream is = motion_socket.getInputStream();
                     byte buffer[] = new byte[128];
-                    int temp;
-                    while ((temp = is.read(buffer)) != -1)
-                        Log.d("RECV", new String(buffer, 0, temp));
+                    int temp, sp;
+                    String data = "";
+                    while ((temp = is.read(buffer)) != -1) {
+                        String recv = new String(buffer, 0, temp);
+                        Log.d("RECV_MOTION", recv);
+                        data += recv;
+                        while ((sp = data.indexOf('#')) != -1) {
+                            float res = Float.valueOf(data.substring(0, sp));
+                            motion_res.add(res);
+                            motion_res.remove(0);
+                            data = data.substring(sp+1);
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -64,24 +74,24 @@ public class SocketManager {
             }
         });
 
-        /*mThreadPool.execute(new Runnable() {
+        mThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    recv_socket = new Socket(HOST, RECV_PORT);
-                    InputStream is = recv_socket.getInputStream();
+                    while (img_socket == null)
+                        Thread.sleep(100);
+                    InputStream is = img_socket.getInputStream();
                     byte buffer[] = new byte[128];
                     int temp;
-                    while (true) {
-                        while ((temp = is.read(buffer)) != -1) {
-                            Log.d("RECV", new String(buffer, 0, temp));
-                        }
-                    }
+                    while ((temp = is.read(buffer)) != -1)
+                        Log.d("RECV_IMG", new String(buffer, 0, temp));
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-        });*/
+        });
     }
 
     public boolean isConnected() {
@@ -130,7 +140,7 @@ public class SocketManager {
             @Override
             public void run() {
                 try {
-                    os = motion_socket.getOutputStream();
+                    OutputStream os = motion_socket.getOutputStream();
                     os.write(str.getBytes("utf-8"));
                     os.flush();
                 } catch (IOException e) {

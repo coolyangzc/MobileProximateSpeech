@@ -98,7 +98,7 @@ public class Study1Activity extends Activity implements SensorEventListener {
     }
 
     private void initViews() {
-        textView_description = findViewById(R.id.textView_recv);
+        textView_description = findViewById(R.id.textView_description);
         textView_description.setText(tasks.getTaskDescription());
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(clickListener);
