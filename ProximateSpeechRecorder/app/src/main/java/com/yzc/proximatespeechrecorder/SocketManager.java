@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 
 public class SocketManager {
 
-    private final String HOST = "192.168.1.102";
+    private String HOST = "";
     private final int MOTION_PORT = 8888;
     private final int IMG_PORT = 8889;
     private static SocketManager shared = new SocketManager();
@@ -101,6 +101,10 @@ public class SocketManager {
                 }
             }
         });
+    }
+
+    public void setHOSTIP(String host) {
+        HOST = host;
     }
 
     public boolean isConnected() {

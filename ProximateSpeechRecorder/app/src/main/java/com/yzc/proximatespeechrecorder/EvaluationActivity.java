@@ -2,9 +2,8 @@ package com.yzc.proximatespeechrecorder;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,17 +27,14 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.speech.tts.Voice;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.text.InputType;
 import android.util.Log;
 import android.util.Range;
-import android.util.Size;
+import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
@@ -95,7 +91,7 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
 
     private String fileName;
     private Long startTimestamp, startUpTimeMillis, startTimeMillis;
-    private Long rapidTimestamp = 0L;
+    private Long rapidTimestamp = 0L, motionTimestamp = 0L;
 
     //experiment state
     private boolean isRecording = false, has_triggerd = false;
@@ -112,11 +108,15 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_evaluation);
+
         initView();
         loadSensor();
         setupCamera();
         openCamera(mCameraIdFront);
 
+        Intent intent = getIntent();
+        String Host_IP = intent.getStringExtra("HOST_IP");
+        SocketManager.getInstance().setHOSTIP(Host_IP);
         mMediaRecorder = new MediaRecorder();
         mVibrator = (Vibrator)getApplication().getSystemService(VIBRATOR_SERVICE);
         setTask(task_id);
@@ -346,7 +346,10 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                 if (!isRecording || has_triggerd)
                     break;
                 if (sensorData[4][2] > 0 && proximityHasZero && orientationOK) {
-                    if (motion_res.get(4) > 0.5) {
+                    if (motion_res.get(4) > 0.5)
+                        motionTimestamp = event.timestamp;
+                    if (motion_res.get(4) > 0.5 ||
+                            (task_id > 10 && event.timestamp - motionTimestamp <= 1000 * 1000000L)) {
                         if (task_id > 10) {
                             if (img_res.size() < 5)
                                 break;
@@ -567,4 +570,13 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
             mCameraDevice = null;
         }
     };
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK
+                && event.getAction() == KeyEvent.ACTION_DOWN) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }

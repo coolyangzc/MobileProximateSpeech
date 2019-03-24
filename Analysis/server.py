@@ -16,8 +16,9 @@ from keras.preprocessing.image import img_to_array
 
 from PIL import Image
 from sklearn.externals import joblib
-from motion_feature import extract_sensor_feature
 from voice_feature import extract_voice_features
+from motion_feature import extract_sensor_feature
+
 
 HOST = '192.168.1.102'
 MOTION_PORT, IMG_PORT, SEND_PORT, AUDIO_PORT = 8888, 8889, 8890, 8891
@@ -51,10 +52,10 @@ def work(data):
 			break
 	if c == -1:
 		if item[0] == 'START':
-			print('start recording ' + data[6:])
+			print('start recording: ' + data[6:])
 			return -1
 		if item[0] == 'END':
-			print('end recording ' + data[4:])
+			print('end recording: ' + data[4:])
 			return -1
 	val = []
 	try:
@@ -170,7 +171,7 @@ class MotionThread(threading.Thread):
 			print('Motion Client Disconnected')
 		s.close()
 
-
+'''
 class AudioThread(threading.Thread):
 
 	def __init__(self):
@@ -206,18 +207,6 @@ class AudioThread(threading.Thread):
 				if len(y) >= 6400:
 					y, z = np.array(y), np.array(z)
 					feature = extract_voice_features(y, z)
-					'''
-					numframes = len(y)
-					framerate = 32000
-					times = []
-					for i in range(numframes):
-						times.append(i / framerate)
-					plt.xlabel('Time [s]')
-					plt.plot(times, y, label='down')
-					plt.plot(times, z, label='up')
-					plt.legend()
-					plt.show()
-					'''
 					y, z = [], []
 					print('audio:', audio_model.predict([feature])[0])
 				# buffer += data
@@ -227,6 +216,7 @@ class AudioThread(threading.Thread):
 			conn.close()
 			print('Audio Client Disconnected')
 		s.close()
+'''
 
 
 class ImgThread(threading.Thread):

@@ -16,7 +16,7 @@ import android.widget.EditText;
 public class MainActivity extends AppCompatActivity {
 
     private Context ctx;
-    private EditText et_randomSeed;
+    private EditText et_randomSeed, et_IP;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         button_evaluation.setOnClickListener(clickListener);
 
         et_randomSeed = findViewById(R.id.editText_randomSeed);
+        et_IP = findViewById(R.id.editText_IP);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("randomSeed", 0);
             else
                 intent.putExtra("randomSeed", Integer.valueOf(seed));
+            intent.putExtra("HOST_IP", et_IP.getText().toString());
+
             switch (view.getId()) {
                 case R.id.button_demo:
                     intent.setClass(ctx, DemoActivity.class);
