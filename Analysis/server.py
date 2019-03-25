@@ -16,11 +16,10 @@ from keras.preprocessing.image import img_to_array
 
 from PIL import Image
 from sklearn.externals import joblib
-from voice_feature import extract_voice_features
 from motion_feature import extract_sensor_feature
 
 
-HOST = '192.168.1.102'
+HOST = '192.168.1.105'
 MOTION_PORT, IMG_PORT, SEND_PORT, AUDIO_PORT = 8888, 8889, 8890, 8891
 res, last_time = 0, 0
 
@@ -30,7 +29,6 @@ sensor_list = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE', '
 def work_sensor(sensor_name, queue, start_time, end_time):
 	arr = [[] for i in range(len(queue[0]) - 1)]
 	for frame in queue:
-		# print(q, start_time, end_time)
 		if frame[0] < start_time:
 			continue
 		if frame[0] > end_time:
@@ -236,22 +234,25 @@ class ImgThread(threading.Thread):
 			print('Connect with ' + addr[0] + ':' + str(addr[1]))
 			buffer, pic = b'', b''
 			while True:
-				data = conn.recv(4096)
-				if not data:
-					break
-				buffer += data
-				while len(buffer) >= 4:
-					pic_len = int.from_bytes(buffer[:4], byteorder='big')
-					if len(buffer) - 4 >= pic_len:
-						print(pic_len)
-						pic = buffer[4:pic_len+4]
-						buffer = buffer[pic_len+4:]
-						img_res = deal_img(pic)
-						if img_res != -1:
-							msg = format(img_res, '.4f') + '#'
-							conn.send(msg.encode())
-					else:
+				try:
+					data = conn.recv(4096)
+					if not data:
 						break
+					buffer += data
+					while len(buffer) >= 4:
+						pic_len = int.from_bytes(buffer[:4], byteorder='big')
+						if len(buffer) - 4 >= pic_len:
+							print(pic_len)
+							pic = buffer[4:pic_len+4]
+							buffer = buffer[pic_len+4:]
+							img_res = deal_img(pic)
+							if img_res != -1:
+								msg = format(img_res, '.4f') + '#'
+								conn.send(msg.encode())
+						else:
+							break
+				except ConnectionResetError:
+					break
 			conn.close()
 			print('Image Client Disconnected')
 		s.close()

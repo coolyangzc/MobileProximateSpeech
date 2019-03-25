@@ -5,7 +5,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -60,8 +59,10 @@ public class SocketManager {
                         data += recv;
                         while ((sp = data.indexOf('#')) != -1) {
                             float res = Float.valueOf(data.substring(0, sp));
-                            motion_res.add(res);
-                            motion_res.remove(0);
+                            if (motion_res != null) {
+                                motion_res.add(res);
+                                motion_res.remove(0);
+                            }
                             data = data.substring(sp+1);
                         }
                     }
@@ -90,7 +91,8 @@ public class SocketManager {
                         data += recv;
                         while ((sp = data.indexOf('#')) != -1) {
                             float res = Float.valueOf(data.substring(0, sp));
-                            img_res.add(res);
+                            if (img_res != null)
+                                img_res.add(res);
                             data = data.substring(sp+1);
                         }
                     }

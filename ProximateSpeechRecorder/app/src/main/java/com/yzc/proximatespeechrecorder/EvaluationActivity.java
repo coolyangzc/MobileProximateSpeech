@@ -2,7 +2,9 @@ package com.yzc.proximatespeechrecorder;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -29,12 +31,14 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.text.InputType;
 import android.util.Log;
 import android.util.Range;
 import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
@@ -86,7 +90,7 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
     private CameraCaptureSession mCaptureSession;
 
     private TextView textView_task, textView_sentence;
-    private Button button_connect, button_record, button_redo;
+    private Button button_connect, button_record, button_redo, button_goto;
     private String sentences[] = VoiceTask.singleCommands;
 
     private String fileName;
@@ -101,7 +105,6 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
     private ArrayList<Float> motion_res = new ArrayList<Float> (Arrays.asList(0f, 0f, 0f, 0f, 0f));
     private ArrayList<Float> img_res = new ArrayList<Float> ();
     private boolean proximityHasZero = false, orientationOK = false;
-
 
 
     @Override
@@ -127,25 +130,33 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
 
         button_connect = findViewById(R.id.button_connect);
         button_connect.setOnClickListener(clickListener);
+        button_connect.setTextColor(Color.RED);
+
         button_record = findViewById(R.id.button_record);
         button_record.setOnClickListener(clickListener);
 
         button_redo = findViewById(R.id.button_redo);
         button_redo.setOnLongClickListener(longClickListener);
 
+        button_goto = findViewById(R.id.button_goto);
+        button_goto.setOnLongClickListener(longClickListener);
+
         textView_task = findViewById(R.id.textView_task);
         textView_sentence = findViewById(R.id.textView_sentence);
+        textView_sentence.setTextColor(Color.BLACK);
     }
 
     private void changeButtonText(boolean startRecording) {
         if (startRecording) {
             button_record.setText("结束");
             button_record.setTextColor(Color.RED);
+            button_goto.setText("");
             button_redo.setText("");
         } else {
             button_record.setText("开始");
             button_record.setTextColor(Color.BLACK);
             button_redo.setText("重做");
+            button_redo.setText("跳转");
         }
     }
 
@@ -205,6 +216,22 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                         task_id -= 1;
                     setTask(task_id);
                     break;
+                case R.id.button_goto:
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                    builder.setTitle("跳转至");
+                    final EditText et = new EditText(ctx);
+                    et.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    builder.setView(et);
+                    builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            task_id = Integer.valueOf(et.getText().toString());
+                            setTask(task_id);
+                        }
+                    });
+                    builder.setNegativeButton("否", null);
+                    builder.show();
+                    break;
             }
             return false;
         }
@@ -233,6 +260,10 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
             else
                 task += "接听电话（左手）";
         }
+        if (task_id == 1 || task_id == 6 || task_id == 11 || task_id == 16)
+            textView_task.setTextColor(Color.RED);
+        else
+            textView_task.setTextColor(Color.BLACK);
         textView_task.setText(task);
 
     }
@@ -398,8 +429,8 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                 name = "PROXIMITY";
                 if (values[2] == 0)
                     proximityHasZero = true;
-                if (remaining_img == -1)
-                    remaining_img = 5;
+                else if (remaining_img == -1 && isRecording)
+                    remaining_img = 7;
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
                 return;
@@ -477,9 +508,13 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                     byte[] bytes = new byte[buffer.remaining()];
                     buffer.get(bytes);
                     image.close();
-                    if (task_id <= 10 || !SocketManager.getInstance().isConnected())
+                    if (!SocketManager.getInstance().isConnected())
                         return;
                     if (remaining_img > 0) {
+                        if (remaining_img >= 6) {
+                            remaining_img -= 1;
+                            return;
+                        }
                         final Bitmap oriBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         final int id = 5 - remaining_img;
                         new Thread(new Runnable() {
@@ -488,13 +523,15 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                                 savePic(oriBitmap, id);
                             }
                         }).start();
-                        Bitmap newBitmap = Bitmap.createScaledBitmap(oriBitmap, 192, 108, false);
-                        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                        newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
-                        bytes = outStream.toByteArray();
-                        Log.d("ImageReader", String.valueOf(bytes.length));
-                        SocketManager.getInstance().send_img(bytes);
                         remaining_img -= 1;
+                        if (task_id > 10) {
+                            Bitmap newBitmap = Bitmap.createScaledBitmap(oriBitmap, 192, 108, false);
+                            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                            newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
+                            bytes = outStream.toByteArray();
+                            Log.d("ImageReader", String.valueOf(bytes.length));
+                            SocketManager.getInstance().send_img(bytes);
+                        }
                     }
                 }
             };

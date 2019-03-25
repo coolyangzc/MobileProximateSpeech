@@ -9,6 +9,7 @@ negative = ['左耳打电话（不碰）', '右耳打电话（不碰）', '左�
 subject_path = '../Data/Study2/fixed subjects'
 sort_path = '../Data/Study2/sorted pics'
 
+
 for u in os.listdir(subject_path):
 	user_path = os.path.join(subject_path, u)
 	orig_path = os.path.join(user_path, 'original')

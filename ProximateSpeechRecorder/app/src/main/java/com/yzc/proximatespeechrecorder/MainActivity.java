@@ -5,13 +5,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.speech.tts.Voice;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO
     };
+
+    private final String ipFile =
+            Environment.getExternalStorageDirectory().getPath() +
+                    "/IP.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +62,22 @@ public class MainActivity extends AppCompatActivity {
 
         et_randomSeed = findViewById(R.id.editText_randomSeed);
         et_IP = findViewById(R.id.editText_IP);
+
+        try {
+            StringBuilder sb = new StringBuilder("");
+            FileInputStream inputStream = new FileInputStream(ipFile);
+            byte[] buffer = new byte[1024];
+            int len = inputStream.read(buffer);
+            while (len > 0) {
+                sb.append(new String(buffer, 0, len));
+                len = inputStream.read(buffer);
+            }
+            inputStream.close();
+            et_IP.setText(sb.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -65,7 +89,8 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("randomSeed", 0);
             else
                 intent.putExtra("randomSeed", Integer.valueOf(seed));
-            intent.putExtra("HOST_IP", et_IP.getText().toString());
+            String host_ip = et_IP.getText().toString();
+            intent.putExtra("HOST_IP", host_ip);
 
             switch (view.getId()) {
                 case R.id.button_demo:
@@ -89,6 +114,14 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     break;
                 case R.id.button_evaluation:
+                    try {
+                        FileOutputStream out = new FileOutputStream(ipFile);
+                        out.write(host_ip.getBytes());
+                        out.flush();
+                        out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     intent.setClass(ctx, EvaluationActivity.class);
                     startActivity(intent);
                     break;
