@@ -1,11 +1,13 @@
 import os
+import math
 import wave
 import struct
 import numpy as np
 
 sample_rate = 32000
 interval_size = 6400
-feature_num = 28
+stride = 0.5
+feature_num = 32
 
 
 def extract_voice_features(left, right):
@@ -32,6 +34,7 @@ def extract_voice_features(left, right):
 		IQR = q75 - q25
 		feature.append(IQR)
 		feature.append(np.mean(np.array(data[i]) ** 2))
+		feature.append(math.sqrt(np.mean(np.array(data[i]) ** 2)))
 	return feature
 
 
@@ -61,7 +64,7 @@ def calc_features(wav_file):
 		feature = extract_voice_features(y[0][s:s + interval_size], y[1][s:s + interval_size])
 		for f in feature:
 			output.write(str(f) + '\n')
-		s += interval_size
+		s += int(interval_size * stride)
 
 
 if __name__ == "__main__":

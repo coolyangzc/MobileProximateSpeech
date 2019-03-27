@@ -113,9 +113,10 @@ def draw_time_series(wav_file, pic_name):
 	times = []
 	for i in range(numframes):
 		times.append(i / framerate)
-	plt.xlabel('Time [s]')
-	plt.plot(times, y, label='down')
-	plt.plot(times, z, label='up')
+	plt.xlabel('Times (s)')
+	plt.ylabel('Amplitude')
+	plt.plot(times, y, label='bottom')
+	plt.plot(times, z, label='top')
 	plt.legend()
 	if pic_name != '':
 		plt.savefig(pic_name + '_down_up.png', format='png')
@@ -123,9 +124,10 @@ def draw_time_series(wav_file, pic_name):
 	else:
 		plt.show()
 
-	plt.xlabel('Times [s]')
-	plt.plot(times, z, label='up')
-	plt.plot(times, y, label='down')
+	plt.xlabel('Times (s)')
+	plt.ylabel('Amplitude')
+	plt.plot(times, z, label='top')
+	plt.plot(times, y, label='bottom')
 	plt.legend()
 	if pic_name != '':
 		plt.savefig(pic_name + '_up_down.png', format='png')

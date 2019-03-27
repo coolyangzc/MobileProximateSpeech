@@ -13,6 +13,16 @@ import matplotlib.pyplot as plt
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴',
 			'水平端起，倒话筒', '话筒', '横屏',
 			'耳旁打电话']
+negative = ['手上正面', '手上反面', '桌上正面', '桌上反面']
+			# '裤兜']
+
+used_feature = [1, # min
+				1, # max
+				1, # median
+				1, # mean
+				0, # std
+				1, # IQR
+				1] # energy
 
 
 def read_file(path, file_name, id):
@@ -27,18 +37,19 @@ def read_file(path, file_name, id):
 	global X, y, task, task_from
 	feature_num = int(lines[2])
 	task_description = lines[0].strip()
-	y_type = 0
+
 	if task_description in positive:
 		y_type = 1
-	if task_description in ['裤兜']:
+	elif task_description in negative:
+		y_type = 0
+	else:
 		return
-	#if task_description in ['耳旁打电话', '裤兜']:
-		#return
 	sp = 3
 	while sp + feature_num <= len(lines):
 		feature = []
 		for i in range(feature_num):
-			feature.append(float(lines[sp + i]))
+			if used_feature[i % 7] == 1:
+				feature.append(float(lines[sp + i]))
 		X[id].append(feature)
 		y[id].append(y_type)
 		task[id].append(task_description)
@@ -84,10 +95,10 @@ def generate_model():
 		y_all.extend(y[i])
 	X_all, y_all = np.array(X_all), np.array(y_all)
 	print(X_all.shape, y_all.shape)
-	# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
-	clf = tree.DecisionTreeClassifier(max_depth=8)
+	clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
+	# clf = tree.DecisionTreeClassifier(max_depth=8)
 	clf.fit(X_all, y_all)
-	joblib.dump(clf, "voice_model.m")
+	# joblib.dump(clf, "voice_model.m")
 	print(clf.score(X_all, y_all))
 
 	cnt = np.zeros((2, 100 + 1))
@@ -128,7 +139,7 @@ def leave_one_out_validation():
 		# bigger gamma -> higher fit acc
 		# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
 		# clf = neighbors.KNeighborsClassifier()
-		clf = tree.DecisionTreeClassifier(max_depth=8)
+		clf = tree.DecisionTreeClassifier(max_depth=8, class_weight={0: 1, 1: 1})
 		clf.fit(X_train, y_train)
 		train_acc = clf.score(X_train, y_train)
 		test_acc = clf.score(X_test, y_test)
@@ -208,5 +219,5 @@ if __name__ == "__main__":
 	X, y, task, task_from = [], [], [], []
 	read_features('../Data/voice feature/')
 	# data_normalization()
-	generate_model()
-	# leave_one_out_validation()
+	# generate_model()
+	leave_one_out_validation()
