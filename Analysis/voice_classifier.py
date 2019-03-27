@@ -13,8 +13,10 @@ import matplotlib.pyplot as plt
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴',
 			'水平端起，倒话筒', '话筒', '横屏',
 			'耳旁打电话']
-negative = ['手上正面', '手上反面', '桌上正面', '桌上反面']
-			# '裤兜']
+negative = ['手上正面', '手上反面', '桌上正面', '桌上反面',
+			'裤兜']
+
+all_category = positive + negative
 
 used_feature = [1, # min
 				1, # max
@@ -22,7 +24,8 @@ used_feature = [1, # min
 				1, # mean
 				0, # std
 				1, # IQR
-				1] # energy
+				0, # energy
+				1] # RMS
 
 
 def read_file(path, file_name, id):
@@ -37,12 +40,15 @@ def read_file(path, file_name, id):
 	global X, y, task, task_from
 	feature_num = int(lines[2])
 	task_description = lines[0].strip()
+	volume = lines[1].strip()
 
 	if task_description in positive:
 		y_type = 1
 	elif task_description in negative:
 		y_type = 0
 	else:
+		return
+	if volume not in ['大声', '小声']:
 		return
 	sp = 3
 	while sp + feature_num <= len(lines):
@@ -62,7 +68,7 @@ def read_features(feature_path):
 	global X, y, task, task_from
 	id = -1
 	for u in user_list:
-		if u[-4:] == '.txt':
+		if not os.path.isdir(os.path.join(feature_path, u)):
 			continue
 		print('Reading', u)
 		p = os.path.join(feature_path, u)
@@ -139,7 +145,7 @@ def leave_one_out_validation():
 		# bigger gamma -> higher fit acc
 		# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
 		# clf = neighbors.KNeighborsClassifier()
-		clf = tree.DecisionTreeClassifier(max_depth=8, class_weight={0: 1, 1: 1})
+		clf = tree.DecisionTreeClassifier(max_depth=10, class_weight={0: 1, 1: 1})
 		clf.fit(X_train, y_train)
 		train_acc = clf.score(X_train, y_train)
 		test_acc = clf.score(X_test, y_test)
@@ -215,9 +221,129 @@ def leave_one_out_validation():
 	print(mean_vote_acc)
 
 
+def leave_one_out_save(path):
+	out_file = os.path.join(path, 'leave_one_out.csv')
+	output = open(out_file, 'w', encoding='utf-8-sig')
+	output.write('user')
+	for c in all_category:
+		output.write(',' + c)
+	for c in all_category:
+		output.write(',' + c + '(sentence)')
+	output.write('\n')
+	type = len(all_category)
+
+	for loo in range(len(X)):
+		print(loo)
+		X_train, y_train = [], []
+		total, correct = np.zeros(type), np.zeros(type)
+		total_vote, correct_vote = np.zeros(type), np.zeros(type)
+		for i in range(len(X)):
+			if i != loo:
+				X_train.extend(X[i])
+				y_train.extend(y[i])
+		X_test, y_test = X[loo], y[loo]
+		X_train, X_test = np.array(X_train), np.array(X_test)
+		y_train, y_test = np.array(y_train), np.array(y_test)
+		print(X_train.shape, y_train.shape)
+		clf = tree.DecisionTreeClassifier(max_depth=10, class_weight={0: 1, 1: 1})
+		clf.fit(X_train, y_train)
+		res = clf.predict(X[loo])
+		res_proba = clf.predict_proba(X[loo])
+		vote = 0
+		task_from[loo].append('#')
+		for i in range(len(res)):
+			t = all_category.index(task[loo][i])
+			total[t] += 1
+			vote -= res_proba[i][0]
+			vote += res_proba[i][1]
+			if res[i] == y[loo][i]:
+				correct[t] += 1
+			if task_from[loo][i] != task_from[loo][i + 1]:
+				if vote > 0:
+					vote_res = 1
+				else:
+					vote_res = 0
+				total_vote[t] += 1
+				if vote_res == y[loo][i]:
+					correct_vote[t] += 1
+				vote = 0
+		output.write(str(loo))
+		for i in range(type):
+			if total[i] > 0:
+				acc = correct[i] / total[i] * 100
+			else:
+				acc = 100
+			output.write(',' + str(acc))
+		for i in range(type):
+			if total_vote[i] > 0:
+				acc_vote = correct_vote[i] / total_vote[i] * 100
+			else:
+				acc_vote = 100
+			output.write(',' + str(acc_vote))
+		output.write('\n')
+
+
+def personalization(path):
+	out_file = os.path.join(path, 'personalization.csv')
+	output = open(out_file, 'w', encoding='utf-8-sig')
+	output.write('user')
+	for c in all_category:
+		output.write(',' + c)
+	for c in all_category:
+		output.write(',' + c + '(sentence)')
+	output.write('\n')
+	type = len(all_category)
+	for user in range(len(X)):
+		print(user)
+		task_from[user].append('#')
+
+		total, correct = np.zeros(type), np.zeros(type)
+		total_vote, correct_vote = np.zeros(type), np.zeros(type)
+		clf = tree.DecisionTreeClassifier(max_depth=10, class_weight={0: 1, 1: 1})
+		clf.fit(X[user], y[user])
+
+		res = clf.predict(X[user])
+		res_proba = clf.predict_proba(X[user])
+		vote = 0
+		for i in range(len(res)):
+			t = all_category.index(task[user][i])
+			total[t] += 1
+			vote -= res_proba[i][0]
+			vote += res_proba[i][1]
+			if res[i] == y[user][i]:
+				correct[t] += 1
+			if task_from[user][i] != task_from[user][i + 1]:
+				if vote > 0:
+					vote_res = 1
+				else:
+					vote_res = 0
+				total_vote[t] += 1
+				if vote_res == y[user][i]:
+					correct_vote[t] += 1
+				vote = 0
+		output.write(str(user))
+		for i in range(type):
+			if total[i] > 0:
+				acc = correct[i] / total[i] * 100
+			else:
+				acc = 100
+			output.write(',' + str(acc))
+		for i in range(type):
+			if total_vote[i] > 0:
+				acc_vote = correct_vote[i] / total_vote[i] * 100
+			else:
+				acc_vote = 100
+			output.write(',' + str(acc_vote))
+		output.write('\n')
+
+
 if __name__ == "__main__":
 	X, y, task, task_from = [], [], [], []
-	read_features('../Data/voice feature/')
+	# read_features('../Data/voice feature/')
+	path = '../Data/voice feature Stereo 32000 Hz 0.2s stride=50%/'
+	read_features(path)
 	# data_normalization()
 	# generate_model()
-	leave_one_out_validation()
+	# leave_one_out_validation()
+	# leave_one_out_save(path)
+	personalization(path)

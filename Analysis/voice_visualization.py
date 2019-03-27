@@ -113,29 +113,38 @@ def draw_time_series(wav_file, pic_name):
 	times = []
 	for i in range(numframes):
 		times.append(i / framerate)
-	plt.xlabel('Times (s)')
-	plt.ylabel('Amplitude')
-	plt.plot(times, y, label='bottom')
-	plt.plot(times, z, label='top')
-	plt.legend()
+
+	fontsize = 20
+	font = {'size': fontsize}
+
+	plt.xlabel('Times (s)', font)
+	plt.ylabel('Amplitude $(10^4)$', font)
+	plt.xticks(size=fontsize)
+	plt.yticks(size=fontsize)
+	plt.plot(times, y / 10000, 'C0', label='bottom')
+	plt.plot(times, z / 10000, 'C1', label='top')
+	plt.tight_layout()
+	plt.legend(prop=font)
 	if pic_name != '':
-		plt.savefig(pic_name + '_down_up.png', format='png')
+		plt.savefig(pic_name + '_bottom_top.png', format='png')
 		plt.close()
 	else:
 		plt.show()
 
-	plt.xlabel('Times (s)')
-	plt.ylabel('Amplitude')
-	plt.plot(times, z, label='top')
-	plt.plot(times, y, label='bottom')
-	plt.legend()
+	plt.xlabel('Times (s)', font)
+	plt.ylabel('Amplitude $(10^4)$', font)
+	plt.xticks(size=fontsize)
+	plt.yticks(size=fontsize)
+	plt.plot(times, z / 10000, 'C1', label='top')
+	plt.plot(times, y / 10000, 'C0', label='bottom')
+	plt.tight_layout()
+	plt.legend(prop=font)
 	if pic_name != '':
-		plt.savefig(pic_name + '_up_down.png', format='png')
+		plt.savefig(pic_name + '_top_bottom.png', format='png')
 		plt.close()
 		return
 	else:
 		plt.show()
-
 
 	s, count = 0, 0
 	freq_tot = np.zeros((2, len(freqs)))

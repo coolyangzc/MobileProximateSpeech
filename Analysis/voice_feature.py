@@ -5,7 +5,7 @@ import struct
 import numpy as np
 
 sample_rate = 32000
-interval_size = 6400
+interval_size = 3200
 stride = 0.5
 feature_num = 32
 
