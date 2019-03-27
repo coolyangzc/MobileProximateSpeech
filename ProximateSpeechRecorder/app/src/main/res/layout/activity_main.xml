@@ -8,13 +8,14 @@
 
     <EditText
         android:id="@+id/editText_IP"
-        android:layout_width="129dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:digits="0123456789."
         android:ems="10"
         android:inputType="number|numberDecimal"
         android:text="192.168.1.102"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -87,12 +88,13 @@
 
     <EditText
         android:id="@+id/editText_randomSeed"
-        android:layout_width="129dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:ems="10"
         android:hint="Seed"
         android:inputType="number"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

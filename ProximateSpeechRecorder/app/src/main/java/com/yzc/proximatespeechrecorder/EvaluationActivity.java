@@ -17,6 +17,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
@@ -99,9 +100,10 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
 
     //experiment state
     private boolean isRecording = false, has_triggerd = false;
-    private int task_id = 0, remaining_img = -1;
+    private int task_id = 0, remaining_img = -1, img_cnt = 0;
     private Random random = new Random();
 
+    private float last_motion_predict = -1;
     private ArrayList<Float> motion_res = new ArrayList<Float> (Arrays.asList(0f, 0f, 0f, 0f, 0f));
     private ArrayList<Float> img_res = new ArrayList<Float> ();
     private boolean proximityHasZero = false, orientationOK = false;
@@ -155,8 +157,8 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
         } else {
             button_record.setText("开始");
             button_record.setTextColor(Color.BLACK);
+            button_goto.setText("跳转");
             button_redo.setText("重做");
-            button_redo.setText("跳转");
         }
     }
 
@@ -226,6 +228,10 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             task_id = Integer.valueOf(et.getText().toString());
+                            if (task_id < 0)
+                                task_id = 0;
+                            else if (task_id > 20)
+                                task_id = 20;
                             setTask(task_id);
                         }
                     });
@@ -239,9 +245,9 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
 
     private void setTask(int task_id) {
         has_triggerd = false;
-        proximityHasZero = sensorData[4] == null || sensorData[4][2] == 0;
+        proximityHasZero = (sensorData[4] == null || sensorData[4][2] == 0);
         img_res.clear();
-        remaining_img = -1;
+        remaining_img = -1; img_cnt = 0;
 
         String task = String.valueOf(task_id) + " / 20\n";
         if (task_id <= 10) {
@@ -367,12 +373,19 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
         switch (type) {
             case Sensor.TYPE_ACCELEROMETER:
                 name = "ACCELEROMETER";
+                if (last_motion_predict != motion_res.get(4)) {
+                    last_motion_predict = motion_res.get(4);
+                    if (isRecording && startTimestamp != null)
+                        s = "MOTION_PREDICT " +
+                                Long.toString((event.timestamp - startTimestamp) / 1000000L)
+                                + " " + String.valueOf(last_motion_predict) + "\n";
+                }
                 break;
             case Sensor.TYPE_LINEAR_ACCELERATION:
                 name = "LINEAR_ACCELERATION";
-                if (values[2] > 3)
+                if (values[2] > 0 || values[0] + values[1] + values[2] > 0)
                     rapidTimestamp = event.timestamp;
-                else if (task_id <= 10 && event.timestamp - rapidTimestamp >= 1000 * 1000000L)
+                else if (task_id <= 10 && event.timestamp - rapidTimestamp >= 2000 * 1000000L)
                     break;
                 if (!isRecording || has_triggerd)
                     break;
@@ -429,8 +442,10 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                 name = "PROXIMITY";
                 if (values[2] == 0)
                     proximityHasZero = true;
-                else if (remaining_img == -1 && isRecording)
+                else if (remaining_img <= -1 && isRecording) {
                     remaining_img = 7;
+                    img_cnt = 0;
+                }
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
                 return;
@@ -473,6 +488,9 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
             else
                 Log.w(TAG, "getSystemService failed");
             mMediaRecorder = new MediaRecorder();
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraIdFront);
+            Range<Integer>[] fpsRanges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+            Log.d("FPS", "SYNC_MAX_LATENCY_PER_FRAME_CONTROL: " + Arrays.toString(fpsRanges));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -510,7 +528,10 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                     image.close();
                     if (!SocketManager.getInstance().isConnected())
                         return;
-                    if (remaining_img > 0) {
+                    img_cnt += 1;
+                    if (img_cnt >= 3)
+                        img_cnt = 0;
+                    if (remaining_img > 0 && img_cnt == 0) {
                         if (remaining_img >= 6) {
                             remaining_img -= 1;
                             return;
@@ -548,7 +569,7 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
             surfaces.add(recorderSurface);
             mCaptureBuilder.addTarget(recorderSurface);
             // mCaptureBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRanges[fpsRanges.length - 1]);
-            Range<Integer> fpsRange = new Range<>(5, 5);
+            Range<Integer> fpsRange = new Range<>(15, 15);
             mCaptureBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
             mCameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
                 @Override

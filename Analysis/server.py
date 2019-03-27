@@ -19,7 +19,7 @@ from sklearn.externals import joblib
 from motion_feature import extract_sensor_feature
 
 
-HOST = '192.168.1.105'
+HOST = '166.111.139.114'
 MOTION_PORT, IMG_PORT, SEND_PORT, AUDIO_PORT = 8888, 8889, 8890, 8891
 res, last_time = 0, 0
 
