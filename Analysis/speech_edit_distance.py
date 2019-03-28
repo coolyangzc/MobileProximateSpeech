@@ -1,6 +1,5 @@
 import os
 import Levenshtein
-dis, tot = {}, {}
 
 
 def digit_to_character(s):
@@ -20,13 +19,18 @@ if __name__ == "__main__":
 				'手上正面', '手上反面',
 				'桌上正面', '桌上反面',
 				'裤兜']
+	dis, tot, percent, cnt = {}, {}, {}, {}
 	for pos in pos_list:
 		dis[pos] = [0, 0, 0, 0, 0, 0]
 		tot[pos] = [0, 0, 0, 0, 0, 0]
+		percent[pos] = [0, 0, 0, 0, 0, 0]
+		cnt[pos] = [0, 0, 0, 0, 0, 0]
 
 	recog_path = '../Data/Voice Study Mono 16000Hz/recognition'
 	user_list = os.listdir(recog_path)
 	for u in user_list:
+		if u in ['wj', 'zfs', 'wwn']:
+			continue
 		user_path = os.path.join(recog_path, u)
 		file_list = os.listdir(user_path)
 		for f in file_list:
@@ -62,17 +66,32 @@ if __name__ == "__main__":
 			print('kind', kind)
 			dis[pos][kind] += d
 			tot[pos][kind] += len(phrase)
+			percent[pos][kind] += d / len(phrase)
+			cnt[pos][kind] += 1
 
 	for pos in dis:
 		if pos == '耳旁打电话':
 			print('-' * 140)
 		print(pos)
-		sumd, sumt = 0, 0
+		sumd, sumt= 0, 0
 		for i in range(len(dis[pos])):
 			d, t = dis[pos][i], tot[pos][i]
 			sumd += d
 			sumt += t
 			print("%3d/%3d: %5.2f%%" % (d, t, d/t * 100), end='    ')
 		print("%3d/%3d: %5.2f%%" % (sumd, sumt, sumd/sumt * 100))
+	print('-' * 140)
+	print('Average Percent:')
+	for pos in dis:
+		if pos == '耳旁打电话':
+			print('-' * 140)
+		print(pos)
+		sump, sumc = 0, 0
+		for i in range(len(dis[pos])):
+			p, c = percent[pos][i], cnt[pos][i]
+			sump += p
+			sumc += c
+			print("%3d: %5.2f%%" % (c, p/c * 100), end='    ')
+		print("%3d: %5.2f%%" % (sumc, sump/sumc * 100))
 
 

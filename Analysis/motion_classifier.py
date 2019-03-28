@@ -93,11 +93,11 @@ def generate_model():
 	print(clf.score(X_all, y_all))
 
 
-def leave_one_out_validation():
+def leave_one_out_validation(weight_balance=False):
+	global X, y, task
+
 	mean_train_acc, mean_test_acc = 0, 0
-
 	total, correct = {}, {}
-
 	for loo in range(len(X)):
 		print(loo)
 		X_train = []
@@ -110,8 +110,20 @@ def leave_one_out_validation():
 		X_train, X_test = np.array(X_train), np.array(X_test)
 		y_train, y_test = np.array(y_train), np.array(y_test)
 		print(X_train.shape, y_train.shape)
+
+		if weight_balance:
+			pos, neg = 0, 0
+			for label in y_train:
+				if label == 0:
+					neg += 1
+				else:
+					pos += 1
+			pos_w = neg / len(y_train)
+			neg_w = pos / len(y_train)
+			clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: neg_w, 1: pos_w})
+		else:
+			clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: 1, 1: 1})
 		# clf = AdaBoostClassifier()
-		clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: 1, 1: 1})
 		# clf = tree.DecisionTreeClassifier(max_depth=5)
 		clf.fit(X_train, y_train)
 
@@ -150,6 +162,6 @@ if __name__ == "__main__":
 	X, y, task = [], [], []
 	read_features('../Data/motion feature/')
 	# data_normalization()
-	generate_model()
-	# leave_one_out_validation()
+	# generate_model()
+	leave_one_out_validation(weight_balance=True)
 

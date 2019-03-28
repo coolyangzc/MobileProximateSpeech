@@ -389,7 +389,7 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                     break;
                 if (!isRecording || has_triggerd)
                     break;
-                if (sensorData[4][2] > 0 && proximityHasZero && orientationOK) {
+                if (sensorData[4][2] > 0) {// && proximityHasZero && orientationOK) {
                     if (motion_res.get(4) > 0.5)
                         motionTimestamp = event.timestamp;
                     if (motion_res.get(4) > 0.5 ||
@@ -419,6 +419,7 @@ public class EvaluationActivity extends Activity implements SensorEventListener 
                             s += "\n";
                         }
                         has_triggerd = true;
+                        SocketManager.getInstance().send_motion("Trigger#");
                     }
                 }
 

@@ -19,7 +19,7 @@ from sklearn.externals import joblib
 from motion_feature import extract_sensor_feature
 
 
-HOST = '166.111.139.114'
+HOST = '166.111.139.125'
 MOTION_PORT, IMG_PORT, SEND_PORT, AUDIO_PORT = 8888, 8889, 8890, 8891
 res, last_time = 0, 0
 
@@ -39,8 +39,10 @@ def work_sensor(sensor_name, queue, start_time, end_time):
 
 
 def work(data):
-	# print("trimmed: " + data + '\n')
 	if len(data) == 0:
+		return -1
+	if data == 'Trigger':
+		print('Triggered!')
 		return -1
 	item = data.split(' ')
 	c = -1

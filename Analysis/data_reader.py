@@ -8,7 +8,7 @@ class FrameList:
 	def get_data_way(self):
 		return len(self.value)
 
-	def get_data(self, kind = 'value'):
+	def get_data(self, kind='value'):
 		if kind[:5] == 'slope':
 			k = kind.split()
 			if len(k) > 1:
