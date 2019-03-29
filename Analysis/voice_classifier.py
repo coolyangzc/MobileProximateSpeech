@@ -119,7 +119,7 @@ def generate_model():
 				p = int(proba[i][res] / 0.01)
 				cnt[correct][p] += 1
 	x_range = np.linspace(50, 100, 51)
-	plt.plot(x_range, cnt[0][50:], label='wrong')
+	plt.plot(x_range, cnt[0][50:], label='error')
 	plt.plot(x_range, cnt[1][50:], label='correct')
 	plt.legend()
 	plt.show()

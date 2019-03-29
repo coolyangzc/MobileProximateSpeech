@@ -30,24 +30,26 @@ def read_file(path, file_name, id):
 		feature = []
 		for i in range(7, 7 + feature_num):
 			feature.append(float(lines[i]))
+		# feature = feature[198:264]
 		X[id].append(feature)
 		y[id].append(1)
 		task[id].append(task_description)
 	else:
-		if task_description == '接听':
-			return
+		# if task_description == '接听':
+			# return
 		sp = 7
 		while sp + feature_num <= len(lines):
 			feature = []
 			for i in range(feature_num):
 				feature.append(float(lines[sp + i]))
-			X[id].append(feature)
-			# if lines[2] == '接听\n':
-			#	y[id].append(2)
-			# else:
-			y[id].append(0)
-			task[id].append(task_description)
+			# feature = feature[198:264]
 			sp += feature_num + 3
+			if task_description == '接听':
+				y[id].append(1)
+			else:
+				y[id].append(0)
+			X[id].append(feature.copy())
+			task[id].append(task_description)
 
 
 def read_features(feature_path):
@@ -100,8 +102,7 @@ def leave_one_out_validation(weight_balance=False):
 	total, correct = {}, {}
 	for loo in range(len(X)):
 		print(loo)
-		X_train = []
-		y_train = []
+		X_train, y_train = [], []
 		for i in range(len(X)):
 			if i != loo:
 				X_train.extend(X[i])
@@ -116,7 +117,7 @@ def leave_one_out_validation(weight_balance=False):
 			for label in y_train:
 				if label == 0:
 					neg += 1
-				else:
+				elif label == 1:
 					pos += 1
 			pos_w = neg / len(y_train)
 			neg_w = pos / len(y_train)
@@ -138,10 +139,9 @@ def leave_one_out_validation(weight_balance=False):
 			t = task[loo][i]
 			if t not in total:
 				total[t] = 0
+				correct[t] = 0
 			total[t] += 1
 			if res[i] == y[loo][i]:
-				if t not in correct:
-					correct[t] = 0
 				same.append(1)
 				correct[t] += 1
 			else:
@@ -163,5 +163,5 @@ if __name__ == "__main__":
 	read_features('../Data/motion feature/')
 	# data_normalization()
 	# generate_model()
-	leave_one_out_validation(weight_balance=True)
+	leave_one_out_validation(weight_balance=False)
 
