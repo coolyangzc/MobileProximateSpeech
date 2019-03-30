@@ -2,9 +2,11 @@ import os
 from PIL import Image
 
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
-            '竖屏握持，上端遮嘴', # '水平端起，倒话筒',
+            '竖屏握持，上端遮嘴', '水平端起，倒话筒',
             '话筒', '横屏']
 negative = ['左耳打电话（不碰）', '右耳打电话（不碰）', '左耳打电话（碰触）', '右耳打电话（碰触）']
+
+other = ['自拍', '拍照', '手中', '打字', '浏览', '裤兜', '摇晃（左右）', '摇晃（前后）']
 
 subject_path = '../Data/Study2/fixed subjects'
 sort_path = '../Data/Study2/sorted pics'
@@ -21,7 +23,7 @@ for u in os.listdir(subject_path):
 		file = open(description_file, "r", encoding='utf-8')
 		line = file.readline()
 		type = line.strip().split(' ')[0]
-		if type not in positive and type not in negative:
+		if type not in positive and type not in negative and type not in other:
 			continue
 		out_path = os.path.join(sort_path, type)
 		if not os.path.exists(out_path):

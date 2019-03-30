@@ -83,9 +83,7 @@ def extract_frames(mov_file, dst_path, start_time=0., minus_time=0.):
 
 if __name__ == '__main__':
 	mov_path = '../Data/Study1/'
-	pic_path = '../Data/Study2/subjects/'
-	# subjects = list(filter(lambda x: os.path.isdir(x), os.listdir('.')))
-	# subjects = ['yzc']
+	pic_path = '../Data/Study2/subjects_shaking/'
 	subjects = os.listdir(mov_path)
 	for user in subjects:
 		user_path = os.path.join(mov_path, user)
@@ -101,7 +99,8 @@ if __name__ == '__main__':
 				lines.append(file.readline())
 			task_id = int(lines[0].split(' ')[0])
 			task_description = lines[3].strip().split(' ')[-1]
-			if task_id < 32 or task_id > 37:
+			# if task_id < 32 or task_id > 37:
+			if task_id <= 37:
 				continue
 			extract_list.append(f)
 			task_list.append(task_description)

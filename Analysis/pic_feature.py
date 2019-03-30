@@ -5,7 +5,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 
-
+'''
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
             '竖屏握持，上端遮嘴',  '水平端起，倒话筒',
             '话筒', '横屏',
@@ -14,6 +14,10 @@ positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
 			'接听']
 negative = ['大千世界', '自拍']
 neg_study1 = ['打字', '浏览', '拍照', '裤兜', '手中']
+'''
+positive = []
+negative = []
+neg_study1 = ['摇晃（前后）', '摇晃（左右）']
 
 
 path = '../Data/Study2'

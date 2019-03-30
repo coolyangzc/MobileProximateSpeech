@@ -20,7 +20,7 @@ class MyThread(threading.Thread):
 				print('cannot open', self.folder_path, file)
 				continue
 			img = auto_crop(img, self.dst_size[1] / self.dst_size[0])
-			img = img.resize(self.dst_size)  # resize image
+			img = img.resize(self.dst_size, Image.LANCZOS)  # resize image
 			img.save(os.path.join(self.dst_folder, file))
 
 
@@ -74,4 +74,4 @@ if __name__ == '__main__':
 	subjects = os.listdir(path)
 	#subjects = ['yzc']
 	for subject in subjects:
-		batch_resize(subject, dst_size=(224, 224), src_folder='original', overwrite=True)
+		batch_resize(subject, dst_size=(192, 108), src_folder='original', overwrite=True)

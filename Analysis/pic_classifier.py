@@ -12,11 +12,11 @@ from sklearn.model_selection import train_test_split
 
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
             '竖屏握持，上端遮嘴',  # '水平端起，倒话筒',
-            #'话筒', '横屏',
+            # '话筒', '横屏',
 			'左耳打电话（不碰）', '右耳打电话（不碰）',
 			'左耳打电话（碰触）', '右耳打电话（碰触）']
 # negative = ['大千世界', '自拍', '拍照', '手中', '打字', '浏览']
-negative = ['自拍', '拍照', '手中', '打字', '浏览']
+negative = ['自拍', '拍照', '手中', '打字', '浏览', '摇晃（左右）', '摇晃（前后）']
 
 
 '''
@@ -171,5 +171,5 @@ def leave_one_out_validation():
 if __name__ == '__main__':
 	X, y, task = [], [], []
 	read_features('../Data/pic feature/')
-	fit_model()
-	# leave_one_out_validation()
+	# fit_model()
+	leave_one_out_validation()
