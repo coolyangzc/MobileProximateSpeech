@@ -4,9 +4,8 @@ import numpy as np
 from PIL import Image
 from keras import Model
 from keras.models import load_model
-from keras.applications import ResNet50
 from keras.models import Sequential
-from keras.optimizers import SGD
+from keras.optimizers import SGD, Adam
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array
 from keras.utils.np_utils import to_categorical
 from keras.applications.densenet import DenseNet201, preprocess_input
@@ -81,7 +80,7 @@ def add_new_last_layer(base_model, nb_classes):
 	return model
 
 
-def fit_model(use_data_generator=False):
+def fit_model(use_data_generator=True):
 	global X, y
 	X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.10, shuffle=True)
 	print(X_train.shape, y_train.shape, X_val.shape, y_val.shape)
@@ -92,8 +91,9 @@ def fit_model(use_data_generator=False):
 
 	model.compile(optimizer=SGD(lr=0.001, momentum=0.9, decay=0.0001, nesterov=True),
 				  loss='categorical_crossentropy', metrics=['accuracy'])
+	# model.compile(optimizer=Adam(), loss='categorical_crossentropy', metrics=['accuracy'])
 	batch_size = 32
-	epochs = 20
+	epochs = 10
 
 	if use_data_generator:
 		datagen = ImageDataGenerator(
@@ -122,7 +122,7 @@ def fit_model(use_data_generator=False):
 							validation_data=(X_val, y_val), shuffle=True,
 							verbose=1)
 	print(model.evaluate(X_val, y_val))
-	model.save('mouth+ear_vs_other.h5')
+	# model.save('mouth+ear_vs_other.h5')
 
 
 def evaluate():
@@ -146,8 +146,8 @@ def evaluate():
 
 if __name__ == "__main__":
 	X, y, task = read_pics(simplification=999)
-	# fit_model(use_data_generator=True)
-	evaluate()
+	fit_model(use_data_generator=True)
+	# evaluate()
 
 
 
