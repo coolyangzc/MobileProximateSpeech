@@ -1,6 +1,7 @@
 import os
 import numpy as np
 
+# res_path = '../Data/Study2/sorted pics_192_108/Mouth vs. Ear/results/'
 res_path = '../Data/Study2/sorted pics_192_108/Mouth+Ear vs. Other/results/'
 
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
@@ -35,4 +36,4 @@ if __name__ == "__main__":
 		else:
 			print(t.ljust(24 - len(t)), cnt[t])
 	all_acc = np.array(all_acc)
-	print(np.mean(all_acc))
+	print('Mean = ', np.mean(all_acc), 'std = ', np.std(all_acc))
