@@ -2,7 +2,8 @@ import os
 import numpy as np
 
 # res_path = '../Data/Study2/sorted pics_192_108/Mouth vs. Ear/results/'
-res_path = '../Data/Study2/sorted pics_192_108/Mouth+Ear vs. Other/results/'
+# res_path = '../Data/Study2/sorted pics_192_108/Mouth+Ear vs. Other/results/'
+res_path = '../Data/Study2/sorted pics_192_108/Mouth&Ear multi-classification/results/'
 
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
            '竖屏握持，上端遮嘴', # '水平端起，倒话筒',

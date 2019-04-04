@@ -54,7 +54,7 @@ def read_file(path, file_name, id):
 	while sp + feature_num <= len(lines):
 		feature = []
 		for i in range(feature_num):
-			if used_feature[i % 7] == 1:
+			if used_feature[i % len(used_feature)] == 1:
 				feature.append(float(lines[sp + i]))
 		X[id].append(feature)
 		y[id].append(y_type)
@@ -145,7 +145,7 @@ def leave_one_out_validation():
 		# bigger gamma -> higher fit acc
 		# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
 		# clf = neighbors.KNeighborsClassifier()
-		clf = tree.DecisionTreeClassifier(max_depth=10, class_weight={0: 1, 1: 1})
+		clf = tree.DecisionTreeClassifier(max_depth=12, class_weight={0: 1, 1: 1})
 		clf.fit(X_train, y_train)
 		train_acc = clf.score(X_train, y_train)
 		test_acc = clf.score(X_test, y_test)
@@ -344,6 +344,6 @@ if __name__ == "__main__":
 	read_features(path)
 	# data_normalization()
 	# generate_model()
-	# leave_one_out_validation()
+	leave_one_out_validation()
 	# leave_one_out_save(path)
-	personalization(path)
+	# personalization(path)

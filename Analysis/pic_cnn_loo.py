@@ -29,14 +29,17 @@ positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
 negative = ['手中', '打字', '拍照', '浏览',
 			'自拍', '摇晃（前后）', '摇晃（左右）', '裤兜']
 
+'''
 mouth = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
 		 '竖屏握持，上端遮嘴', # '水平端起，倒话筒',
 		 '话筒', '横屏']
+'''
+mouth = ['竖屏握持，上端遮嘴']
 ear = ['左耳打电话（不碰）', '右耳打电话（不碰）', '左耳打电话（碰触）', '右耳打电话（碰触）']
 
 # all_type = positive + negative
 all_type = mouth + ear
-num_classes = 6
+num_classes = 2
 pic_path = '../Data/Study2/sorted pics_192_108'
 model_path = '../Data/Study2/sorted pics_192_108/models'
 
