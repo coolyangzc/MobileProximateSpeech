@@ -102,7 +102,7 @@ public class Study1Task {
             tasks.add("站\n手中\n" + p);
         }
 
-        for(int i = 0; i < tasks.size() * 10; ++i)
+        for(int i = 0; i < tasks.size() * 16; ++i)
             speechList.add(random.nextInt(commands.length));
     }
 
@@ -142,11 +142,11 @@ public class Study1Task {
         s += "姿态: " + comp[0] + "\n";
         s += "起始位置: " + comp[1] + "\n";
         s += "任务: " + comp[2] + "\n";
-        if (repeat_times < 5)
+        if (repeat_times < 8)
             s += "右手\n";
         else
             s += "左手\n";
-        s += commands[speechList.get(task_id * 10 + repeat_times)] + "\n";
+        s += commands[speechList.get(task_id * 16 + repeat_times)] + "\n";
         return s;
     }
 
@@ -164,7 +164,7 @@ public class Study1Task {
         if (repeat_times < 0) {
             if (task_id > 0) {
                 task_id -= 1;
-                repeat_times = 9;
+                repeat_times = 15;
             } else
                 repeat_times = 0;
         }
@@ -173,7 +173,7 @@ public class Study1Task {
 
     public String nextTask() {
         repeat_times += 1;
-        if (repeat_times >= 10) {
+        if (repeat_times >= 16) {
             repeat_times = 0;
             task_id += 1;
             if (task_id >= tasks.size())
