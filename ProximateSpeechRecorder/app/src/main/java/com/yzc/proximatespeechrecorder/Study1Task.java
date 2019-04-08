@@ -17,11 +17,13 @@ public class Study1Task {
 
     Study1Task(int seed) {
         random = new Random(seed);
-        initTasks();
+        //initTasks();
+        initMultiClassTask();
         task_id = repeat_times = 0;
     }
 
     private void initTasks() {
+
         List<String> pos = Arrays.asList(
                 "竖直对脸，碰触鼻子",
                 "竖直对脸，不碰鼻子",
@@ -79,6 +81,26 @@ public class Study1Task {
 
         for (String t: tasks)
             Log.e("tasks", t);
+
+        for(int i = 0; i < tasks.size() * 10; ++i)
+            speechList.add(random.nextInt(commands.length));
+    }
+
+    private void initMultiClassTask() {
+        List<String> multi_pos = Arrays.asList(
+                "竖直对脸，碰触鼻子",
+                "竖直对脸，不碰鼻子",
+                "竖屏握持，上端遮嘴",
+                "水平端起，倒话筒",
+                "话筒",
+                "横屏",
+                "耳旁打电话"
+        );
+        Collections.shuffle(multi_pos, random);
+        for (String p : multi_pos) {
+            tasks.add("坐\n手中\n" + p);
+            tasks.add("站\n手中\n" + p);
+        }
 
         for(int i = 0; i < tasks.size() * 10; ++i)
             speechList.add(random.nextInt(commands.length));
