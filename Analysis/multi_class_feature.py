@@ -24,11 +24,14 @@ def extract_feature(start_time, end_time, data, output):
 	feature = []
 	sensor_list = ['ACCELEROMETER', 'LINEAR_ACCELERATION', 'GRAVITY', 'GYROSCOPE', 'PROXIMITY']
 	for sensor in sensor_list:
-		f = motion_feature.extract_time_feature(data, sensor, s, e)
+		# f = motion_feature.extract_time_feature(data, sensor, s, e)
 
 		# 2s
-		# f = extract_time_feature(data, sensor, s, m)
-		# f.extend(extract_time_feature(data, sensor, m, e))
+		# f = motion_feature.extract_time_feature(data, sensor, s, m)
+		# f.extend(motion_feature.extract_time_feature(data, sensor, m, e))
+
+		f = motion_feature.extract_time_feature(data, sensor, s, e)
+		f.extend(motion_feature.extract_time_feature(data, sensor, e, e + 0.5))
 
 		output.write(sensor + ' ' + str(len(f)) + ' ')
 		feature.extend(f)
@@ -72,8 +75,8 @@ def calc_data(file_name, file_dir, out_dir):
 
 	t = get_vad_chunks(file_dir, file_name)
 	print(t)
-	# end = find_suitable_end(t, 0.5, 4.0)
-	# extract_feature(0.05, end, d, output)
+	end = find_suitable_end(t, 0.4, 4.0)
+	extract_feature(0.05, end, d, output)
 
 
 if __name__ == "__main__":
