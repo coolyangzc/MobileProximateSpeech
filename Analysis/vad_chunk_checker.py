@@ -33,8 +33,15 @@ def check_vad_chunk(file_name, file_dir):
 		print_in_format(t, 'aggressiveness = 2')
 		t = webrtcvad_utils.calc_vad(1, os.path.join(file_dir, file_name + '.wav'))
 		print_in_format(t, 'aggressiveness = 1')
-	elif t[0] < 0.5 or t[0] > 4.0:
+	elif t[0] < 0.5 or t[0] > 3.0:
 		strange_file_cnt += 1
+		print(file_dir, file_name)
+		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + '.wav'))
+		print_in_format(t, 'aggressiveness = 3')
+		t = webrtcvad_utils.calc_vad(2, os.path.join(file_dir, file_name + '.wav'))
+		print_in_format(t, 'aggressiveness = 2')
+		t = webrtcvad_utils.calc_vad(1, os.path.join(file_dir, file_name + '.wav'))
+		print_in_format(t, 'aggressiveness = 1')
 
 
 if __name__ == "__main__":

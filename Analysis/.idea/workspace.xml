@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="de7ba81e-35ff-462d-bbea-3ee31447ea18" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/vad_chunk_checker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/multi_class_feature.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_class_feature.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vad_chunk_checker.py" beforeDir="false" afterPath="$PROJECT_DIR$/vad_chunk_checker.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -62,8 +60,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/vad_chunk_checker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="14" column="11" selection-start-line="14" selection-start-column="11" selection-end-line="14" selection-end-column="11" />
+            <state relative-caret-position="105">
+              <caret line="35" column="19" selection-start-line="35" selection-start-column="19" selection-end-line="35" selection-end-column="19" />
               <folding>
                 <element signature="e#0#6#0" expanded="true" />
               </folding>
@@ -74,7 +72,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/multi_class_feature.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
+            <state relative-caret-position="-500">
               <caret line="43" column="8" lean-forward="true" selection-start-line="43" selection-start-column="8" selection-end-line="46" selection-end-column="23" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -497,12 +495,12 @@
       <workItem from="1554858718869" duration="3867000" />
       <workItem from="1554944411239" duration="603000" />
       <workItem from="1555033531065" duration="1792000" />
-      <workItem from="1556080956396" duration="6457000" />
+      <workItem from="1556080956396" duration="8232000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="493807000" />
+    <option name="totallyTimeSpent" value="495582000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -521,7 +519,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.46033993" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.4858357" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -546,7 +544,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Analysis$pic_cnn.coverage" NAME="pic_cnn Coverage Results" MODIFIED="1553926869026" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$voice_classifier.coverage" NAME="voice_classifier Coverage Results" MODIFIED="1554368734238" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Analysis$vad_chunk_checker.coverage" NAME="vad_chunk_checker Coverage Results" MODIFIED="1556090678154" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$vad_chunk_checker.coverage" NAME="vad_chunk_checker Coverage Results" MODIFIED="1556092425818" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$pic_classifier.coverage" NAME="pic_classifier Coverage Results" MODIFIED="1553838777695" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$voice_multi_classifier.coverage" NAME="voice_multi_classifier Coverage Results" MODIFIED="1556087363684" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$voice_vad_trimmer.coverage" NAME="voice_vad_trimmer Coverage Results" MODIFIED="1554859931239" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -948,7 +946,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/multi_class_feature.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
+        <state relative-caret-position="-500">
           <caret line="43" column="8" lean-forward="true" selection-start-line="43" selection-start-column="8" selection-end-line="46" selection-end-column="23" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
@@ -958,8 +956,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/vad_chunk_checker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="14" column="11" selection-start-line="14" selection-start-column="11" selection-end-line="14" selection-end-column="11" />
+        <state relative-caret-position="105">
+          <caret line="35" column="19" selection-start-line="35" selection-start-column="19" selection-end-line="35" selection-end-column="19" />
           <folding>
             <element signature="e#0#6#0" expanded="true" />
           </folding>
