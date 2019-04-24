@@ -197,7 +197,6 @@ def calc_data(file_name, file_dir, out_dir):
 			start += 2.0
 
 
-
 if __name__ == "__main__":
 	data_path = '../Data/Study1/'
 	feature_path = '../Data/motion feature/'

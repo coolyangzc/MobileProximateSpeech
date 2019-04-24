@@ -137,7 +137,6 @@ def leave_one_out_validation():
 				confusion_vote[y[loo][i]][vote_res] += 1
 				vote = np.zeros(category_n)
 
-
 	print('Mean')
 	print(mean_train_acc / len(X))
 	print(mean_test_acc / len(X))

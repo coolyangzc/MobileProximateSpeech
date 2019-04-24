@@ -22,8 +22,7 @@ end_interval = {
 	'桌上反面': 1000, '手上反面': 1000,
 	'裤兜': 2000,
 }
-start_response_time = 300
-
+start_response_time = 200
 
 
 path = '../Data/Voice Study Stereo 32000Hz'
