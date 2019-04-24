@@ -40,7 +40,7 @@ def extract_feature(start_time, end_time, data, output):
 def get_vad_chunks(file_dir, file_name):
 	vad_file = os.path.join(file_dir, file_name + '_vad.txt')
 	if not os.path.exists(vad_file):
-		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + ".wav"))
+		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + '.wav'))
 		out_vad = open(vad_file, 'w', encoding='utf-8')
 		for i in range(0, len(t), 2):
 			out_vad.write(str(t[i]) + ' ' + str(t[i + 1]) + '\n')
