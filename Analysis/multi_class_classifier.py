@@ -6,8 +6,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import RobustScaler
 from sklearn.ensemble import AdaBoostClassifier
 
-feature_path = '../Data/multi-class/features'
-# feature_path = '../Data/multi-class/features (motion, 162 dimensions)'
+# feature_path = '../Data/multi-class/features'
+feature_path = '../Data/multi-class/features (motion, 162 dimensions)'
 
 all_category = []
 user_list = []
@@ -15,14 +15,30 @@ user_list = []
 X, y, task = [], [], []
 
 
-def set_category():
+def set_category(c_type = 'motion'):
 	global all_category
 
+	if c_type == 'motion':
 	# motion
-	all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴', '话筒'],
-					['水平端起，倒话筒'],
-					['耳旁打电话'],
-					['横屏']]
+		all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴', '话筒'],
+						['水平端起，倒话筒'],
+						['耳旁打电话'],
+						['横屏']]
+	if c_type == 'all':
+		all_category = [['竖直对脸，碰触鼻子'],
+						['竖直对脸，不碰鼻子'],
+						['竖屏握持，上端遮嘴'],
+						['话筒'],
+						['水平端起，倒话筒'],
+						['耳旁打电话'],
+						['横屏']]
+	if c_type == 'all_compact':
+		all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子'],
+						['竖屏握持，上端遮嘴'],
+						['话筒'],
+						['水平端起，倒话筒'],
+						['耳旁打电话'],
+						['横屏']]
 	'''
 	# voice
 	all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子'],
@@ -105,7 +121,8 @@ def leave_one_out_validation():
 		print(X_train.shape, y_train.shape)
 
 		# clf = tree.DecisionTreeClassifier(max_depth=10)
-		clf = svm.SVC(kernel='rbf', gamma=1e-3)
+		# clf = svm.SVC(kernel='rbf', gamma=1e-2, class_weight='balanced')
+		clf = svm.SVC(kernel='rbf', gamma='auto', class_weight='balanced')
 		# clf = AdaBoostClassifier(n_estimators=100)
 
 		clf.fit(X_train, y_train)
@@ -135,7 +152,8 @@ def leave_one_out_validation():
 		for j in range(category_n):
 			tot += confusion[i][j]
 		acc = confusion[i][i] / tot
-		print(confusion[i], acc * 100)
+		print(confusion[i], round(acc * 100, 2), end='\t')
+		print(int(confusion[i][i]), '/', int(tot), all_category[i])
 
 
 def data_normalization():
@@ -151,7 +169,7 @@ def data_normalization():
 
 
 if __name__ == "__main__":
-	set_category()
+	set_category(c_type='all_compact')
 	read_features()
 	data_normalization()
 	leave_one_out_validation()

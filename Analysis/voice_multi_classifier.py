@@ -11,11 +11,17 @@ all_category = [# ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子']
 				['横屏'],
 				['耳旁打电话']]
 '''
-
+'''
 all_category = [#['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子'],
 				['竖直对脸，不碰鼻子'],
 				['竖屏握持，上端遮嘴', '话筒'],
 				['水平端起，倒话筒', '耳旁打电话']]
+				# ['横屏']]
+'''
+
+all_category = [['竖直对脸，不碰鼻子'],
+				['竖屏握持，上端遮嘴'],
+				['话筒']]
 				# ['横屏']]
 
 used_feature = [1, # min
@@ -102,7 +108,7 @@ def leave_one_out_validation():
 		X_train, X_test = np.array(X_train), np.array(X_test)
 		y_train, y_test = np.array(y_train), np.array(y_test)
 		print(X_train.shape, y_train.shape)
-		clf = tree.DecisionTreeClassifier(max_depth=10)
+		clf = tree.DecisionTreeClassifier(max_depth=10, class_weight='balanced')
 		clf.fit(X_train, y_train)
 		res = clf.predict(X[loo])
 		res_proba = clf.predict_proba(X[loo])

@@ -60,7 +60,7 @@ def get_vad_chunks(file_dir, file_name):
 	return t
 
 
-def calc_data(file_name, file_dir, out_dir):
+def calc_motion_data(file_name, file_dir, out_dir):
 	print(file_name)
 	d = data_reader.Data()
 	d.read(os.path.join(file_dir, file_name + ".txt"))
@@ -87,4 +87,4 @@ if __name__ == "__main__":
 			os.makedirs(out_dir)
 		for f in os.listdir(p):
 			if f.endswith('.txt') and not f.endswith('_vad.txt'):
-				calc_data(f[:-4], p, out_dir)
+				calc_motion_data(f[:-4], p, out_dir)
