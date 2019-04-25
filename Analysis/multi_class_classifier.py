@@ -7,7 +7,9 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.ensemble import AdaBoostClassifier
 
 # feature_path = '../Data/multi-class/features'
-feature_path = '../Data/multi-class/features (motion, 162 dimensions)'
+motion_feature_path = '../Data/multi-class/features (motion, 162 dimensions)'
+voice_feature_path = '../Data/multi-class/voice features'
+use_motion, use_voice = True, True
 
 all_category = []
 user_list = []
@@ -15,11 +17,10 @@ user_list = []
 X, y, task = [], [], []
 
 
-def set_category(c_type = 'motion'):
+def set_category(c_type='motion'):
 	global all_category
 
 	if c_type == 'motion':
-	# motion
 		all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴', '话筒'],
 						['水平端起，倒话筒'],
 						['耳旁打电话'],
@@ -39,6 +40,12 @@ def set_category(c_type = 'motion'):
 						['水平端起，倒话筒'],
 						['耳旁打电话'],
 						['横屏']]
+	if c_type == 'motion+voice':
+		all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子'],
+						['竖屏握持，上端遮嘴', '话筒'],
+						['水平端起，倒话筒'],
+						['耳旁打电话'],
+						['横屏']]
 	'''
 	# voice
 	all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子'],
@@ -48,10 +55,12 @@ def set_category(c_type = 'motion'):
 	'''
 
 
-def read_file(path, file_name, id):
+def read_file(user, file_name, id):
 	if not file_name.endswith('.txt'):
 		return
-	file = open(os.path.join(path, file_name), "r", encoding='utf-8')
+	feature = []
+
+	file = open(os.path.join(motion_feature_path, user, file_name), "r", encoding='utf-8')
 	lines = file.readlines()
 	file.close()
 	if len(lines) <= 7:
@@ -72,10 +81,19 @@ def read_file(path, file_name, id):
 	if y_type == -1:
 		print('Warning: unknown task:' + task_description, file_name)
 		return
-	feature = []
-	for i in range(7, 7 + feature_num):
-		feature.append(float(lines[i]))
-	# feature = feature[198:264]
+
+	if use_motion:
+		for i in range(7, 7 + feature_num):
+			feature.append(float(lines[i]))
+
+	if use_voice:
+		file = open(os.path.join(voice_feature_path, user, file_name), "r", encoding='utf-8')
+		lines = file.readlines()
+		file.close()
+
+		for i in range(len(lines)):
+			feature.append(float(lines[i]))
+
 	X[id].append(feature)
 	y[id].append(y_type)
 	task[id].append(task_description)
@@ -84,19 +102,19 @@ def read_file(path, file_name, id):
 def read_features():
 	global X, y, task, user_list
 	id = -1
-	for u in os.listdir(feature_path):
+	for u in os.listdir(motion_feature_path):
 		if u.endswith('.txt'):
 			continue
 		print('Reading', u)
 		user_list.append(u)
-		p = os.path.join(feature_path, u)
+		p = os.path.join(motion_feature_path, u)
 		files = os.listdir(p)
 		X.append([])
 		y.append([])
 		task.append([])
 		id += 1
 		for f in files:
-			read_file(p, f, id)
+			read_file(u, f, id)
 
 
 def leave_one_out_validation():
@@ -142,7 +160,10 @@ def leave_one_out_validation():
 			confusion[y[loo][i]][res[i]] += 1
 		print('-' * 20)
 
-	print(feature_path)
+	if use_motion:
+		print('motion feature:', motion_feature_path)
+	if use_voice:
+		print('voice feature:', voice_feature_path)
 	print('Mean')
 	print(mean_train_acc / len(X))
 	print(mean_test_acc / len(X))
@@ -169,7 +190,7 @@ def data_normalization():
 
 
 if __name__ == "__main__":
-	set_category(c_type='all_compact')
+	set_category(c_type='motion')
 	read_features()
 	data_normalization()
 	leave_one_out_validation()

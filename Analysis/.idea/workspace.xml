@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="de7ba81e-35ff-462d-bbea-3ee31447ea18" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/multi_class_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_class_classifier.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/multi_class_feature.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_class_feature.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vad_chunk_checker.py" beforeDir="false" afterPath="$PROJECT_DIR$/vad_chunk_checker.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -54,10 +54,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multi_class_feature.py">
+        <entry file="file://$PROJECT_DIR$/multi_class_classifier.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="82" column="17" selection-start-line="82" selection-start-column="17" selection-end-line="82" selection-end-column="17" />
+            <state relative-caret-position="60">
+              <caret line="11" column="34" selection-start-line="11" selection-start-column="34" selection-end-line="11" selection-end-column="34" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -66,19 +66,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/vad_chunk_checker.py">
+        <entry file="file://$PROJECT_DIR$/multi_class_feature.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="57" column="4" lean-forward="true" selection-start-line="57" selection-start-column="4" selection-end-line="57" selection-end-column="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/voice_feature.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="6" column="11" selection-start-line="6" selection-end-line="6" selection-end-column="11" />
+            <state relative-caret-position="305">
+              <caret line="155" selection-start-line="155" selection-end-line="155" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -87,10 +78,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multi_class_classifier.py">
+        <entry file="file://$PROJECT_DIR$/voice_feature.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="108">
-              <caret line="155" column="14" selection-start-line="155" selection-start-column="14" selection-end-line="155" selection-end-column="14" />
+            <state relative-caret-position="165">
+              <caret line="63" column="28" selection-start-line="63" selection-start-column="28" selection-end-line="63" selection-end-column="28" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -120,10 +111,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data_reader.py">
+        <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/typing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2040">
-              <caret line="102" selection-start-line="102" selection-end-line="102" />
+            <state relative-caret-position="143">
+              <caret line="2290" column="8" selection-start-line="2290" selection-start-column="8" selection-end-line="2290" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -212,7 +203,6 @@
         <option value="$USER_HOME$/Desktop/Evaluation/test.py" />
         <option value="$PROJECT_DIR$/voice_feature.py" />
         <option value="$PROJECT_DIR$/server.py" />
-        <option value="$PROJECT_DIR$/data_reader.py" />
         <option value="$PROJECT_DIR$/speech_edit_distance.py" />
         <option value="$PROJECT_DIR$/motion_classifier.py" />
         <option value="$PROJECT_DIR$/frame_extractor.py" />
@@ -228,19 +218,20 @@
         <option value="$PROJECT_DIR$/voice_visualization.py" />
         <option value="$PROJECT_DIR$/server_audio_recording.py" />
         <option value="$PROJECT_DIR$/voice_trimmer.py" />
-        <option value="$USER_HOME$/Desktop/capa test/test.py" />
         <option value="$PROJECT_DIR$/motion_feature.py" />
         <option value="$PROJECT_DIR$/webrtcvad_utils.py" />
         <option value="$PROJECT_DIR$/voice_multi_classifier.py" />
+        <option value="$PROJECT_DIR$/vad_chunk_checker.py" />
+        <option value="$PROJECT_DIR$/data_reader.py" />
+        <option value="$USER_HOME$/Desktop/capa test/test.py" />
         <option value="$PROJECT_DIR$/multi_class_classifier.py" />
         <option value="$PROJECT_DIR$/multi_class_feature.py" />
-        <option value="$PROJECT_DIR$/vad_chunk_checker.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="82" />
-    <option name="y" value="247" />
+    <option name="x" value="632" />
+    <option name="y" value="422" />
     <option name="width" value="1940" />
     <option name="height" value="955" />
   </component>
@@ -303,7 +294,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.vad_chunk_checker">
+  <component name="RunManager" selected="Python.multi_class_feature">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -371,9 +362,6 @@
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="C:\Users\coolyangzc\AppData\Local\Programs\Python\Python36\python.exe" />
       <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop/capa test" />
       <option name="IS_MODULE_SDK" value="false" />
@@ -382,7 +370,7 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$USER_HOME$/Desktop/capa test/test.py" />
       <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
@@ -439,11 +427,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.vad_chunk_checker" />
-        <item itemvalue="Python.multi_class_classifier" />
-        <item itemvalue="Python.voice_multi_classifier" />
         <item itemvalue="Python.multi_class_feature" />
+        <item itemvalue="Python.multi_class_classifier" />
         <item itemvalue="Python.test" />
+        <item itemvalue="Python.vad_chunk_checker" />
+        <item itemvalue="Python.voice_multi_classifier" />
       </list>
     </recent_temporary>
   </component>
@@ -515,12 +503,12 @@
       <workItem from="1556080956396" duration="12330000" />
       <workItem from="1556096439799" duration="409000" />
       <workItem from="1556153513610" duration="1779000" />
-      <workItem from="1556155425704" duration="5653000" />
+      <workItem from="1556155425704" duration="10905000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="507521000" />
+    <option name="totallyTimeSpent" value="512773000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -533,13 +521,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2613941" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3526912" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32294616" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -549,7 +538,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.3286119" />
-      <window_info anchor="bottom" id="Python Console" order="12" weight="0.17705382" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.059490085" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -570,25 +559,11 @@
     <SUITE FILE_PATH="coverage/Analysis$voice_vad_trimmer.coverage" NAME="voice_vad_trimmer Coverage Results" MODIFIED="1554859931239" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$multi_class_classifier.coverage" NAME="multi_class_classifier Coverage Results" MODIFIED="1556093902248" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$pic_res_analyzer.coverage" NAME="pic_res_analyzer Coverage Results" MODIFIED="1554276703890" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Analysis$multi_class_feature.coverage" NAME="multi_class_feature Coverage Results" MODIFIED="1556095253978" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$multi_class_feature.coverage" NAME="multi_class_feature Coverage Results" MODIFIED="1556178868133" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$pic_cnn_loo.coverage" NAME="pic_cnn_loo Coverage Results" MODIFIED="1554270817630" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$test.coverage" NAME="test Coverage Results" MODIFIED="1555035242794" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Desktop/capa test" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/threading.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="915" selection-start-line="915" selection-end-line="915" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/keras/preprocessing/image.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="50" column="11" lean-forward="true" selection-start-line="50" selection-start-column="11" selection-end-line="50" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../sorted pics_192_108/test.py" />
     <entry file="file://$USER_HOME$/Desktop/Evaluation/test.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -857,16 +832,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Desktop/capa test/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="460">
-          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/audio_recorder.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2040">
@@ -901,20 +866,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/motion_classifier.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="6" selection-start-line="6" selection-end-line="7" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_reader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2040">
-          <caret line="102" selection-start-line="102" selection-end-line="102" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/voice_visualization.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80">
@@ -939,6 +890,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/vad_chunk_checker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="12" column="6" lean-forward="true" selection-start-line="12" selection-start-column="6" selection-end-line="12" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/voice_multi_classifier.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2711">
@@ -949,20 +907,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/multi_class_classifier.py">
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/typing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="155" column="14" selection-start-line="155" selection-start-column="14" selection-end-line="155" selection-end-column="14" />
+        <state relative-caret-position="143">
+          <caret line="2290" column="8" selection-start-line="2290" selection-start-column="8" selection-end-line="2290" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/voice_feature.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="63" column="28" selection-start-line="63" selection-start-column="28" selection-end-line="63" selection-end-column="28" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/voice_feature.py">
+    <entry file="file://$PROJECT_DIR$/data_reader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="98" column="24" lean-forward="true" selection-start-line="98" selection-start-column="24" selection-end-line="98" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motion_classifier.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
-          <caret line="6" column="11" selection-start-line="6" selection-end-line="6" selection-end-column="11" />
+          <caret line="6" selection-start-line="6" selection-end-line="7" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/ntpath.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="74" column="4" selection-start-line="74" selection-start-column="4" selection-end-line="74" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Desktop/capa test/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="413">
+          <caret line="21" column="32" lean-forward="true" selection-start-line="21" selection-start-column="32" selection-end-line="21" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multi_class_classifier.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="11" column="34" selection-start-line="11" selection-start-column="34" selection-end-line="11" selection-end-column="34" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -971,18 +967,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/multi_class_feature.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="82" column="17" selection-start-line="82" selection-start-column="17" selection-end-line="82" selection-end-column="17" />
+        <state relative-caret-position="305">
+          <caret line="155" selection-start-line="155" selection-end-line="155" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vad_chunk_checker.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="57" column="4" lean-forward="true" selection-start-line="57" selection-start-column="4" selection-end-line="57" selection-end-column="4" />
         </state>
       </provider>
     </entry>

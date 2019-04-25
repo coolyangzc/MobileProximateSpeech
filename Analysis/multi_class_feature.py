@@ -4,10 +4,12 @@ import wave
 import struct
 import numpy as np
 import data_reader
+import voice_feature
 import motion_feature
 import webrtcvad_utils
 
 data_path = '../Data/multi-class/users/'
+voice_data_path = '../Data/multi-class/32000 Hz stereo/'
 feature_path = '../Data/multi-class/features/'
 voice_feature_path = '../Data/multi-class/voice features/'
 
@@ -35,8 +37,11 @@ def extract_feature(start_time, end_time, data, output):
 		# f = motion_feature.extract_time_feature(data, sensor, s, m)
 		# f.extend(motion_feature.extract_time_feature(data, sensor, m, e))
 
-		f = motion_feature.extract_time_feature(data, sensor, s, e)
-		f.extend(motion_feature.extract_time_feature(data, sensor, e, e + 0.5))
+		# f = motion_feature.extract_time_feature(data, sensor, s, e)
+		# f.extend(motion_feature.extract_time_feature(data, sensor, e, e + 0.5))
+
+		f = motion_feature.extract_time_feature(data, sensor, s, e - 0.1)
+		f.extend(motion_feature.extract_time_feature(data, sensor, e - 0.1, e))
 
 		output.write(sensor + ' ' + str(len(f)) + ' ')
 		feature.extend(f)
@@ -84,8 +89,15 @@ def calc_motion_data(file_name, file_dir, out_dir):
 	extract_feature(0.05, end, d, output)
 
 
-def calc_voice_data(file_name, file_dir, voice_out_dir):
-	wav_file = os.path.join(file_dir, file_name + '.wav')
+def calc_voice_data(file_name, file_dir, user_name, voice_out_dir):
+	f = open(os.path.join(file_dir, file_name + ".txt"), "r", encoding='utf-8')
+	line = f.readline()
+	task_id = line.strip().replace("/", "_").replace(":", "_").replace(" ", "")
+	print(user_name, task_id)
+	out_file = os.path.join(voice_out_dir, task_id + ".txt")
+	output = open(out_file, 'w', encoding='utf-8')
+
+	wav_file = os.path.join(voice_data_path + '/' + user_name, file_name + '.wav')
 	try:
 		wavefile = wave.open(wav_file, 'r')
 	except wave.Error:
@@ -105,6 +117,28 @@ def calc_voice_data(file_name, file_dir, voice_out_dir):
 		y[0][i] = struct.unpack('h', left)[0]
 		y[1][i] = struct.unpack('h', right)[0]
 
+	t = get_vad_chunks(file_dir, file_name)
+	print(t)
+	end = find_suitable_end(t, 0.4, 4.0)
+
+	interval_size = 3200
+	stride = 0.5
+	s = int(framerate * end)
+	t = int(framerate * (end + 1.0))
+	feature = voice_feature.extract_voice_features\
+		(y[0][s:t], y[1][s:t])
+	for f in feature:
+		output.write(str(f) + '\n')
+
+	'''
+	while s + interval_size < numframes:
+		feature = voice_feature.extract_voice_features\
+			(y[0][s:s + interval_size], y[1][s:s + interval_size])
+		for f in feature:
+			output.write(str(f) + '\n')
+		s += int(interval_size * stride)
+	'''
+
 
 if __name__ == "__main__":
 	for u in os.listdir(data_path):
@@ -117,5 +151,5 @@ if __name__ == "__main__":
 			os.makedirs(voice_out_dir)
 		for f in os.listdir(p):
 			if f.endswith('.txt') and not f.endswith('_vad.txt'):
-				# calc_motion_data(f[:-4], p, out_dir)
-				calc_voice_data(f[:-4], p, voice_out_dir)
+				calc_motion_data(f[:-4], p, out_dir)
+				# calc_voice_data(f[:-4], p, u, voice_out_dir)
