@@ -2,7 +2,7 @@ import os
 import webrtcvad_utils
 
 check_path = '../Data/multi-class/users/'
-empty_file_cnt, strange_file_cnt = 0, 0
+empty_file_cnt, strange_file_cnt, too_short_cnt = 0, 0, 0
 
 
 def print_in_format(t, description):
@@ -21,7 +21,7 @@ def check_vad_chunk(file_name, file_dir):
 	lines = f_vad.readlines()
 	f_vad.close()
 	t = []
-	global empty_file_cnt, strange_file_cnt
+	global empty_file_cnt, strange_file_cnt, too_short_cnt
 	for line in lines:
 		data = line.strip().split(' ')
 		t.append(float(data[0]))
@@ -33,8 +33,17 @@ def check_vad_chunk(file_name, file_dir):
 		print_in_format(t, 'aggressiveness = 2')
 		t = webrtcvad_utils.calc_vad(1, os.path.join(file_dir, file_name + '.wav'))
 		print_in_format(t, 'aggressiveness = 1')
-	elif t[0] < 0.5 or t[0] > 3.0:
+	elif t[0] < 0.4 or t[0] > 3.0:
 		strange_file_cnt += 1
+		print(file_dir, file_name)
+		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + '.wav'))
+		print_in_format(t, 'aggressiveness = 3')
+		t = webrtcvad_utils.calc_vad(2, os.path.join(file_dir, file_name + '.wav'))
+		print_in_format(t, 'aggressiveness = 2')
+		t = webrtcvad_utils.calc_vad(1, os.path.join(file_dir, file_name + '.wav'))
+		print_in_format(t, 'aggressiveness = 1')
+	if len(t) > 0 and t[1] - t[0] < 1.3:
+		too_short_cnt += 1
 		print(file_dir, file_name)
 		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + '.wav'))
 		print_in_format(t, 'aggressiveness = 3')
@@ -50,4 +59,4 @@ if __name__ == "__main__":
 		for f in os.listdir(p):
 			if f.endswith('.wav'):
 				check_vad_chunk(f[:-4], p)
-	print(empty_file_cnt, strange_file_cnt)
+	print(empty_file_cnt, strange_file_cnt, too_short_cnt)

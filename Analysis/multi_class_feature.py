@@ -1,10 +1,15 @@
 import os
+import math
+import wave
+import struct
+import numpy as np
 import data_reader
 import motion_feature
 import webrtcvad_utils
 
 data_path = '../Data/multi-class/users/'
 feature_path = '../Data/multi-class/features/'
+voice_feature_path = '../Data/multi-class/voice features/'
 
 
 def find_suitable_end(t, l, r):
@@ -79,12 +84,38 @@ def calc_motion_data(file_name, file_dir, out_dir):
 	extract_feature(0.05, end, d, output)
 
 
+def calc_voice_data(file_name, file_dir, voice_out_dir):
+	wav_file = os.path.join(file_dir, file_name + '.wav')
+	try:
+		wavefile = wave.open(wav_file, 'r')
+	except wave.Error:
+		return
+	nchannels = wavefile.getnchannels()
+	sample_width = wavefile.getsampwidth()
+	framerate = wavefile.getframerate()
+	numframes = wavefile.getnframes()
+	time = numframes / framerate
+	print(nchannels, sample_width, framerate, numframes, time)
+
+	y = np.zeros((2, numframes))
+
+	for i in range(numframes):
+		val = wavefile.readframes(1)
+		left, right = val[0:2], val[2:4]
+		y[0][i] = struct.unpack('h', left)[0]
+		y[1][i] = struct.unpack('h', right)[0]
+
+
 if __name__ == "__main__":
 	for u in os.listdir(data_path):
 		p = os.path.join(data_path, u)
 		out_dir = os.path.join(feature_path, u)
 		if not os.path.exists(out_dir):
 			os.makedirs(out_dir)
+		voice_out_dir = os.path.join(voice_feature_path, u)
+		if not os.path.exists(voice_out_dir):
+			os.makedirs(voice_out_dir)
 		for f in os.listdir(p):
 			if f.endswith('.txt') and not f.endswith('_vad.txt'):
-				calc_motion_data(f[:-4], p, out_dir)
+				# calc_motion_data(f[:-4], p, out_dir)
+				calc_voice_data(f[:-4], p, voice_out_dir)
