@@ -4,14 +4,18 @@ import wave
 import struct
 import numpy as np
 import data_reader
+import capa_feature
 import voice_feature
 import motion_feature
 import webrtcvad_utils
 
 data_path = '../Data/multi-class/users/'
 voice_data_path = '../Data/multi-class/32000 Hz stereo/'
-feature_path = '../Data/multi-class/features/'
+motion_feature_path = '../Data/multi-class/motion features/'
+capa_feature_path = '../Data/multi-class/capa features/'
 voice_feature_path = '../Data/multi-class/voice features/'
+
+calc_motion, calc_capa, calc_voice = True, True, True
 
 
 def find_suitable_end(t, l, r):
@@ -21,7 +25,7 @@ def find_suitable_end(t, l, r):
 	return l
 
 
-def extract_feature(start_time, end_time, data, output):
+def extract_motion_feature(start_time, end_time, data, output):
 	start_time *= 1000
 	end_time *= 1000
 	output.write(str(start_time) + "\n")
@@ -37,11 +41,13 @@ def extract_feature(start_time, end_time, data, output):
 		# f = motion_feature.extract_time_feature(data, sensor, s, m)
 		# f.extend(motion_feature.extract_time_feature(data, sensor, m, e))
 
-		# f = motion_feature.extract_time_feature(data, sensor, s, e)
-		# f.extend(motion_feature.extract_time_feature(data, sensor, e, e + 0.5))
+		f = motion_feature.extract_time_feature(data, sensor, s, e)
+		f.extend(motion_feature.extract_time_feature(data, sensor, e, e + 0.5 * 1000))
 
-		f = motion_feature.extract_time_feature(data, sensor, s, e - 0.1)
-		f.extend(motion_feature.extract_time_feature(data, sensor, e - 0.1, e))
+		# f = motion_feature.extract_time_feature(data, sensor, s, e - 0.1 * 1000)
+		# f.extend(motion_feature.extract_time_feature(data, sensor, e - 0.1 * 1000, e))
+
+		# f = motion_feature.extract_time_feature(data, sensor, s, s + 1000)
 
 		output.write(sensor + ' ' + str(len(f)) + ' ')
 		feature.extend(f)
@@ -70,23 +76,34 @@ def get_vad_chunks(file_dir, file_name):
 	return t
 
 
-def calc_motion_data(file_name, file_dir, out_dir):
-	print(file_name)
+def calc_motion_capa_data(file_name, file_dir, motion_out_dir, capa_out_dir):
 	d = data_reader.Data()
 	d.read(os.path.join(file_dir, file_name + ".txt"))
-	out_file = os.path.join(out_dir, d.task_id + ".txt")
-	print(out_file)
-
-	output = open(out_file, 'w', encoding='utf-8')
-	output.write(d.user_pos + '\n')
-	output.write(d.start_pos + '\n')
-	output.write(d.description + '\n')
-	output.write(d.hand + '\n')
+	print(u, d.task_id)
 
 	t = get_vad_chunks(file_dir, file_name)
-	print(t)
+	# print(t)
 	end = find_suitable_end(t, 0.4, 4.0)
-	extract_feature(0.05, end, d, output)
+
+	if calc_motion:
+		out_file = os.path.join(motion_out_dir, d.task_id + '.txt')
+		print(out_file)
+		output = open(out_file, 'w', encoding='utf-8')
+		output.write(d.user_pos + '\n')
+		output.write(d.start_pos + '\n')
+		output.write(d.description + '\n')
+		output.write(d.hand + '\n')
+
+		extract_motion_feature(0.05, end, d, output)
+		output.close()
+
+	if calc_capa:
+		out_file = os.path.join(capa_out_dir, d.task_id + '.txt')
+		output = open(out_file, 'w', encoding='utf-8')
+		feature = capa_feature.extract_time_feature(d, end * 1000, (end + 2.0) * 1000)
+		for f in feature:
+			output.write(str(f) + '\n')
+		output.close()
 
 
 def calc_voice_data(file_name, file_dir, user_name, voice_out_dir):
@@ -124,7 +141,7 @@ def calc_voice_data(file_name, file_dir, user_name, voice_out_dir):
 	interval_size = 3200
 	stride = 0.5
 	s = int(framerate * end)
-	t = int(framerate * (end + 1.0))
+	t = int(framerate * (end + 0.2))
 	feature = voice_feature.extract_voice_features\
 		(y[0][s:t], y[1][s:t])
 	for f in feature:
@@ -143,13 +160,18 @@ def calc_voice_data(file_name, file_dir, user_name, voice_out_dir):
 if __name__ == "__main__":
 	for u in os.listdir(data_path):
 		p = os.path.join(data_path, u)
-		out_dir = os.path.join(feature_path, u)
-		if not os.path.exists(out_dir):
-			os.makedirs(out_dir)
+		motion_out_dir = os.path.join(motion_feature_path, u)
+		if not os.path.exists(motion_out_dir):
+			os.makedirs(motion_out_dir)
 		voice_out_dir = os.path.join(voice_feature_path, u)
 		if not os.path.exists(voice_out_dir):
 			os.makedirs(voice_out_dir)
+		capa_out_dir = os.path.join(capa_feature_path, u)
+		if not os.path.exists(capa_out_dir):
+			os.makedirs(capa_out_dir)
 		for f in os.listdir(p):
 			if f.endswith('.txt') and not f.endswith('_vad.txt'):
-				calc_motion_data(f[:-4], p, out_dir)
-				# calc_voice_data(f[:-4], p, u, voice_out_dir)
+				if calc_motion or calc_capa:
+					calc_motion_capa_data(f[:-4], p, motion_out_dir, capa_out_dir)
+				if calc_voice:
+					calc_voice_data(f[:-4], p, u, voice_out_dir)

@@ -6,10 +6,14 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import RobustScaler
 from sklearn.ensemble import AdaBoostClassifier
 
-# feature_path = '../Data/multi-class/features'
-motion_feature_path = '../Data/multi-class/features (motion, 162 dimensions)'
-voice_feature_path = '../Data/multi-class/voice features'
-use_motion, use_voice = True, True
+feature_path = '../Data/multi-class/features/'
+motion_feature_path = feature_path + 'motion features (full, 162 dimensions)'
+# motion_feature_path = feature_path + 'motion features (s~s+1.0, 162 dimensions)'
+# motion_feature_path = '../Data/multi-class/motion features (half, half, 324 dimensions)'
+voice_feature_path = feature_path + 'voice features (0.2s)'
+capa_feature_path = feature_path + 'capa features (10x18, thre=100, 1s)'
+# capa_feature_path = feature_path + 'capa features (x,y of 10x18)'
+use_motion, use_capa, use_voice = True, True, True
 
 all_category = []
 user_list = []
@@ -25,6 +29,12 @@ def set_category(c_type='motion'):
 						['水平端起，倒话筒'],
 						['耳旁打电话'],
 						['横屏']]
+	if c_type == 'motion(proximity)':
+		all_category = [['竖直对脸，不碰鼻子', '话筒'],
+						['竖直对脸，碰触鼻子', '竖屏握持，上端遮嘴'],
+						['水平端起，倒话筒'],
+						['耳旁打电话'],
+						['横屏']]
 	if c_type == 'all':
 		all_category = [['竖直对脸，碰触鼻子'],
 						['竖直对脸，不碰鼻子'],
@@ -34,9 +44,16 @@ def set_category(c_type='motion'):
 						['耳旁打电话'],
 						['横屏']]
 	if c_type == 'all_compact':
-		all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子'],
+		all_category = [['竖直对脸，碰触鼻子'],
+						['竖直对脸，不碰鼻子'],
+						['竖屏握持，上端遮嘴', '话筒'],
+						['水平端起，倒话筒'],
+						['耳旁打电话'],
+						['横屏']]
+	if c_type == 'all_no_microphone':
+		all_category = [['竖直对脸，碰触鼻子'],
+						['竖直对脸，不碰鼻子'],
 						['竖屏握持，上端遮嘴'],
-						['话筒'],
 						['水平端起，倒话筒'],
 						['耳旁打电话'],
 						['横屏']]
@@ -46,6 +63,11 @@ def set_category(c_type='motion'):
 						['水平端起，倒话筒'],
 						['耳旁打电话'],
 						['横屏']]
+	if c_type == 'confused':
+		all_category = [['竖直对脸，碰触鼻子'],
+						['竖直对脸，不碰鼻子'],
+						['竖屏握持，上端遮嘴'],
+						['话筒']]
 	'''
 	# voice
 	all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子'],
@@ -90,7 +112,13 @@ def read_file(user, file_name, id):
 		file = open(os.path.join(voice_feature_path, user, file_name), "r", encoding='utf-8')
 		lines = file.readlines()
 		file.close()
+		for i in range(len(lines)):
+			feature.append(float(lines[i]))
 
+	if use_capa:
+		file = open(os.path.join(capa_feature_path, user, file_name), "r", encoding='utf-8')
+		lines = file.readlines()
+		file.close()
 		for i in range(len(lines)):
 			feature.append(float(lines[i]))
 
@@ -162,6 +190,8 @@ def leave_one_out_validation():
 
 	if use_motion:
 		print('motion feature:', motion_feature_path)
+	if use_capa:
+		print('capa feature:', capa_feature_path)
 	if use_voice:
 		print('voice feature:', voice_feature_path)
 	print('Mean')
@@ -190,7 +220,7 @@ def data_normalization():
 
 
 if __name__ == "__main__":
-	set_category(c_type='motion')
+	set_category(c_type='all_compact')
 	read_features()
 	data_normalization()
 	leave_one_out_validation()
