@@ -10,8 +10,8 @@ feature_path = '../Data/multi-class/features/'
 motion_feature_path = feature_path + 'motion features (full, 162 dimensions)'
 # motion_feature_path = feature_path + 'motion features (s~s+1.0, 162 dimensions)'
 # motion_feature_path = '../Data/multi-class/motion features (half, half, 324 dimensions)'
-voice_feature_path = feature_path + 'voice features (0.2s)'
-capa_feature_path = feature_path + 'capa features (10x18, thre=100, 1s)'
+voice_feature_path = feature_path + 'voice features (1.0s)'
+capa_feature_path = feature_path + 'capa features (10x18, thre=100, 2s)'
 # capa_feature_path = feature_path + 'capa features (x,y of 10x18)'
 use_motion, use_capa, use_voice = True, True, True
 

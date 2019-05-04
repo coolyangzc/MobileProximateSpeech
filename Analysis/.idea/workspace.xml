@@ -2,10 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="de7ba81e-35ff-462d-bbea-3ee31447ea18" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/capa_feature.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/motion_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/motion_classifier.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/multi_class_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_class_classifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/multi_class_feature.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_class_feature.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pic_cnn_loo.bat" beforeDir="false" afterPath="$PROJECT_DIR$/pic_cnn_loo.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pic_cnn_loo.py" beforeDir="false" afterPath="$PROJECT_DIR$/pic_cnn_loo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pic_res_analyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/pic_res_analyzer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/voice_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/voice_classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/voice_feature.py" beforeDir="false" afterPath="$PROJECT_DIR$/voice_feature.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/voice_vad_trimmer.py" beforeDir="false" afterPath="$PROJECT_DIR$/voice_vad_trimmer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webrtcvad_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/webrtcvad_utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -56,19 +62,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multi_class_classifier.py">
+        <entry file="file://$PROJECT_DIR$/pic_cnn_loo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="4" selection-start-line="4" selection-end-line="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/multi_class_feature.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="212">
-              <caret line="143" column="20" lean-forward="true" selection-start-line="143" selection-start-column="20" selection-end-line="143" selection-end-column="20" />
+            <state relative-caret-position="3020">
+              <caret line="165" selection-start-line="165" selection-end-line="165" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -77,19 +74,80 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/capa_feature.py">
+        <entry file="file://$PROJECT_DIR$/pic_res_analyzer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="372">
-              <caret line="24" column="28" selection-start-line="24" selection-start-column="20" selection-end-line="24" selection-end-column="28" />
+            <state relative-caret-position="179">
+              <caret line="31" column="32" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Desktop/capa test/test.py">
+        <entry file="file://$PROJECT_DIR$/voice_classifier.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
+            <state>
+              <caret line="44" column="18" lean-forward="true" selection-start-line="44" selection-start-column="18" selection-end-line="44" selection-end-column="18" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+                <element signature="e#7238#8638#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/voice_feature.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="97">
+              <caret line="74" column="20" selection-start-line="74" selection-start-column="20" selection-end-line="74" selection-end-column="20" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/voice_vad_trimmer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="80">
+              <caret line="4" column="87" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="87" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webrtcvad_utils.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="422">
+              <caret line="137" column="32" selection-start-line="137" selection-start-column="19" selection-end-line="137" selection-end-column="32" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/voice_trimmer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="592">
+              <caret line="50" column="26" selection-start-line="50" selection-start-column="12" selection-end-line="50" selection-end-column="26" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pic_sort.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="280">
+              <caret line="15" column="4" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="4" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -100,44 +158,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/motion_feature.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2200">
-              <caret line="114" column="37" selection-start-line="114" selection-start-column="34" selection-end-line="114" selection-end-column="37" />
+            <state relative-caret-position="3020">
+              <caret line="155" column="50" selection-start-line="155" selection-start-column="13" selection-end-line="155" selection-end-column="50" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/voice_feature.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1180">
-              <caret line="63" column="28" selection-start-line="63" selection-start-column="28" selection-end-line="63" selection-end-column="28" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/voice_multi_classifier.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
-              <caret line="9" column="24" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/motion_classifier.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="6" selection-start-line="6" selection-end-line="7" selection-end-column="46" />
             </state>
           </provider>
         </entry>
@@ -145,17 +170,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_reader.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2240">
-              <caret line="112" column="28" selection-start-line="112" selection-start-column="17" selection-end-line="112" selection-end-column="28" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/typing.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45660">
-              <caret line="2290" column="8" selection-start-line="2290" selection-start-column="8" selection-end-line="2290" selection-end-column="8" />
+            <state relative-caret-position="1940">
+              <caret line="97" column="8" selection-start-line="97" selection-start-column="8" selection-end-line="97" selection-end-column="50" />
             </state>
           </provider>
         </entry>
@@ -171,7 +187,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>print(</find>
       <find>print(X</find>
       <find>print</find>
       <find>bind</find>
@@ -201,6 +216,7 @@
       <find>file_dir</find>
       <find>AdaBoostClassifier</find>
       <find>&quot;</find>
+      <find>sy</find>
     </findStrings>
     <replaceStrings>
       <replace>file_id</replace>
@@ -224,44 +240,45 @@
         <option value="$PROJECT_DIR$/voice_SVM.py" />
         <option value="$PROJECT_DIR$/speech_recognition.py" />
         <option value="$PROJECT_DIR$/voice_freq_compare.py" />
-        <option value="$PROJECT_DIR$/voice_vad_trimmer.py" />
         <option value="$PROJECT_DIR$/pic.py" />
         <option value="E:/Tsinghua/博二上/人工智能/作业/手写数字识别/src/CNN.py" />
         <option value="$PROJECT_DIR$/../../sorted pics_192_108/test.py" />
         <option value="$PROJECT_DIR$/data_visualization.py" />
         <option value="$USER_HOME$/Desktop/Evaluation/test.py" />
-        <option value="$PROJECT_DIR$/voice_feature.py" />
         <option value="$PROJECT_DIR$/server.py" />
         <option value="$PROJECT_DIR$/speech_edit_distance.py" />
-        <option value="$PROJECT_DIR$/motion_classifier.py" />
         <option value="$PROJECT_DIR$/frame_extractor.py" />
         <option value="$PROJECT_DIR$/pic_compresser.py" />
         <option value="$PROJECT_DIR$/pic_feature.py" />
         <option value="$PROJECT_DIR$/pic_classifier.py" />
-        <option value="$PROJECT_DIR$/pic_sort.py" />
         <option value="$PROJECT_DIR$/pic_cnn.py" />
-        <option value="$PROJECT_DIR$/pic_res_analyzer.py" />
-        <option value="$PROJECT_DIR$/pic_cnn_loo.py" />
-        <option value="$PROJECT_DIR$/voice_classifier.py" />
         <option value="$PROJECT_DIR$/audio_recorder.py" />
         <option value="$PROJECT_DIR$/voice_visualization.py" />
         <option value="$PROJECT_DIR$/server_audio_recording.py" />
         <option value="$PROJECT_DIR$/voice_trimmer.py" />
         <option value="$PROJECT_DIR$/motion_feature.py" />
-        <option value="$PROJECT_DIR$/webrtcvad_utils.py" />
         <option value="$PROJECT_DIR$/voice_multi_classifier.py" />
         <option value="$PROJECT_DIR$/vad_chunk_checker.py" />
         <option value="$PROJECT_DIR$/data_reader.py" />
         <option value="$USER_HOME$/Desktop/capa test/test.py" />
-        <option value="$PROJECT_DIR$/multi_class_classifier.py" />
         <option value="$PROJECT_DIR$/capa_feature.py" />
         <option value="$PROJECT_DIR$/multi_class_feature.py" />
+        <option value="$PROJECT_DIR$/multi_class_classifier.py" />
+        <option value="$PROJECT_DIR$/../Data/subjective ratings/format.py" />
+        <option value="$PROJECT_DIR$/motion_classifier.py" />
+        <option value="$PROJECT_DIR$/pic_sort.py" />
+        <option value="$PROJECT_DIR$/pic_cnn_loo.py" />
+        <option value="$PROJECT_DIR$/pic_res_analyzer.py" />
+        <option value="$PROJECT_DIR$/voice_classifier.py" />
+        <option value="$PROJECT_DIR$/webrtcvad_utils.py" />
+        <option value="$PROJECT_DIR$/voice_vad_trimmer.py" />
+        <option value="$PROJECT_DIR$/voice_feature.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="631" />
-    <option name="y" value="421" />
+    <option name="x" value="21" />
+    <option name="y" value="5" />
     <option name="width" value="1940" />
     <option name="height" value="955" />
   </component>
@@ -324,7 +341,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.multi_class_classifier">
+  <component name="RunManager" selected="Python.voice_feature">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -347,7 +364,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="capa_feature" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="motion_classifier" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -360,7 +377,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/capa_feature.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/motion_classifier.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -369,17 +386,20 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="multi_class_classifier" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="pic_res_analyzer" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/multi_class_classifier.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pic_res_analyzer.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -388,42 +408,17 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="multi_class_feature" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="voice_classifier" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/multi_class_feature.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="Analysis" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="C:\Users\coolyangzc\AppData\Local\Programs\Python\Python36\python.exe" />
-      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop/capa test" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$USER_HOME$/Desktop/capa test/test.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/voice_classifier.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -432,22 +427,38 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="vad_chunk_checker" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="voice_feature" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Analysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vad_chunk_checker.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/voice_feature.py" />
       <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="voice_vad_trimmer" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Analysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/voice_vad_trimmer.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
@@ -455,19 +466,19 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.test" />
-      <item itemvalue="Python.multi_class_feature" />
-      <item itemvalue="Python.vad_chunk_checker" />
-      <item itemvalue="Python.multi_class_classifier" />
-      <item itemvalue="Python.capa_feature" />
+      <item itemvalue="Python.motion_classifier" />
+      <item itemvalue="Python.pic_res_analyzer" />
+      <item itemvalue="Python.voice_classifier" />
+      <item itemvalue="Python.voice_vad_trimmer" />
+      <item itemvalue="Python.voice_feature" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.multi_class_classifier" />
-        <item itemvalue="Python.multi_class_feature" />
-        <item itemvalue="Python.capa_feature" />
-        <item itemvalue="Python.test" />
-        <item itemvalue="Python.vad_chunk_checker" />
+        <item itemvalue="Python.voice_feature" />
+        <item itemvalue="Python.voice_vad_trimmer" />
+        <item itemvalue="Python.voice_classifier" />
+        <item itemvalue="Python.pic_res_analyzer" />
+        <item itemvalue="Python.motion_classifier" />
       </list>
     </recent_temporary>
   </component>
@@ -540,12 +551,18 @@
       <workItem from="1556096439799" duration="409000" />
       <workItem from="1556153513610" duration="1779000" />
       <workItem from="1556155425704" duration="18281000" />
-      <workItem from="1556242758019" duration="2382000" />
+      <workItem from="1556242758019" duration="2551000" />
+      <workItem from="1556416369056" duration="1910000" />
+      <workItem from="1556499287728" duration="603000" />
+      <workItem from="1556588396352" duration="2275000" />
+      <workItem from="1556758588469" duration="4169000" />
+      <workItem from="1556844662977" duration="4053000" />
+      <workItem from="1556932194756" duration="3204000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="522531000" />
+    <option name="totallyTimeSpent" value="538914000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -559,12 +576,12 @@
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2647453" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.28686327" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.14872521" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.26345608" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -574,7 +591,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.3286119" />
-      <window_info anchor="bottom" id="Python Console" order="12" weight="0.28470254" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="12" visible="true" weight="0.2266289" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -596,17 +613,11 @@
     <SUITE FILE_PATH="coverage/Analysis$multi_class_classifier.coverage" NAME="multi_class_classifier Coverage Results" MODIFIED="1556093902248" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$pic_res_analyzer.coverage" NAME="pic_res_analyzer Coverage Results" MODIFIED="1554276703890" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$multi_class_feature.coverage" NAME="multi_class_feature Coverage Results" MODIFIED="1556247004252" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Analysis$format.coverage" NAME="format Coverage Results" MODIFIED="1556591104561" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../Data/subjective ratings" />
     <SUITE FILE_PATH="coverage/Analysis$pic_cnn_loo.coverage" NAME="pic_cnn_loo Coverage Results" MODIFIED="1554270817630" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Analysis$test.coverage" NAME="test Coverage Results" MODIFIED="1555035242794" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Desktop/capa test" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/Desktop/Evaluation/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="39" selection-start-column="39" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sample.jpg">
       <provider selected="true" editor-type-id="images" />
     </entry>
@@ -717,16 +728,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pic_classifier.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3120">
-          <caret line="166" column="4" selection-start-line="166" selection-start-column="4" selection-end-line="167" selection-end-column="85" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="260">
@@ -761,23 +762,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pic_res_analyzer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-65">
-          <caret column="9" lean-forward="true" selection-start-column="9" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pic_cnn_loo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2400">
-          <caret line="134" column="28" selection-start-line="134" selection-start-column="11" selection-end-line="134" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/speech_recognition.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="840">
@@ -808,30 +792,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pic_sort.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server_audio_recording.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="260">
           <caret line="69" column="35" selection-start-line="69" selection-start-column="35" selection-end-line="69" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/voice_classifier.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="822">
-          <caret line="206" column="24" selection-start-line="192" selection-start-column="8" selection-end-line="206" selection-end-column="24" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -847,26 +811,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/voice_trimmer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="980">
-          <caret line="49" column="48" selection-start-line="49" selection-start-column="48" selection-end-line="49" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/voice_vad_trimmer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="19" column="36" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/audio_recorder.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2040">
@@ -874,13 +818,6 @@
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/webrtcvad_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-691">
-          <caret line="58" column="4" selection-start-line="58" selection-start-column="4" selection-end-line="58" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -908,13 +845,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/sklearn/svm/classes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2990">
-          <caret line="604" column="8" selection-start-line="604" selection-start-column="8" selection-end-line="604" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/vad_chunk_checker.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
@@ -929,30 +859,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Desktop/capa test/test.py">
+    <entry file="file://$PROJECT_DIR$/multi_class_classifier.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
+        <state relative-caret-position="180">
+          <caret line="13" column="69" selection-start-line="13" selection-start-column="69" selection-end-line="13" selection-end-column="69" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/motion_feature.py">
+    <entry file="file://$PROJECT_DIR$/multi_class_feature.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2200">
-          <caret line="114" column="37" selection-start-line="114" selection-start-column="34" selection-end-line="114" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/voice_feature.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1180">
-          <caret line="63" column="28" selection-start-line="63" selection-start-column="28" selection-end-line="63" selection-end-column="28" />
+        <state relative-caret-position="740">
+          <caret line="46" column="82" selection-start-line="46" selection-start-column="82" selection-end-line="46" selection-end-column="82" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -969,20 +889,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/motion_classifier.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="6" selection-start-line="6" selection-end-line="7" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_reader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2240">
-          <caret line="112" column="28" selection-start-line="112" selection-start-column="17" selection-end-line="112" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/typing.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45660">
@@ -990,24 +896,146 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/multi_class_classifier.py">
+    <entry file="file://$USER_HOME$/Desktop/capa test/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="4" selection-start-line="4" selection-end-line="4" />
+        <state relative-caret-position="340">
+          <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/capa_feature.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="372">
-          <caret line="24" column="28" selection-start-line="24" selection-start-column="20" selection-end-line="24" selection-end-column="28" />
+        <state relative-caret-position="60">
+          <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/multi_class_feature.py">
+    <entry file="file://$PROJECT_DIR$/../Data/subjective ratings/format.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="212">
-          <caret line="143" column="20" lean-forward="true" selection-start-line="143" selection-start-column="20" selection-end-line="143" selection-end-column="20" />
+        <state relative-caret-position="200">
+          <caret line="10" column="9" selection-start-line="10" selection-start-column="9" selection-end-line="10" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/sklearn/svm/classes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2399">
+          <caret line="606" column="43" selection-start-line="606" selection-start-column="43" selection-end-line="606" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motion_classifier.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3160">
+          <caret line="166" column="43" selection-start-line="166" selection-start-column="29" selection-end-line="166" selection-end-column="43" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pic_classifier.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="960">
+          <caret line="58" column="4" selection-start-line="58" selection-start-column="4" selection-end-line="58" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pic_cnn_loo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3020">
+          <caret line="165" selection-start-line="165" selection-end-line="165" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pic_sort.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="15" column="4" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motion_feature.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3020">
+          <caret line="155" column="50" selection-start-line="155" selection-start-column="13" selection-end-line="155" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_reader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1940">
+          <caret line="97" column="8" selection-start-line="97" selection-start-column="8" selection-end-line="97" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pic_res_analyzer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="179">
+          <caret line="31" column="32" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/voice_trimmer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="592">
+          <caret line="50" column="26" selection-start-line="50" selection-start-column="12" selection-end-line="50" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webrtcvad_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="422">
+          <caret line="137" column="32" selection-start-line="137" selection-start-column="19" selection-end-line="137" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/voice_vad_trimmer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="4" column="87" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="87" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/voice_classifier.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret line="44" column="18" lean-forward="true" selection-start-line="44" selection-start-column="18" selection-end-line="44" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#7238#8638#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/voice_feature.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="97">
+          <caret line="74" column="20" selection-start-line="74" selection-start-column="20" selection-end-line="74" selection-end-column="20" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

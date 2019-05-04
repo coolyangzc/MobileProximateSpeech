@@ -2,8 +2,8 @@ import os
 import numpy as np
 
 # res_path = '../Data/Study2/sorted pics_192_108/Mouth vs. Ear/results/'
-# res_path = '../Data/Study2/sorted pics_192_108/Mouth+Ear vs. Other/results/'
-res_path = '../Data/Study2/sorted pics_192_108/Mouth&Ear multi-classification/results/'
+res_path = '../Data/Study2/sorted pics_192_108/Mouth+Ear vs. Other/results/'
+# res_path = '../Data/Study2/sorted pics_192_108/Mouth&Ear multi-classification/results/'
 
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
            '竖屏握持，上端遮嘴', # '水平端起，倒话筒',
@@ -21,12 +21,16 @@ if __name__ == "__main__":
 		acc[t], cnt[t] = 0, 0
 
 	for file_name in os.listdir(res_path):
+		if not file_name.endswith('.txt'):
+			continue
 		file = open(os.path.join(res_path, file_name), "r", encoding='utf-8')
 		lines = file.readlines()
 		for line in lines[1:-1]:
 			data = line.strip().split(' ')
 			t = data[0]
 			predict_acc = float(data[-1])
+			if predict_acc < 0.70:
+				print(file_name, t, predict_acc)
 			acc[t] += predict_acc
 			cnt[t] += 1
 	all_acc = []

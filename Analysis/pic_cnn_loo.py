@@ -37,8 +37,8 @@ mouth = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子',
 mouth = ['竖屏握持，上端遮嘴']
 ear = ['左耳打电话（不碰）', '右耳打电话（不碰）', '左耳打电话（碰触）', '右耳打电话（碰触）']
 
-# all_type = positive + negative
-all_type = mouth + ear
+all_type = positive + negative
+# all_type = mouth + ear
 num_classes = 2
 pic_path = '../Data/Study2/sorted pics_192_108'
 model_path = '../Data/Study2/sorted pics_192_108/models'
@@ -163,16 +163,18 @@ def leave_one_out_validation(loo, simplification=-1):
 	output.write('user ' + loo + '\n')
 	X_train, y_train, X_test, y_test, t_test = [], [], [], [], []
 	for i in range(len(pic_sources)):
-		'''
+
 		if i >= len(positive):
 			label = 0
 		else:
 			label = 1
+
 		'''
 		if pic_type[i] in ear:
 			label = 0
 		else:
 			label = mouth.index(pic_type[i]) + 1
+		'''
 		train_files, test_files = [], []
 		for user in pic_sources[i]:
 			if user == loo:
@@ -207,5 +209,5 @@ def leave_one_out_validation(loo, simplification=-1):
 
 if __name__ == "__main__":
 	read_pic_sources()
-	leave_one_out_validation(sys.argv[1], simplification=1000)
+	leave_one_out_validation(sys.argv[1], simplification=999)
 

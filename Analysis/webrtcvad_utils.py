@@ -133,7 +133,7 @@ def vad_collector(sample_rate, frame_duration_ms,
 def calc_vad(aggressiveness, file_path):
 	audio, sample_rate = read_wave(file_path)
 	vad = webrtcvad.Vad(aggressiveness)
-	frames = frame_generator(30, audio, sample_rate)
+	frames = frame_generator(20, audio, sample_rate)
 	frames = list(frames)
-	trigger_time = vad_collector(sample_rate, 30, 500, vad, frames)
+	trigger_time = vad_collector(sample_rate, 20, 200, vad, frames)
 	return trigger_time

@@ -121,7 +121,8 @@ def leave_one_out_validation(weight_balance=False):
 					pos += 1
 			pos_w = neg / len(y_train)
 			neg_w = pos / len(y_train)
-			clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: neg_w, 1: pos_w})
+			# clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: neg_w, 1: pos_w})
+			clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight='balanced')
 		else:
 			clf = svm.SVC(kernel='rbf', gamma=1e-5, class_weight={0: 1, 1: 1})
 		# clf = AdaBoostClassifier()
@@ -160,8 +161,8 @@ def leave_one_out_validation(weight_balance=False):
 
 if __name__ == "__main__":
 	X, y, task = [], [], []
-	read_features('../Data/motion feature/')
+	read_features('../Data/motion feature_2s_1s1s_324/')
 	# data_normalization()
 	# generate_model()
-	leave_one_out_validation(weight_balance=False)
+	leave_one_out_validation(weight_balance=True)
 

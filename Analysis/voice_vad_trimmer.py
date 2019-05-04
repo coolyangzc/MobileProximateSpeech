@@ -2,7 +2,7 @@ import os
 from pydub import AudioSegment
 from webrtcvad_utils import calc_vad
 
-path = '../Data/Trimmed Stereo 32000Hz'
+path = '../Data/Trimmed Stereo 32000Hz-vad_collector(sample_rate, 20, 200, vad, frames)'
 
 for u in os.listdir(path):
 	print(u)
