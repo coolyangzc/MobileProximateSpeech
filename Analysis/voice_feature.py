@@ -5,7 +5,7 @@ import struct
 import numpy as np
 
 sample_rate = 32000
-interval_size = 3200
+interval_size = 6400
 stride = 0.5
 feature_num = 32
 
@@ -71,8 +71,6 @@ if __name__ == "__main__":
 	path = '../Data/Trimmed Stereo 32000Hz-vad_collector(sample_rate, 20, 200, vad, frames)/'
 	feature_path = '../Data/voice feature/'
 	for u in os.listdir(path):
-		if u != 'yzc':
-			continue
 		user_path = os.path.join(path, u)
 		out_path = os.path.join(feature_path, u)
 		if not os.path.exists(out_path):

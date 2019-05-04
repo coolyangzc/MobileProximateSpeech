@@ -124,7 +124,7 @@ def draw_time_series(wav_file, pic_name):
 	plt.plot(times, y / 10000, 'C0', label='bottom')
 	plt.plot(times, z / 10000, 'C1', label='top')
 	plt.tight_layout()
-	plt.legend(prop=font)
+	# plt.legend(prop=font)
 	if pic_name != '':
 		plt.savefig(pic_name + '_bottom_top.png', format='png')
 		plt.close()
@@ -138,7 +138,7 @@ def draw_time_series(wav_file, pic_name):
 	plt.plot(times, z / 10000, 'C1', label='top')
 	plt.plot(times, y / 10000, 'C0', label='bottom')
 	plt.tight_layout()
-	plt.legend(prop=font)
+	# plt.legend(prop=font)
 	if pic_name != '':
 		plt.savefig(pic_name + '_top_bottom.png', format='png')
 		plt.close()

@@ -1,5 +1,7 @@
+from re import sub
 import os
 import Levenshtein
+
 
 
 def digit_to_character(s):
@@ -8,6 +10,7 @@ def digit_to_character(s):
 				'七', '八', '九']
 	for i in range(len(digit_list)):
 		s = s.replace(digit_list[i], ch_list[i])
+	s = sub('[a-zA-Z]', '', s)
 	return s
 
 
@@ -34,7 +37,7 @@ if __name__ == "__main__":
 		user_path = os.path.join(recog_path, u)
 		file_list = os.listdir(user_path)
 		for f in file_list:
-			print(u, f)
+
 			file = open(os.path.join(user_path, f), "r", encoding='utf-8')
 			lines = file.readlines()
 			file.close()
@@ -44,16 +47,13 @@ if __name__ == "__main__":
 			for re in re_list:
 				phrase = phrase.replace(re, '')
 			phrase = digit_to_character(phrase)
-			print(phrase)
 
 			recog_res = ''
 			if len(lines) >= 5:
 				recog_res = lines[4].strip()
-			print(recog_res)
+			# print(recog_res)
 			recog_res = digit_to_character(recog_res)
-			print(recog_res)
 			d = Levenshtein.distance(phrase, recog_res)
-			print('dis', d)
 
 			pos = lines[1].strip()
 			volume = lines[2].strip()
@@ -63,14 +63,20 @@ if __name__ == "__main__":
 			if volume == '大声':
 				kind = 3
 			kind += order - 1
-			print('kind', kind)
+			if d >= 10: # pos == '竖屏握持，上端遮嘴':
+				print(u, f)
+				print(phrase)
+				print(recog_res)
+				print('dis', d)
+				print('kind', kind)
 			dis[pos][kind] += d
 			tot[pos][kind] += len(phrase)
 			percent[pos][kind] += d / len(phrase)
 			cnt[pos][kind] += 1
 
+	print('-' * 140)
 	for pos in dis:
-		if pos == '耳旁打电话':
+		if pos == '手上正面':
 			print('-' * 140)
 		print(pos)
 		sumd, sumt= 0, 0
@@ -83,7 +89,7 @@ if __name__ == "__main__":
 	print('-' * 140)
 	print('Average Percent:')
 	for pos in dis:
-		if pos == '耳旁打电话':
+		if pos == '手上正面':
 			print('-' * 140)
 		print(pos)
 		sump, sumc = 0, 0
@@ -92,6 +98,6 @@ if __name__ == "__main__":
 			sump += p
 			sumc += c
 			print("%3d: %5.2f%%" % (c, p/c * 100), end='    ')
-		print("%3d: %5.2f%%" % (sumc, sump/sumc * 100))
+		print("| %3d: %5.2f%%" % (sumc, sump/sumc * 100))
 
 

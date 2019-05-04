@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 positive = ['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴',
 			'水平端起，倒话筒', '话筒', '横屏', '耳旁打电话']
-negative = ['手上正面', '手上反面', '桌上正面', '桌上反面']
-			#'裤兜']
+negative = ['手上正面', '手上反面', '桌上正面', '桌上反面',
+			'裤兜']
 
 all_category = positive + negative
 
@@ -67,7 +67,7 @@ def read_features(feature_path):
 	global X, y, task, task_from
 	id = -1
 	for u in user_list:
-		if not os.path.isdir(os.path.join(feature_path, u)):
+		if not os.path.isdir(os.path.join(feature_path, u)) or u == 'discarded':
 			continue
 		print('Reading', u)
 		p = os.path.join(feature_path, u)
@@ -142,8 +142,9 @@ def leave_one_out_validation():
 		print(X_train.shape, y_train.shape)
 		# clf = AdaBoostClassifier()
 		# bigger gamma -> higher fit acc
-		# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
+		# clf = svm.SVC(kernel='rbf', gamma=1e-1, class_weight={0: 1, 1: 1}, probability=True)
 		# clf = neighbors.KNeighborsClassifier()
+		# clf = tree.DecisionTreeClassifier(max_depth=10, class_weight='balanced')
 		clf = tree.DecisionTreeClassifier(max_depth=10, class_weight={0: 1, 1: 1})
 		clf.fit(X_train, y_train)
 		train_acc = clf.score(X_train, y_train)
@@ -221,7 +222,7 @@ def leave_one_out_validation():
 
 
 def leave_one_out_save(path):
-	out_file = os.path.join(path, 'leave_one_out3.csv')
+	out_file = os.path.join(path, 'leave_one_out.csv')
 	output = open(out_file, 'w', encoding='utf-8-sig')
 	output.write('user')
 	for c in all_category:
@@ -339,10 +340,11 @@ def personalization(path):
 if __name__ == "__main__":
 	X, y, task, task_from = [], [], [], []
 	# read_features('../Data/voice feature/')
-	path = '../Data/voice feature Stereo 32000 Hz 0.2s stride=50%/'
+	# path = '../Data/voice feature Stereo 32000 Hz 0.2s stride=50%/'
+	path = '../Data/voice feature Stereo 32000 Hz 0.2s stride=50%-vad_collector(sample_rate, 20, 200, vad, frames)/'
 	read_features(path)
-	data_normalization()
+	# data_normalization()
 	# generate_model()
-	leave_one_out_validation()
-	# leave_one_out_save(path)
+	# leave_one_out_validation()
+	leave_one_out_save(path)
 	# personalization(path)
