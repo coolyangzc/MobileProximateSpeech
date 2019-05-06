@@ -15,7 +15,7 @@ motion_feature_path = '../Data/multi-class/motion features/'
 capa_feature_path = '../Data/multi-class/capa features/'
 voice_feature_path = '../Data/multi-class/voice features/'
 
-calc_motion, calc_capa, calc_voice = True, True, True
+calc_motion, calc_capa, calc_voice = False, True, False
 
 
 def find_suitable_end(t, l, r):
@@ -100,7 +100,8 @@ def calc_motion_capa_data(file_name, file_dir, motion_out_dir, capa_out_dir):
 	if calc_capa:
 		out_file = os.path.join(capa_out_dir, d.task_id + '.txt')
 		output = open(out_file, 'w', encoding='utf-8')
-		feature = capa_feature.extract_time_feature(d, end * 1000, (end + 2.0) * 1000)
+		# feature = capa_feature.extract_time_feature(d, end * 1000, (end + 2.0) * 1000)
+		feature = capa_feature.extract_time_feature_count_appearance_only(d, end * 1000, (end + 2.0) * 1000)
 		for f in feature:
 			output.write(str(f) + '\n')
 		output.close()

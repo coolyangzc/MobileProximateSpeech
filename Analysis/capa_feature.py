@@ -48,3 +48,40 @@ def extract_time_feature(data, start_time, end_time):
 				feature.append(0)
 
 	return feature
+
+
+def extract_time_feature_count_appearance_only(data, start_time, end_time):
+	frame_list = data.get_list('CAPACITY')
+	values = frame_list.get_data()
+	arr = [[] for i in range(len(values))]
+	t = frame_list.time_stamp
+
+	sum_capa = np.zeros((32, 18))
+	cnt = 0
+	for i in range(len(t)):
+		if t[i] < start_time:
+			continue
+		if t[i] > end_time:
+			break
+		capa = np.zeros(32 * 18)
+		for v in range(len(values)):
+			capa[v] = values[v][i]
+		capa = capa.reshape((32, 18))
+		appear = False
+		for i in range(10):
+			for j in range(18):
+				if capa[i][j] >= 100:
+					sum_capa[i][j] += capa[i][j]
+					appear = True
+		if appear:
+			cnt += 1
+
+	feature = []
+	for i in range(10):
+		for j in range(18):
+			if cnt > 0:
+				feature.append(sum_capa[i][j] / cnt)
+			else:
+				feature.append(0)
+	return feature
+

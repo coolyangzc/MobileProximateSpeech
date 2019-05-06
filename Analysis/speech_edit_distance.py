@@ -1,7 +1,9 @@
 from re import sub
 import os
+import numpy as np
 import Levenshtein
 
+user_num = 11
 
 
 def digit_to_character(s):
@@ -22,18 +24,25 @@ if __name__ == "__main__":
 				'手上正面', '手上反面',
 				'桌上正面', '桌上反面',
 				'裤兜']
-	dis, tot, percent, cnt = {}, {}, {}, {}
+	dis, tot, percent, cnt, percent_user, cnt_user = {}, {}, {}, {}, {}, {}
 	for pos in pos_list:
 		dis[pos] = [0, 0, 0, 0, 0, 0]
 		tot[pos] = [0, 0, 0, 0, 0, 0]
 		percent[pos] = [0, 0, 0, 0, 0, 0]
 		cnt[pos] = [0, 0, 0, 0, 0, 0]
+		percent_user[pos] = np.zeros(user_num)
+		cnt_user[pos] = np.zeros(user_num)
 
 	recog_path = '../Data/Voice Study Mono 16000Hz/recognition'
 	user_list = os.listdir(recog_path)
+	remove_list = ['results', 'wj', 'zfs', 'wwn']
+	print(user_list)
+	for rem in remove_list:
+		if rem in user_list:
+			user_list.remove(rem)
+	user_id = -1
 	for u in user_list:
-		if u in ['wj', 'zfs', 'wwn']:
-			continue
+		user_id += 1
 		user_path = os.path.join(recog_path, u)
 		file_list = os.listdir(user_path)
 		for f in file_list:
@@ -63,8 +72,9 @@ if __name__ == "__main__":
 			if volume == '大声':
 				kind = 3
 			kind += order - 1
-			if d >= 10: # pos == '竖屏握持，上端遮嘴':
-				print(u, f)
+			if d >= 10:  # pos == '竖屏握持，上端遮嘴':
+				print('-' * 120)
+				print(u, f, pos)
 				print(phrase)
 				print(recog_res)
 				print('dis', d)
@@ -72,8 +82,11 @@ if __name__ == "__main__":
 			dis[pos][kind] += d
 			tot[pos][kind] += len(phrase)
 			percent[pos][kind] += d / len(phrase)
+			percent_user[pos][user_id] += d / len(phrase)
 			cnt[pos][kind] += 1
+			cnt_user[pos][user_id] += 1
 
+	# print average results
 	print('-' * 140)
 	for pos in dis:
 		if pos == '手上正面':
@@ -100,4 +113,16 @@ if __name__ == "__main__":
 			print("%3d: %5.2f%%" % (c, p/c * 100), end='    ')
 		print("| %3d: %5.2f%%" % (sumc, sump/sumc * 100))
 
-
+	# save user results
+	file_path = '../Data/Voice Study Mono 16000Hz/results/STT_results.csv'
+	output = open(file_path, 'w', encoding='utf-8-sig')
+	output.write('user')
+	for pos in pos_list:
+		output.write(',' + pos)
+	output.write('\n')
+	for u in range(len(user_list)):
+		output.write(user_list[u])
+		for pos in pos_list:
+			output.write(',' + str(percent_user[pos][u] / cnt_user[pos][u]))
+		output.write('\n')
+	output.close()
