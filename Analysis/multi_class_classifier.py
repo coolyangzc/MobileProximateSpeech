@@ -7,12 +7,14 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.ensemble import AdaBoostClassifier
 
 feature_path = '../Data/multi-class/features (backup, mannual)/'
-motion_feature_path = feature_path + 'motion features (full, 162 dimensions)'
+# motion_feature_path = feature_path + 'motion features (full, 162 dimensions)'
+motion_feature_path = '../Data/multi-class/features/motion features (1000ms)'
 # motion_feature_path = feature_path + 'motion features (full, e~e+0.5, 324)'
 # motion_feature_path = feature_path + 'motion features (s~s+1.0, 162 dimensions)'
 # motion_feature_path = feature_path + 'motion features (half, half, 324 dimensions)'
 voice_feature_path = feature_path + 'voice features (1.0s)'
 capa_feature_path = feature_path + 'capa features (10x18, thre=100, 2s, appear only)'
+# capa_feature_path = '../Data/multi-class/features/capa features (1000ms)'
 # capa_feature_path = feature_path + 'capa features (x,y of 10x18)'
 use_motion, use_capa, use_voice = True, True, True
 
@@ -24,7 +26,13 @@ X, y, task = [], [], []
 
 def set_category(c_type='motion'):
 	global all_category
-
+	if c_type == 'test':
+		all_category = [['竖屏握持，上端遮嘴'],
+						['水平端起，倒话筒'],
+						['耳旁打电话'],
+						['横屏'],
+						['竖直对脸，碰触鼻子'],
+						['竖直对脸，不碰鼻子']]
 	if c_type == 'motion':
 		all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子', '竖屏握持，上端遮嘴', '话筒'],
 						['水平端起，倒话筒'],
@@ -223,7 +231,8 @@ def data_normalization():
 
 
 if __name__ == "__main__":
-	set_category(c_type='all_compact')
+	set_category(c_type='test')
+	# set_category(c_type='all_compact')
 	# set_category(c_type='motion(4 types)')
 	# set_category(c_type='motion')
 	# set_category(c_type='motion+voice')
