@@ -42,15 +42,15 @@ def check_vad_chunk(file_name, file_dir):
 		print_in_format(t, 'aggressiveness = 2')
 		t = webrtcvad_utils.calc_vad(1, os.path.join(file_dir, file_name + '.wav'))
 		print_in_format(t, 'aggressiveness = 1')
-	if len(t) > 0 and t[1] - t[0] < 1.3:
+	if len(t) > 0 and t[1] - t[0] > 3.0:
 		too_short_cnt += 1
-		print(file_dir, file_name)
-		t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + '.wav'))
-		print_in_format(t, 'aggressiveness = 3')
-		t = webrtcvad_utils.calc_vad(2, os.path.join(file_dir, file_name + '.wav'))
-		print_in_format(t, 'aggressiveness = 2')
-		t = webrtcvad_utils.calc_vad(1, os.path.join(file_dir, file_name + '.wav'))
-		print_in_format(t, 'aggressiveness = 1')
+		# print(file_dir, file_name)
+		# t = webrtcvad_utils.calc_vad(3, os.path.join(file_dir, file_name + '.wav'))
+		# print_in_format(t, 'aggressiveness = 3')
+		# t = webrtcvad_utils.calc_vad(2, os.path.join(file_dir, file_name + '.wav'))
+		# print_in_format(t, 'aggressiveness = 2')
+		# t = webrtcvad_utils.calc_vad(1, os.path.join(file_dir, file_name + '.wav'))
+		# print_in_format(t, 'aggressiveness = 1')
 
 
 if __name__ == "__main__":
