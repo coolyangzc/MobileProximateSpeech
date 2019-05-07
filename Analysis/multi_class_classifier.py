@@ -14,11 +14,11 @@ feature_path = '../Data/multi-class/features (backup, mannual)/'
 # motion_feature_path = feature_path + 'motion features (half, half, 324 dimensions)'
 #voice_feature_path = feature_path + 'voice features (1.0s)'
 motion_feature_path = '../Data/multi-class/features/motion features (1000ms)'
-voice_feature_path = '../Data/multi-class/features/voice features (1000ms)'
-capa_feature_path = '../Data/multi-class/features/capa features (0ms)'
+voice_feature_path = '../Data/multi-class/features/voice features (2000ms)'
+capa_feature_path = '../Data/multi-class/features/capa features (2000ms)'
 # capa_feature_path = feature_path + 'capa features (10x18, thre=100, 2s, appear only)'
 
-use_motion, use_capa, use_voice = True, False, True
+use_motion, use_capa, use_voice = True, True, True
 
 all_category = []
 user_list = []
@@ -60,12 +60,12 @@ def set_category(c_type='motion'):
 						['耳旁打电话'],
 						['横屏']]
 	if c_type == 'all_no_microphone':
-		all_category = [['竖直对脸，碰触鼻子'],
-						['竖直对脸，不碰鼻子'],
+		all_category = [['水平端起，倒话筒'],
 						['竖屏握持，上端遮嘴'],
-						['水平端起，倒话筒'],
-						['耳旁打电话'],
-						['横屏']]
+						['竖直对脸，碰触鼻子'],
+						['竖直对脸，不碰鼻子'],
+						['横屏'],
+						['耳旁打电话']]
 	if c_type == 'motion+voice':
 		all_category = [['竖直对脸，碰触鼻子', '竖直对脸，不碰鼻子'],
 						['竖屏握持，上端遮嘴', '话筒'],
@@ -209,6 +209,7 @@ def leave_one_out_validation():
 	print('Mean')
 	print(mean_train_acc / len(X))
 	print(mean_test_acc / len(X))
+	'''
 	print('truth | predict')
 	for i in range(category_n):
 		tot = 0
@@ -216,6 +217,17 @@ def leave_one_out_validation():
 			tot += confusion[i][j]
 		acc = confusion[i][i] / tot
 		print(confusion[i], round(acc * 100, 2), end='\t')
+		print(int(confusion[i][i]), '/', int(tot), all_category[i])
+	'''
+
+	print('predict | truth')
+	for i in range(category_n):
+		tot = 0
+		for j in range(category_n):
+			tot += confusion[j][i]
+			print(str(int(confusion[j][i])), end='\t')
+		acc = confusion[i][i] / tot
+		print('\t', round(acc * 100, 2), end='\t')
 		print(int(confusion[i][i]), '/', int(tot), all_category[i])
 
 
@@ -234,7 +246,8 @@ def data_normalization():
 if __name__ == "__main__":
 	# set_category(c_type='all')
 	# set_category(c_type='all_compact')
-	# set_category(c_type='motion(4 types)')
+	# set_category(c_type='all_no_microphone')
+	# set_category(c_type='motion (4 types)')
 	# set_category(c_type='motion')
 	set_category(c_type='motion+voice (5 types)')
 	# set_category(c_type='voice')
