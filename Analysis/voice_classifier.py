@@ -100,10 +100,10 @@ def generate_model():
 		y_all.extend(y[i])
 	X_all, y_all = np.array(X_all), np.array(y_all)
 	print(X_all.shape, y_all.shape)
-	clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
-	# clf = tree.DecisionTreeClassifier(max_depth=8)
+	# clf = svm.SVC(kernel='rbf', gamma='scale', class_weight={0: 1, 1: 1}, probability=True)
+	clf = tree.DecisionTreeClassifier(max_depth=10)
 	clf.fit(X_all, y_all)
-	# joblib.dump(clf, "voice_model.m")
+	joblib.dump(clf, "voice_model.m")
 	print(clf.score(X_all, y_all))
 
 	cnt = np.zeros((2, 100 + 1))
@@ -344,7 +344,7 @@ if __name__ == "__main__":
 	path = '../Data/voice feature Stereo 32000 Hz 0.2s stride=50%-vad_collector(sample_rate, 20, 200, vad, frames)/'
 	read_features(path)
 	# data_normalization()
-	# generate_model()
+	generate_model()
 	# leave_one_out_validation()
-	leave_one_out_save(path)
+	# leave_one_out_save(path)
 	# personalization(path)
