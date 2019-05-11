@@ -3,8 +3,19 @@ import wave
 import struct
 import numpy as np
 import voice_feature
+from sklearn.externals import joblib
 
 voice_path = '../Data/Field Study/trimmed/phone-voice_check'
+feature_num = 32
+
+used_feature = [1, # min
+				1, # max
+				1, # median
+				1, # mean
+				0, # std
+				1, # IQR
+				0, # energy
+				1] # RMS
 
 
 def analyze(user_path, file_name):
@@ -40,7 +51,6 @@ def analyze(user_path, file_name):
 
 	out_file = os.path.join(user_path, file_name + ' feature.txt')
 	output = open(out_file, 'w', encoding='utf-8')
-	feature_num = 32
 	output.write(str(feature_num) + '\n')
 
 	interval_size = 6400  # 32000 * 0.2s
@@ -63,5 +73,34 @@ def calc_features():
 			if f.endswith('.wav'):
 				analyze(user_path, f[:-4])
 
+
+def classification():
+	voice_model = joblib.load('voice_model.m')
+	for u in os.listdir(voice_path):
+		if 'no speak' in u or '.txt' in u:
+			continue
+		user_path = os.path.join(voice_path, u)
+		for f in os.listdir(user_path):
+			if f.endswith('feature.txt'):
+				feature_file = os.path.join(user_path, f)
+				print(feature_file)
+				file = open(feature_file, "r", encoding='utf-8')
+				lines = file.readlines()
+				file.close()
+				sp = 1
+				sum, cnt = 0, 0
+				while sp + feature_num <= len(lines):
+					feature = []
+					for i in range(feature_num):
+						if used_feature[i % len(used_feature)] == 1:
+							feature.append(float(lines[sp + i]))
+					res = voice_model.predict([feature])
+					sum += res[0]
+					cnt += 1
+					sp += feature_num
+				print(sum / cnt)
+
+
 if __name__ == "__main__":
-	calc_features()
+	# calc_features()
+	classification()
