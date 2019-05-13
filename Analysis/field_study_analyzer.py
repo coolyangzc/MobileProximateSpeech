@@ -51,12 +51,13 @@ def analyze_user(user):
 			linear += 1
 			if min_happen == -1:
 				min_happen = t
-		else:
-			print('no motion triggered:', user, t)
+		# else:
+			# print('no motion triggered:', user, t)
 
 	sum_orig += orig
 	sum_linear += linear
-	print(user, orig, linear, min_happen)
+	#print(user, orig, linear, min_happen)
+	print(linear, end=',')
 
 
 if __name__ == "__main__":

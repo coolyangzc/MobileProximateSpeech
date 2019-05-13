@@ -13,9 +13,9 @@ feature_path = '../Data/multi-class/features (backup, mannual)/'
 # motion_feature_path = feature_path + 'motion features (s~s+1.0, 162 dimensions)'
 # motion_feature_path = feature_path + 'motion features (half, half, 324 dimensions)'
 #voice_feature_path = feature_path + 'voice features (1.0s)'
-motion_feature_path = '../Data/multi-class/features/motion features (1000ms)'
-voice_feature_path = '../Data/multi-class/features/voice features (2000ms)'
-capa_feature_path = '../Data/multi-class/features/capa features (2000ms)'
+motion_feature_path = '../Data/multi-class/features/motion features (2200ms)'
+voice_feature_path = '../Data/multi-class/features/voice features (2200ms)'
+capa_feature_path = '../Data/multi-class/features/capa features (2200ms)'
 # capa_feature_path = feature_path + 'capa features (10x18, thre=100, 2s, appear only)'
 
 use_motion, use_capa, use_voice = True, True, True
@@ -47,8 +47,8 @@ def set_category(c_type='motion'):
 	if c_type == 'all':
 		all_category = [['水平端起，倒话筒'],
 						['竖屏握持，上端遮嘴'],
-						['竖直对脸，碰触鼻子'],
 						['竖直对脸，不碰鼻子'],
+						['竖直对脸，碰触鼻子'],
 						['横屏'],
 						['话筒'],
 						['耳旁打电话']]
@@ -244,12 +244,12 @@ def data_normalization():
 
 
 if __name__ == "__main__":
-	# set_category(c_type='all')
+	set_category(c_type='all')
 	# set_category(c_type='all_compact')
 	# set_category(c_type='all_no_microphone')
 	# set_category(c_type='motion (4 types)')
 	# set_category(c_type='motion')
-	set_category(c_type='motion+voice (5 types)')
+	# set_category(c_type='motion+voice (5 types)')
 	# set_category(c_type='voice')
 	read_features()
 	data_normalization()
