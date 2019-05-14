@@ -17,14 +17,18 @@ negative = ['手上正面', '手上反面', '桌上正面', '桌上反面',
 
 all_category = positive + negative
 
-used_feature = [1, # min
-				1, # max
-				1, # median
-				1, # mean
-				0, # std
-				1, # IQR
-				0, # energy
-				1] # RMS
+used_data_series = [0,  # bottom
+					0,  # top
+					1,  # bottom - top
+					1]  # bottom / top
+used_feature = [1,  # min
+				1,  # max
+				1,  # median
+				1,  # mean
+				0,  # std
+				1,  # IQR
+				0,  # energy
+				1]  # RMS
 
 
 def read_file(path, file_name, id):
@@ -52,8 +56,11 @@ def read_file(path, file_name, id):
 	sp = 3
 	while sp + feature_num <= len(lines):
 		feature = []
+		series = -1
 		for i in range(feature_num):
-			if used_feature[i % len(used_feature)] == 1:
+			if i % len(used_feature) == 0:
+				series += 1
+			if used_data_series[series] == 1 and used_feature[i % len(used_feature)] == 1:
 				feature.append(float(lines[sp + i]))
 		X[id].append(feature)
 		y[id].append(y_type)
@@ -344,7 +351,7 @@ if __name__ == "__main__":
 	path = '../Data/voice feature Stereo 32000 Hz 0.2s stride=50%-vad_collector(sample_rate, 20, 200, vad, frames)/'
 	read_features(path)
 	# data_normalization()
-	generate_model()
-	# leave_one_out_validation()
+	# generate_model()
+	leave_one_out_validation()
 	# leave_one_out_save(path)
 	# personalization(path)
