@@ -10,6 +10,7 @@ public class SensorUtil {
             Sensor.TYPE_GRAVITY, Sensor.TYPE_PROXIMITY,
             Sensor.TYPE_LIGHT, Sensor.TYPE_LINEAR_ACCELERATION,
 
+
             Sensor.TYPE_ACCELEROMETER_UNCALIBRATED, Sensor.TYPE_PRESSURE,
             Sensor.TYPE_RELATIVE_HUMIDITY, Sensor.TYPE_AMBIENT_TEMPERATURE,
 

@@ -1,0 +1,3 @@
+E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/.cxx/cmake/debug/arm64-v8a/CMakeFiles/native-lib.dir
+E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/.cxx/cmake/debug/arm64-v8a/CMakeFiles/edit_cache.dir
+E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/.cxx/cmake/debug/arm64-v8a/CMakeFiles/rebuild_cache.dir

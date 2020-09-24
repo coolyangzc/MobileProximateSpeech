@@ -41,6 +41,10 @@
             android:label="DemoActivity"  >
         </activity>
         <activity
+            android:name="com.yzc.proximatespeechrecorder.VIPDemoActivity"
+            android:label="VIPDemoActivity"  >
+        </activity>
+        <activity
             android:name="com.yzc.proximatespeechrecorder.Study1Activity"
             android:label="Study1Activity"  >
         </activity>

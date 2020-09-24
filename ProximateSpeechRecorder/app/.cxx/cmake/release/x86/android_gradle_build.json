@@ -1,0 +1,41 @@
+
+{
+	"buildFiles" : 
+	[
+		"E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/CMakeLists.txt"
+	],
+	"cleanCommands" : 
+	[
+		"D:\\software\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release\\x86 --target clean"
+	],
+	"cppFileExtensions" : [ "cpp" ],
+	"libraries" : 
+	{
+		"native-lib-Release-x86" : 
+		{
+			"abi" : "x86",
+			"artifactName" : "native-lib",
+			"buildCommand" : "D:\\software\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release\\x86 --target native-lib",
+			"buildType" : "release",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  --target=i686-none-linux-android26 --gcc-toolchain=D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -Dnative_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/src/main/cpp/native-lib.cpp",
+					"workingDirectory" : "E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/.cxx/cmake/release/x86"
+				}
+			],
+			"output" : "E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/build/intermediates/cmake/release/obj/x86/libnative-lib.so",
+			"toolchain" : "336837991"
+		}
+	},
+	"toolchains" : 
+	{
+		"336837991" : 
+		{
+			"cCompilerExecutable" : "D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
+			"cppCompilerExecutable" : "D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+		}
+	}
+}

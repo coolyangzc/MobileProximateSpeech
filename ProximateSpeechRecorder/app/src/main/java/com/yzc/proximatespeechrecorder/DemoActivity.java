@@ -114,8 +114,8 @@ public class DemoActivity extends Activity implements SensorEventListener {
                 if (f_proximity == null)
                     break;
                 if (f_proximity.values[2] > 0 && proximityHasZero &&
-                        sensorEvent.timestamp - rapidTimestamp <= 500 * 1000000L) {
-                    VibrationEffect ve = VibrationEffect.createOneShot(100, 1);
+                        sensorEvent.timestamp - rapidTimestamp <= 600 * 1000000L) {
+                    VibrationEffect ve = VibrationEffect.createOneShot(150, 1);
                     mVibrator.vibrate(ve);
                     triggerTimestamp = sensorEvent.timestamp;
                     proximityHasZero = false;
@@ -169,7 +169,7 @@ public class DemoActivity extends Activity implements SensorEventListener {
             if (Math.abs(sum[i]) > 30)
                 rapid = true;
          */
-        if (maxDistance > 1000)
+        if (maxDistance > 800)
             rapid = true;
         sb.append(rapidTimestamp);
         sb.append("\n");

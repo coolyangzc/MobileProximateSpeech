@@ -1,0 +1,70 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder",
+      "sdkFolder": "D:\\software\\android-sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\build\\intermediates",
+      "gradleModulePathName": ":app",
+      "moduleRootFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app",
+      "makeFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\.cxx",
+      "cxxFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx",
+      "ndkFolder": "D:\\software\\android-sdk\\ndk-bundle",
+      "ndkVersion": "21.3.6528147",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [],
+    "variantName": "release",
+    "soFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\build\\intermediates\\cmake\\release\\lib",
+    "objFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\build\\intermediates\\cmake\\release\\obj",
+    "jsonFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release",
+    "gradleBuildOutputFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cxx\\release",
+    "isDebuggableEnabled": false,
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "X86_64",
+  "abiPlatformVersion": 26,
+  "cxxBuildFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release\\x86_64",
+  "jsonFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release\\x86_64\\android_gradle_build.json",
+  "gradleBuildOutputFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cxx\\release\\x86_64",
+  "objFolder": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\build\\intermediates\\cmake\\release\\obj\\x86_64",
+  "buildCommandFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release\\x86_64\\build_command.txt",
+  "buildOutputFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release\\x86_64\\build_output.txt",
+  "modelOutputFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release\\x86_64\\build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cxx\\release\\x86_64\\CMakeLists.txt",
+    "toolchainWrapperFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cxx\\release\\x86_64\\android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cxx\\release\\x86_64\\build_generation_state.json",
+    "cacheKeyFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cxx\\release\\x86_64\\compiler_cache_key.json",
+    "compilerCacheUseFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cxx\\release\\x86_64\\compiler_cache_use.json",
+    "compilerCacheWriteFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cxx\\release\\x86_64\\compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cxx\\release\\x86_64\\compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release\\x86_64\\json_generation_record.json",
+  "compileCommandsJsonFile": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\release\\x86_64\\compile_commands.json"
+}

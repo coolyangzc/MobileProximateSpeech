@@ -22,6 +22,17 @@
         app:layout_constraintTop_toBottomOf="@+id/editText_randomSeed" />
 
     <Button
+        android:id="@+id/button_vipDemo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="VIP Demo Activity"
+        app:layout_constraintBottom_toTopOf="@+id/button_evaluation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
         android:id="@+id/button_evaluation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
