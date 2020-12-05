@@ -1,0 +1,11 @@
+{
+  "ndk": "D:\\software\\android-sdk\\ndk-bundle",
+  "revision": {
+    "mMajor": 22,
+    "mMinor": 0,
+    "mMicro": 6917172,
+    "mPreview": 0,
+    "mPrecision": "MICRO",
+    "mPreviewSeparator": " "
+  }
+}

@@ -203,7 +203,7 @@ public class CameraActivity extends Activity implements TextureView.SurfaceTextu
 
         try {
             closePreviewSession();
-            Log.e("aasdasdasd", "prepareMediaRecorder");
+            Log.d("prepareMediaRecorder", "prepareMediaRecorder");
             setUpMediaRecorder();
 
             SurfaceTexture texture = mTextureView.getSurfaceTexture();
@@ -213,9 +213,9 @@ public class CameraActivity extends Activity implements TextureView.SurfaceTextu
             List<Surface> surfaces = new ArrayList<>();
 
             // Set up Surface for the camera preview
-            //Surface previewSurface = new Surface(texture);
-            //surfaces.add(previewSurface);
-            //mPreviewBuilder.addTarget(previewSurface);
+            Surface previewSurface = new Surface(texture);
+            surfaces.add(previewSurface);
+            mPreviewBuilder.addTarget(previewSurface);
 
             // Set up Surface for the MediaRecorder
             Surface recorderSurface = mMediaRecorder.getSurface();

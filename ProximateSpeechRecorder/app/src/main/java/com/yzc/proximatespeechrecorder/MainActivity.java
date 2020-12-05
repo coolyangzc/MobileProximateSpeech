@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         Button button_client = findViewById(R.id.button_client);
         Button button_evaluation = findViewById(R.id.button_evaluation);
         Button button_vipDemo = findViewById(R.id.button_vipDemo);
+        Button button_cameara = findViewById(R.id.button_camera);
         button_demo.setOnClickListener(clickListener);
         button_record.setOnClickListener(clickListener);
         button_study1.setOnClickListener(clickListener);
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         button_client.setOnClickListener(clickListener);
         button_evaluation.setOnClickListener(clickListener);
         button_vipDemo.setOnClickListener(clickListener);
+        button_cameara.setOnClickListener(clickListener);
 
         et_randomSeed = findViewById(R.id.editText_randomSeed);
         et_IP = findViewById(R.id.editText_IP);
@@ -117,6 +119,10 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.button_client:
                     intent.setClass(ctx, ClientActivity.class);
+                    startActivity(intent);
+                    break;
+                case R.id.button_camera:
+                    intent.setClass(ctx, CameraActivity.class);
                     startActivity(intent);
                     break;
                 case R.id.button_evaluation:

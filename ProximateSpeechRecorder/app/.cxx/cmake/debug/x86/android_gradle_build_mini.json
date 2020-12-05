@@ -1,16 +1,20 @@
 {
   "buildFiles": [
-    "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\CMakeLists.txt"
+    "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\CMakeLists.txt",
+    "D:\\software\\android-sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
+    "D:\\software\\android-sdk\\ndk-bundle\\build\\cmake\\platforms.cmake"
   ],
   "cleanCommands": [
-    "D:\\software\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86 --target clean"
+    "D:\\software\\android-sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86\" clean"
   ],
+  "buildTargetsCommand": "D:\\software\\android-sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "native-lib-Debug-x86": {
       "artifactName": "native-lib",
-      "buildCommand": "D:\\software\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86 --target native-lib",
+      "buildCommand": "D:\\software\\android-sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86\" native-lib",
       "abi": "x86",
-      "output": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\build\\intermediates\\cmake\\debug\\obj\\x86\\libnative-lib.so"
+      "output": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\build\\intermediates\\cmake\\debug\\obj\\x86\\libnative-lib.so",
+      "runtimeFiles": []
     }
   }
 }

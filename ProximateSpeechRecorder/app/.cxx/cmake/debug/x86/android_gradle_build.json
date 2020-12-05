@@ -1,41 +1,43 @@
-
 {
-	"buildFiles" : 
-	[
-		"E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/CMakeLists.txt"
-	],
-	"cleanCommands" : 
-	[
-		"D:\\software\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86 --target clean"
-	],
-	"cppFileExtensions" : [ "cpp" ],
-	"libraries" : 
-	{
-		"native-lib-Debug-x86" : 
-		{
-			"abi" : "x86",
-			"artifactName" : "native-lib",
-			"buildCommand" : "D:\\software\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86 --target native-lib",
-			"buildType" : "debug",
-			"files" : 
-			[
-				
-				{
-					"flags" : "  --target=i686-none-linux-android26 --gcc-toolchain=D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -Dnative_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC    -c ",
-					"src" : "E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/src/main/cpp/native-lib.cpp",
-					"workingDirectory" : "E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/.cxx/cmake/debug/x86"
-				}
-			],
-			"output" : "E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/build/intermediates/cmake/debug/obj/x86/libnative-lib.so",
-			"toolchain" : "336837991"
-		}
-	},
-	"toolchains" : 
-	{
-		"336837991" : 
-		{
-			"cCompilerExecutable" : "D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
-			"cppCompilerExecutable" : "D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
-		}
-	}
+  "stringTable": {
+    "0": "E:/Projects/MobileProximateSpeech/ProximateSpeechRecorder/app/.cxx/cmake/debug/x86",
+    "1": "--target=i686-none-linux-android26 --gcc-toolchain=D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=D:/software/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dnative_lib_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC"
+  },
+  "buildFiles": [
+    "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\CMakeLists.txt",
+    "D:\\software\\android-sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
+    "D:\\software\\android-sdk\\ndk-bundle\\build\\cmake\\platforms.cmake"
+  ],
+  "cleanCommands": [
+    "D:\\software\\android-sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86\" clean"
+  ],
+  "buildTargetsCommand": "D:\\software\\android-sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "native-lib-Debug-x86": {
+      "buildCommand": "D:\\software\\android-sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\.cxx\\cmake\\debug\\x86\" native-lib",
+      "buildType": "debug",
+      "toolchain": "3996200400",
+      "abi": "x86",
+      "artifactName": "native-lib",
+      "files": [
+        {
+          "src": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\src\\main\\cpp\\native-lib.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "E:\\Projects\\MobileProximateSpeech\\ProximateSpeechRecorder\\app\\build\\intermediates\\cmake\\debug\\obj\\x86\\libnative-lib.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "3996200400": {
+      "cppCompilerExecutable": "D:\\software\\android-sdk\\ndk-bundle\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
 }

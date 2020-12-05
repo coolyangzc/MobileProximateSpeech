@@ -1,1 +1,2 @@
+ninja: Entering directory `E:\Projects\MobileProximateSpeech\ProximateSpeechRecorder\app\.cxx\cmake\debug\x86_64'
 ninja: no work to do.
